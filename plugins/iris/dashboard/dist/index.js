@@ -3,6 +3,8 @@
    Control-center home page (overrides "/") + mobile bar (overlay slot).
    No invented data: every block reads a documented core API endpoint
    and degrades gracefully ("—") when a response is missing or reshaped.
+   i18n: built-in EN/FR catalog; locale comes from the dashboard's
+   SDK.useI18n hook when available, then the browser, then English.
    ============================================================= */
 (function () {
   "use strict";
@@ -16,6 +18,146 @@
   var useState = hooks.useState;
   var useEffect = hooks.useEffect;
   var useMemo = hooks.useMemo;
+
+  /* ---------- i18n ---------- */
+  var CATALOG = {
+    en: {
+      overview: "Overview",
+      gatewayOnline: "Gateway online",
+      gatewayDown: "Gateway stopped",
+      activeSessionsSuffix: "active session(s)",
+      logs: "Logs",
+      openChat: "Open chat",
+      costToday: "Cost today",
+      avg7d: "7-day average: {0} / day",
+      viaAnalytics: "via /api/analytics/usage",
+      tokensLastDay: "Tokens · last day",
+      cacheRate: "cache rate {0} %",
+      activeSessions: "Active sessions",
+      recentSessionsCount: "{0} recent sessions",
+      nextAutomation: "Next automation",
+      jobs: "jobs",
+      noScheduledJob: "no scheduled job",
+      automationsLastRuns: "Automations · latest runs",
+      cron: "Cron",
+      noCronJob: "No cron job configured",
+      usage14d: "Usage · 14 days",
+      total: "total",
+      recentSessions: "Recent sessions",
+      all: "All",
+      noRecentSession: "No recent session",
+      needsAttention: "Needs attention",
+      nothingPending: "Nothing pending ✓",
+      pairing: "Pairing",
+      pairingCode: "code",
+      handle: "Handle",
+      channelDisconnected: "{0}: disconnected",
+      channelEnabledNotConnected: "Channel enabled but not connected",
+      check: "Check",
+      memorySkills: "Memory & skills",
+      manage: "Manage",
+      memory: "Memory",
+      skills: "Skills",
+      provider: "Provider",
+      channelsSystem: "Channels & system",
+      gateway: "Gateway",
+      cpu: "CPU",
+      ram: "Memory",
+      disk: "Disk",
+      tokensUnit: "tokens",
+      chartAria: "Tokens per day",
+      usageUnavailable: "Usage data unavailable",
+      cost: "Cost",
+      tokens: "Tokens",
+      navHome: "Home",
+      navChat: "Chat",
+      navSessions: "Sessions",
+      navCron: "Cron",
+      navConfig: "Config"
+    },
+    fr: {
+      overview: "Vue d'ensemble",
+      gatewayOnline: "Passerelle en ligne",
+      gatewayDown: "Passerelle arrêtée",
+      activeSessionsSuffix: "session(s) active(s)",
+      logs: "Logs",
+      openChat: "Ouvrir le chat",
+      costToday: "Coût aujourd'hui",
+      avg7d: "moyenne 7 j : {0} / jour",
+      viaAnalytics: "via /api/analytics/usage",
+      tokensLastDay: "Tokens · dernier jour",
+      cacheRate: "taux de cache {0} %",
+      activeSessions: "Sessions actives",
+      recentSessionsCount: "{0} sessions récentes",
+      nextAutomation: "Prochaine automatisation",
+      jobs: "jobs",
+      noScheduledJob: "aucun job planifié",
+      automationsLastRuns: "Automatisations · dernières exécutions",
+      cron: "Cron",
+      noCronJob: "Aucun job cron configuré",
+      usage14d: "Utilisation · 14 jours",
+      total: "total",
+      recentSessions: "Sessions récentes",
+      all: "Toutes",
+      noRecentSession: "Aucune session récente",
+      needsAttention: "À traiter",
+      nothingPending: "Rien à traiter ✓",
+      pairing: "Appairage",
+      pairingCode: "code",
+      handle: "Traiter",
+      channelDisconnected: "{0} : déconnecté",
+      channelEnabledNotConnected: "Canal activé mais non connecté",
+      check: "Vérifier",
+      memorySkills: "Mémoire & skills",
+      manage: "Gérer",
+      memory: "Mémoire",
+      skills: "Skills",
+      provider: "Provider",
+      channelsSystem: "Canaux & système",
+      gateway: "Passerelle",
+      cpu: "CPU",
+      ram: "Mémoire",
+      disk: "Disque",
+      tokensUnit: "tokens",
+      chartAria: "Tokens par jour",
+      usageUnavailable: "Données d'utilisation indisponibles",
+      cost: "Coût",
+      tokens: "Tokens",
+      navHome: "Accueil",
+      navChat: "Chat",
+      navSessions: "Sessions",
+      navCron: "Cron",
+      navConfig: "Config"
+    }
+  };
+
+  // Resolve the active locale: dashboard i18n hook → browser → English.
+  // The exact shape of useI18n() is undocumented, so probe common fields.
+  function useLocale() {
+    var fromHook = null;
+    try {
+      if (typeof SDK.useI18n === "function") {
+        var i18n = SDK.useI18n();
+        if (i18n) {
+          fromHook = i18n.locale || i18n.lang || i18n.language ||
+            (typeof i18n === "string" ? i18n : null);
+        }
+      }
+    } catch (e) { /* hook unavailable outside provider — fall through */ }
+    var raw = fromHook ||
+      (typeof navigator !== "undefined" && navigator.language) || "en";
+    return String(raw).toLowerCase().indexOf("fr") === 0 ? "fr" : "en";
+  }
+  function makeT(locale) {
+    var table = CATALOG[locale] || CATALOG.en;
+    return function (key) {
+      var s = table[key] || CATALOG.en[key] || key;
+      for (var i = 1; i < arguments.length; i++) {
+        s = s.replace("{" + (i - 1) + "}", arguments[i]);
+      }
+      return s;
+    };
+  }
 
   /* ---------- utilities ---------- */
   function timeAgo(v) {
@@ -55,12 +197,13 @@
   function fmtCost(n) {
     return n == null ? "—" : n.toFixed(2) + " $";
   }
-  function fmtBytes(n) {
+  function fmtBytes(n, locale) {
     if (n == null) return "—";
-    if (n >= 1e9) return (n / 1e9).toFixed(1) + " Go";
-    if (n >= 1e6) return Math.round(n / 1e6) + " Mo";
-    if (n >= 1e3) return Math.round(n / 1e3) + " Ko";
-    return n + " o";
+    var units = locale === "fr" ? ["o", "Ko", "Mo", "Go"] : ["B", "KB", "MB", "GB"];
+    if (n >= 1e9) return (n / 1e9).toFixed(1) + " " + units[3];
+    if (n >= 1e6) return Math.round(n / 1e6) + " " + units[2];
+    if (n >= 1e3) return Math.round(n / 1e3) + " " + units[1];
+    return n + " " + units[0];
   }
 
   function useJSON(path, refreshMs) {
@@ -89,7 +232,7 @@
     return h("div", { className: "iris-card iris-tile" },
       h("div", { className: "iris-t-label" }, label),
       h("div", { className: "iris-t-value" }, value),
-      h("div", { className: "iris-t-sub" }, sub || " "));
+      h("div", { className: "iris-t-sub" }, sub || " "));
   }
   function Row(icon, title, sub, meta) {
     return h("div", { className: "iris-row" },
@@ -128,8 +271,9 @@
   /* ---------- chart (inline SVG, single series) ---------- */
   function UsageChart(props) {
     var days = props.days || [];
+    var t = props.t;
     var hv = useState(-1); var hover = hv[0], setHover = hv[1];
-    if (!days.length) return h("div", { className: "iris-empty" }, "Données d'utilisation indisponibles");
+    if (!days.length) return h("div", { className: "iris-empty" }, t("usageUnavailable"));
     var W = 640, H = 190, padL = 42, padR = 6, padT = 12, padB = 22;
     var max = Math.max.apply(null, days.map(function (d) { return d.tokens; })) * 1.15 || 1;
     var plotW = W - padL - padR, plotH = H - padT - padB;
@@ -156,16 +300,18 @@
     });
     var tip = hover >= 0 ? h("div", { className: "iris-tt" },
       h("b", null, days[hover].date),
-      h("div", null, "Tokens : " + fmtTokens(days[hover].tokens)),
-      days[hover].cost != null ? h("div", null, "Coût : " + fmtCost(days[hover].cost)) : null
+      h("div", null, t("tokens") + " : " + fmtTokens(days[hover].tokens)),
+      days[hover].cost != null ? h("div", null, t("cost") + " : " + fmtCost(days[hover].cost)) : null
     ) : null;
     return h("div", { className: "iris-chart-wrap" },
       h("svg", { viewBox: "0 0 " + W + " " + H, className: "iris-chart", role: "img",
-        "aria-label": "Tokens par jour" }, kids), tip);
+        "aria-label": t("chartAria") }, kids), tip);
   }
 
   /* ---------- home page ---------- */
   function HomePage() {
+    var locale = useLocale();
+    var t = makeT(locale);
     var status = useJSON("/api/status", 5000);
     var sessions = useJSON("/api/sessions", 15000);
     var usage = useJSON("/api/analytics/usage?days=14", 60000);
@@ -211,16 +357,16 @@
 
     var alerts = [];
     pending.forEach(function (p) {
-      alerts.push(Row("warn", "Appairage " + (p.platform || ""),
-        (p.user || p.username || p.code || "") + " · code " + (p.code || "?"),
-        NavLink("/pairing", "Traiter")));
+      alerts.push(Row("warn", t("pairing") + " " + (p.platform || ""),
+        (p.user || p.username || p.code || "") + " · " + t("pairingCode") + " " + (p.code || "?"),
+        NavLink("/pairing", t("handle"))));
     });
     plats.forEach(function (p) {
       var enabled = p.enabled !== false && p.enabled !== undefined;
       var connected = p.connected === true || p.status === "connected";
       if (enabled && p.configured !== false && !connected) {
-        alerts.push(Row("warn", (p.label || p.id || "Canal") + " : déconnecté",
-          "Canal activé mais non connecté", NavLink("/config", "Vérifier")));
+        alerts.push(Row("warn", t("channelDisconnected", p.label || p.id || "?"),
+          t("channelEnabledNotConnected"), NavLink("/config", t("check"))));
       }
     });
 
@@ -228,32 +374,32 @@
       /* header */
       h("div", { className: "iris-page-head" },
         h("div", null,
-          h("h2", null, "Vue d'ensemble"),
+          h("h2", null, t("overview")),
           h("p", null,
-            gwOnline ? "Passerelle en ligne" : "Passerelle arrêtée",
-            active != null ? " · " + active + " session(s) active(s)" : "",
+            gwOnline ? t("gatewayOnline") : t("gatewayDown"),
+            active != null ? " · " + active + " " + t("activeSessionsSuffix") : "",
             status && status.version ? " · v" + status.version : "")),
         h("div", { className: "iris-actions" },
-          h("a", { className: "iris-btn", href: "/logs" }, "Logs"),
-          h("a", { className: "iris-btn primary", href: "/chat" }, "Ouvrir le chat"))),
+          h("a", { className: "iris-btn", href: "/logs" }, t("logs")),
+          h("a", { className: "iris-btn primary", href: "/chat" }, t("openChat")))),
 
       /* stat tiles */
       h("div", { className: "iris-tiles" },
-        Tile("Coût aujourd'hui", last ? fmtCost(last.cost) : "—",
-          avg7 != null ? "moyenne 7 j : " + fmtCost(avg7) + " / jour" : "via /api/analytics/usage"),
-        Tile("Tokens · dernier jour", last ? fmtTokens(last.tokens) : "—",
-          last && last.cache != null ? "taux de cache " + Math.round(last.cache) + " %" : " "),
-        Tile("Sessions actives", active != null ? String(active) : "—",
-          sessList.length ? sessList.length + " sessions récentes" : " "),
-        Tile("Prochaine automatisation",
-          nextJob ? (nextJob.name || "job") : (jobs.length ? jobs.length + " jobs" : "—"),
-          nextJob ? (nextJob.schedule || "") : "aucun job planifié")),
+        Tile(t("costToday"), last ? fmtCost(last.cost) : "—",
+          avg7 != null ? t("avg7d", fmtCost(avg7)) : t("viaAnalytics")),
+        Tile(t("tokensLastDay"), last ? fmtTokens(last.tokens) : "—",
+          last && last.cache != null ? t("cacheRate", Math.round(last.cache)) : " "),
+        Tile(t("activeSessions"), active != null ? String(active) : "—",
+          sessList.length ? t("recentSessionsCount", sessList.length) : " "),
+        Tile(t("nextAutomation"),
+          nextJob ? (nextJob.name || "job") : (jobs.length ? jobs.length + " " + t("jobs") : "—"),
+          nextJob ? (nextJob.schedule || "") : t("noScheduledJob"))),
 
       /* main + side columns */
       h("div", { className: "iris-cols" },
         h("div", { className: "iris-col-main" },
 
-          Card("Automatisations · dernières exécutions", NavLink("/cron", "Cron"),
+          Card(t("automationsLastRuns"), NavLink("/cron", t("cron")),
             jobs.length ? jobs.slice(0, 5).map(function (j, i) {
               var lastRun = j.last_run || j.lastRun;
               var ok = !(j.last_status === "error" || j.last_error);
@@ -262,63 +408,65 @@
                   (j.schedule || "") + (j.deliver ? " → " + j.deliver : ""),
                   h("span", { className: "iris-badge " + (ok ? "good" : "crit") },
                     lastRun ? timeAgo(lastRun) || String(lastRun).slice(11, 16) : (j.state || ""))));
-            }) : h("div", { className: "iris-empty" }, "Aucun job cron configuré")),
+            }) : h("div", { className: "iris-empty" }, t("noCronJob"))),
 
-          Card("Utilisation · 14 jours",
+          Card(t("usage14d"),
             h("span", { className: "iris-muted" },
-              days.length ? "total " + fmtTokens(days.reduce(function (s, d) { return s + d.tokens; }, 0)) : ""),
-            h(UsageChart, { days: days })),
+              days.length ? t("total") + " " + fmtTokens(days.reduce(function (s, d) { return s + d.tokens; }, 0)) : ""),
+            h(UsageChart, { days: days, t: t })),
 
-          Card("Sessions récentes", NavLink("/sessions", "Toutes"),
+          Card(t("recentSessions"), NavLink("/sessions", t("all")),
             sessList.length ? sessList.slice(0, 6).map(function (s, i) {
               return h(React.Fragment, { key: i },
                 Row("", s.name || s.title || s.preview || s.id || "session",
                   (s.model ? s.model + " · " : "") +
-                  (firstNum(s.tokens, s.total_tokens) != null ? fmtTokens(firstNum(s.tokens, s.total_tokens)) + " tokens" : ""),
+                  (firstNum(s.tokens, s.total_tokens) != null ?
+                    fmtTokens(firstNum(s.tokens, s.total_tokens)) + " " + t("tokensUnit") : ""),
                   timeAgo(s.updated_at || s.last_activity || s.timestamp)));
-            }) : h("div", { className: "iris-empty" }, "Aucune session récente"))),
+            }) : h("div", { className: "iris-empty" }, t("noRecentSession")))),
 
         h("div", { className: "iris-col-side" },
 
-          Card("À traiter",
+          Card(t("needsAttention"),
             h("span", { className: "iris-badge " + (alerts.length ? "warn" : "good") },
               String(alerts.length)),
-            alerts.length ? alerts : h("div", { className: "iris-empty" }, "Rien à traiter ✓")),
+            alerts.length ? alerts : h("div", { className: "iris-empty" }, t("nothingPending"))),
 
-          Card("Mémoire & skills", NavLink("/config", "Gérer"),
+          Card(t("memorySkills"), NavLink("/config", t("manage")),
             [
-              Meter("Mémoire", memTotal != null ? Math.min(100, memTotal / 2e9 * 100) : 0,
-                fmtBytes(memTotal)),
-              Meter("Skills", skillList.length ? enabledSkills / skillList.length * 100 : 0,
+              Meter(t("memory"), memTotal != null ? Math.min(100, memTotal / 2e9 * 100) : 0,
+                fmtBytes(memTotal, locale)),
+              Meter(t("skills"), skillList.length ? enabledSkills / skillList.length * 100 : 0,
                 skillList.length ? enabledSkills + "/" + skillList.length : "—"),
               h("div", { className: "iris-note", key: "n" },
                 memory && (memory.provider || memory.active) ?
-                  "Provider : " + (memory.provider || memory.active) : " ")
+                  t("provider") + " : " + (memory.provider || memory.active) : " ")
             ]),
 
-          Card("Canaux & système", null,
+          Card(t("channelsSystem"), null,
             [
-              Row(gwOnline ? "good" : "crit", "Passerelle",
+              Row(gwOnline ? "good" : "crit", t("gateway"),
                 null, Dot(gwOnline ? "ok" : "err")),
               plats.filter(function (p) { return p.enabled || p.configured; }).slice(0, 5)
                 .map(function (p, i) {
                   var connected = p.connected === true || p.status === "connected";
                   return h(React.Fragment, { key: i },
-                    Row("", p.label || p.id || "canal", null,
+                    Row("", p.label || p.id || "?", null,
                       Dot(connected ? "ok" : (p.enabled ? "err" : "off"))));
                 }),
               h("hr", { className: "iris-sep", key: "s" }),
-              Meter("CPU", cpu, cpu != null ? Math.round(cpu) + " %" : "—"),
-              Meter("Mémoire", mem, mem != null ? Math.round(mem) + " %" : "—"),
-              Meter("Disque", disk, disk != null ? Math.round(disk) + " %" : "—")
+              Meter(t("cpu"), cpu, cpu != null ? Math.round(cpu) + " %" : "—"),
+              Meter(t("ram"), mem, mem != null ? Math.round(mem) + " %" : "—"),
+              Meter(t("disk"), disk, disk != null ? Math.round(disk) + " %" : "—")
             ]))));
   }
 
   /* ---------- mobile navigation bar (overlay slot) ---------- */
   function MobileNav() {
+    var t = makeT(useLocale());
     var links = [
-      ["/", "Accueil"], ["/chat", "Chat"], ["/sessions", "Sessions"],
-      ["/cron", "Cron"], ["/config", "Config"]
+      ["/", t("navHome")], ["/chat", t("navChat")], ["/sessions", t("navSessions")],
+      ["/cron", t("navCron")], ["/config", t("navConfig")]
     ];
     var path = (typeof location !== "undefined" ? location.pathname : "/");
     return h("nav", { className: "iris-bottombar" },

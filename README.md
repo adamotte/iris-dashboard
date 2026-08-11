@@ -49,6 +49,12 @@ accessibility-validated themes. Everything is additive and removable in seconds.
   documented `overlay` slot — appears under 860 px only, iPhone safe-area handled
 - The Iris home page is fully responsive
 
+### 🌍 Languages
+
+- All plugin labels ship in **English and French**; the active language follows
+  the dashboard's `SDK.useI18n` locale when available, then the browser
+  language, then falls back to English
+
 ### 🛡️ Technical highlights
 
 - **Read-only**: the plugin only calls documented `GET` endpoints — it cannot
@@ -150,6 +156,10 @@ Every block of the home page maps to a documented core API endpoint:
   screens and the bottom bar are responsive regardless.
 - Only one plugin can override `/` — if another plugin claims it, the first one
   loaded wins.
+- The exact shape of the `SDK.useI18n` hook is undocumented: the plugin probes
+  common fields (`locale`, `lang`, `language`) and ships its own EN/FR catalog
+  rather than reusing the dashboard's native strings; mapping shared terms onto
+  the native catalog is possible once the hook is inspected on a live instance.
 - `fontUrl` loads Google Fonts from your browser; self-host the fonts and change
   the URL in the theme files if you want zero external requests.
 
