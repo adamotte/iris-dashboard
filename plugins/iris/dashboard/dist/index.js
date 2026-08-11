@@ -1,8 +1,8 @@
 /* =============================================================
-   Iris — plugin dashboard hermes-agent
-   Page d'accueil « control center » (override "/") + barre mobile (slot overlay).
-   Aucune donnée inventée : chaque bloc lit un endpoint documenté de l'API core
-   et se dégrade proprement (« — ») si la réponse manque ou change de forme.
+   Iris — hermes-agent dashboard plugin
+   Control-center home page (overrides "/") + mobile bar (overlay slot).
+   No invented data: every block reads a documented core API endpoint
+   and degrades gracefully ("—") when a response is missing or reshaped.
    ============================================================= */
 (function () {
   "use strict";
@@ -17,7 +17,7 @@
   var useEffect = hooks.useEffect;
   var useMemo = hooks.useMemo;
 
-  /* ---------- utilitaires ---------- */
+  /* ---------- utilities ---------- */
   function timeAgo(v) {
     try {
       if (v == null) return "";
@@ -29,7 +29,7 @@
     return "";
   }
 
-  // Les formes exactes des réponses varient : on cherche le premier tableau plausible.
+  // Exact response shapes vary across versions: find the first plausible array.
   function asList(data, keys) {
     if (Array.isArray(data)) return data;
     if (!data || typeof data !== "object") return [];
@@ -69,7 +69,7 @@
       var alive = true;
       function load() {
         SDK.fetchJSON(path).then(function (d) { if (alive) setData(d); })
-          .catch(function () { /* silencieux : le bloc affichera — */ });
+          .catch(function () { /* silent: the block will render "—" */ });
       }
       load();
       var t = refreshMs ? setInterval(load, refreshMs) : null;
@@ -78,7 +78,7 @@
     return data;
   }
 
-  /* ---------- briques UI ---------- */
+  /* ---------- UI building blocks ---------- */
   function Card(title, extraHead, body, cls) {
     return h("section", { className: "iris-card " + (cls || "") },
       title ? h("div", { className: "iris-card-head" },
@@ -110,7 +110,7 @@
     return h("a", { className: "iris-link", href: href }, label + " →");
   }
 
-  /* ---------- normalisation des données ---------- */
+  /* ---------- data normalization ---------- */
   function normDaily(usage) {
     var days = asList(usage, ["daily", "days", "usage", "chart"]);
     return days.map(function (d) {
@@ -125,7 +125,7 @@
     }).filter(function (d) { return d.tokens != null; });
   }
 
-  /* ---------- graphique (SVG, série unique, --iris-series) ---------- */
+  /* ---------- chart (inline SVG, single series) ---------- */
   function UsageChart(props) {
     var days = props.days || [];
     var hv = useState(-1); var hover = hv[0], setHover = hv[1];
@@ -164,7 +164,7 @@
         "aria-label": "Tokens par jour" }, kids), tip);
   }
 
-  /* ---------- page d'accueil ---------- */
+  /* ---------- home page ---------- */
   function HomePage() {
     var status = useJSON("/api/status", 5000);
     var sessions = useJSON("/api/sessions", 15000);
@@ -225,7 +225,7 @@
     });
 
     return h("div", { className: "iris-home" },
-      /* entête */
+      /* header */
       h("div", { className: "iris-page-head" },
         h("div", null,
           h("h2", null, "Vue d'ensemble"),
@@ -237,7 +237,7 @@
           h("a", { className: "iris-btn", href: "/logs" }, "Logs"),
           h("a", { className: "iris-btn primary", href: "/chat" }, "Ouvrir le chat"))),
 
-      /* tuiles */
+      /* stat tiles */
       h("div", { className: "iris-tiles" },
         Tile("Coût aujourd'hui", last ? fmtCost(last.cost) : "—",
           avg7 != null ? "moyenne 7 j : " + fmtCost(avg7) + " / jour" : "via /api/analytics/usage"),
@@ -249,7 +249,7 @@
           nextJob ? (nextJob.name || "job") : (jobs.length ? jobs.length + " jobs" : "—"),
           nextJob ? (nextJob.schedule || "") : "aucun job planifié")),
 
-      /* colonne principale + latérale */
+      /* main + side columns */
       h("div", { className: "iris-cols" },
         h("div", { className: "iris-col-main" },
 
@@ -314,7 +314,7 @@
             ]))));
   }
 
-  /* ---------- barre de navigation mobile (slot overlay) ---------- */
+  /* ---------- mobile navigation bar (overlay slot) ---------- */
   function MobileNav() {
     var links = [
       ["/", "Accueil"], ["/chat", "Chat"], ["/sessions", "Sessions"],

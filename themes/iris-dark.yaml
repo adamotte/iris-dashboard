@@ -1,6 +1,6 @@
-# Iris — thème sombre
-# Palette validée contraste + daltonisme (voir mockup/). À déposer dans
-# ~/.hermes/dashboard-themes/ puis sélectionner via l'icône palette du dashboard.
+# Iris — dark theme
+# Palette validated for contrast and color-blindness. Drop into
+# ~/.hermes/dashboard-themes/ then select it via the dashboard palette icon.
 
 name: iris-dark
 label: Iris (sombre)
@@ -56,7 +56,7 @@ componentStyles:
     background: "#16151d"
 
 customCSS: |
-  /* Signature Iris : arc spectral sur l'onglet actif */
+  /* Iris signature: spectral arc under the active tab */
   [data-state="active"][role="tab"],
   .nav-tab-active {
     position: relative;

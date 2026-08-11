@@ -1,5 +1,5 @@
-# maquettes de travail — hors périmètre du dépôt
+# working mockups — out of the repository scope
 mockup/
 
-# config locale Claude Code
+# local tooling config
 .claude/
