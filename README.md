@@ -79,6 +79,43 @@ cp themes/iris-*.yaml ~/.hermes/dashboard-themes/
 curl http://127.0.0.1:9119/api/dashboard/plugins/rescan
 ```
 
+### 🐳 Docker
+
+If Hermes runs in a container, its data directory (`~/.hermes` inside the
+container) is normally a host-mounted volume. Two options:
+
+**Option A — copy into the volume (simplest).** No compose change needed:
+
+```bash
+./install.sh --docker /path/to/hermes-data
+docker restart hermes   # if the rescan endpoint is unreachable
+```
+
+**Option B — mount the git clone (git-pull updates).** Keep the clone on the
+host and bind-mount only the plugin directory:
+
+```yaml
+# docker-compose.yml
+services:
+  hermes:
+    volumes:
+      - ./hermes-data:/root/.hermes
+      - /opt/iris-dashboard/plugins/iris:/root/.hermes/plugins/iris:ro
+```
+
+Themes are still copied into the volume (`./install.sh --docker ./hermes-data`):
+bind-mounting individual files is fragile — `git pull` replaces the inode and
+the container keeps seeing the old content.
+
+Notes:
+- Check where the container home lives in your image (`/root/.hermes` vs
+  `/home/<user>/.hermes`) and adjust the target path.
+- The plugin is read-only for the dashboard, so `:ro` should be safe; if plugin
+  discovery misbehaves (known dashboard quirks on read-only filesystems in
+  Docker), drop `:ro` first.
+- After the first mount, restart the container — a rescan alone does not always
+  pick up a brand-new volume.
+
 ## 🔧 Configuration
 
 1. Open the dashboard (`hermes dashboard`) and reload the page — the Iris home
