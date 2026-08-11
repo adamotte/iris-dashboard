@@ -1,0 +1,95 @@
+/* Iris — styles du plugin. Préfixe .iris- pour éviter toute collision.
+   Les couleurs viennent des variables du thème actif (--color-*) : le plugin
+   suit automatiquement iris-dark / iris-light ou tout autre thème. */
+
+.iris-home{display:flex;flex-direction:column;gap:14px}
+.iris-page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.iris-page-head h2{font-size:20px;font-weight:700;letter-spacing:-.015em;margin:0}
+.iris-page-head p{color:var(--color-muted-foreground,#8c8a9c);font-size:13px;margin:2px 0 0}
+.iris-actions{display:flex;gap:8px}
+.iris-btn{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;
+  padding:7px 13px;border-radius:var(--radius,9px);text-decoration:none;
+  border:1px solid var(--color-border,rgba(128,128,128,.25));color:var(--color-muted-foreground,#888)}
+.iris-btn:hover{color:var(--color-foreground,inherit)}
+.iris-btn.primary{background:var(--color-primary,#5b4bd4);color:var(--color-primary-foreground,#fff);border-color:transparent}
+
+.iris-card{background:var(--color-card,rgba(128,128,128,.06));
+  border:1px solid var(--color-border,rgba(128,128,128,.2));
+  border-radius:var(--radius,12px);padding:16px 18px;min-width:0}
+.iris-card-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.iris-card-head h3{font-size:13px;font-weight:650;margin:0}
+.iris-spacer{flex:1}
+.iris-muted{font-size:11.5px;color:var(--color-muted-foreground,#8c8a9c)}
+.iris-link{font-size:12px;font-weight:550;color:var(--color-primary,#5b4bd4);text-decoration:none;white-space:nowrap}
+.iris-link:hover{text-decoration:underline}
+.iris-note{font-size:11.5px;color:var(--color-muted-foreground,#8c8a9c);margin-top:8px}
+.iris-sep{border:none;border-top:1px solid var(--color-border,rgba(128,128,128,.2));margin:10px 0}
+.iris-empty{font-size:12.5px;color:var(--color-muted-foreground,#8c8a9c);padding:8px 0}
+
+.iris-tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.iris-tile .iris-t-label{font-size:12px;color:var(--color-muted-foreground,#8c8a9c);font-weight:550}
+.iris-tile .iris-t-value{font-size:24px;font-weight:700;letter-spacing:-.02em;margin:6px 0 2px;
+  font-variant-numeric:tabular-nums;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.iris-tile .iris-t-sub{font-size:11.5px;color:var(--color-muted-foreground,#8c8a9c);font-variant-numeric:tabular-nums}
+
+.iris-cols{display:grid;grid-template-columns:1.85fr 1fr;gap:14px;min-width:0}
+.iris-col-main,.iris-col-side{display:flex;flex-direction:column;gap:14px;min-width:0}
+
+.iris-row{display:flex;align-items:center;gap:11px;padding:8px 0}
+.iris-row + .iris-row{border-top:1px solid var(--color-border,rgba(128,128,128,.15))}
+.iris-row-ic{width:9px;height:9px;border-radius:50%;flex:none;background:var(--color-muted-foreground,#888)}
+.iris-row-ic.good{background:var(--color-success,#22b573)}
+.iris-row-ic.warn{background:var(--color-warning,#fab219)}
+.iris-row-ic.crit{background:var(--color-destructive,#e05a6b)}
+.iris-row-body{flex:1;min-width:0}
+.iris-row-body b{font-size:12.5px;font-weight:600;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.iris-row-body small{font-size:11.5px;color:var(--color-muted-foreground,#8c8a9c);display:block;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.iris-row-meta{flex:none;font-size:11px;color:var(--color-muted-foreground,#8c8a9c);
+  font-variant-numeric:tabular-nums;text-align:right}
+
+.iris-badge{font-size:10.5px;font-weight:650;padding:1.5px 8px;border-radius:99px;white-space:nowrap}
+.iris-badge.good{background:color-mix(in srgb,var(--color-success,#22b573) 14%,transparent);color:var(--color-success,#22b573)}
+.iris-badge.warn{background:color-mix(in srgb,var(--color-warning,#fab219) 14%,transparent);color:var(--color-warning,#fab219)}
+.iris-badge.crit{background:color-mix(in srgb,var(--color-destructive,#e05a6b) 14%,transparent);color:var(--color-destructive,#e05a6b)}
+
+.iris-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.iris-dot.ok{background:var(--color-success,#22b573)}
+.iris-dot.err{background:var(--color-warning,#fab219)}
+.iris-dot.off{background:var(--color-muted-foreground,#888)}
+
+.iris-meter{display:flex;align-items:center;gap:10px;padding:5px 0;font-size:11.5px;
+  color:var(--color-muted-foreground,#8c8a9c)}
+.iris-m-label{width:70px;flex:none}
+.iris-m-bar{flex:1;height:4px;border-radius:2px;overflow:hidden;
+  background:color-mix(in srgb,var(--color-foreground,#888) 10%,transparent)}
+.iris-m-bar i{display:block;height:100%;border-radius:2px;background:var(--color-primary,#5b4bd4)}
+.iris-m-val{width:52px;text-align:right;font-variant-numeric:tabular-nums}
+
+.iris-chart-wrap{position:relative}
+.iris-chart{width:100%;height:auto;display:block}
+.iris-grid{stroke:color-mix(in srgb,var(--color-foreground,#888) 8%,transparent)}
+.iris-axis{font-size:10px;fill:var(--color-muted-foreground,#8c8a9c)}
+.iris-bar{fill:var(--color-primary,#5b4bd4)}
+.iris-bar.hover{filter:brightness(1.2)}
+.iris-tt{position:absolute;top:8px;right:8px;pointer-events:none;
+  background:var(--color-popover,var(--color-card,#222));border:1px solid var(--color-border,rgba(128,128,128,.3));
+  border-radius:9px;padding:8px 11px;font-size:11.5px;min-width:120px}
+.iris-tt b{display:block;font-size:12px;margin-bottom:3px}
+
+/* ---- barre mobile (slot overlay) ---- */
+.iris-bottombar{display:none}
+@media (max-width:860px){
+  .iris-tiles{grid-template-columns:1fr 1fr}
+  .iris-cols{grid-template-columns:1fr}
+  .iris-bottombar{
+    display:flex;position:fixed;left:0;right:0;bottom:0;z-index:60;
+    background:var(--color-card,#16151d);border-top:1px solid var(--color-border,rgba(128,128,128,.2));
+    padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
+  .iris-bb-item{flex:1;text-align:center;font-size:11px;font-weight:600;text-decoration:none;
+    color:var(--color-muted-foreground,#8c8a9c);padding:9px 0;border-radius:8px}
+  .iris-bb-item.active{color:var(--color-primary,#5b4bd4)}
+}
+@media (max-width:480px){
+  .iris-tiles{gap:10px}
+}

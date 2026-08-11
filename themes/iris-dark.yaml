@@ -1,0 +1,74 @@
+# Iris — thème sombre
+# Palette validée contraste + daltonisme (voir mockup/). À déposer dans
+# ~/.hermes/dashboard-themes/ puis sélectionner via l'icône palette du dashboard.
+
+name: iris-dark
+label: Iris (sombre)
+description: Base violacée profonde, accent iris, arc spectral discret.
+
+palette:
+  background: "#0f0e15"
+  midground: "#8b80f9"
+  foreground:
+    hex: "#f0eff7"
+    alpha: 1
+  noiseOpacity: 0
+
+colors:
+  card: "#16151d"
+  cardForeground: "#f0eff7"
+  popover: "#1d1c26"
+  popoverForeground: "#f0eff7"
+  primary: "#8b80f9"
+  primaryForeground: "#0f0e15"
+  secondary: "#1d1c26"
+  secondaryForeground: "#aaa8bb"
+  muted: "#1d1c26"
+  mutedForeground: "#8c8a9c"
+  accent: "#8b80f9"
+  accentForeground: "#0f0e15"
+  destructive: "#e05a6b"
+  destructiveForeground: "#f0eff7"
+  success: "#22b573"
+  warning: "#fab219"
+  border: "#2a2936"
+  input: "#1d1c26"
+  ring: "#8b80f9"
+
+fontSans: "'Schibsted Grotesk', system-ui, sans-serif"
+fontMono: "'JetBrains Mono', ui-monospace, monospace"
+fontUrl: "https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:ital,wght@0,400..900;1,400&family=JetBrains+Mono:wght@400;500&display=swap"
+baseSize: "14px"
+lineHeight: "1.5"
+letterSpacing: "0"
+
+radius: "0.8rem"
+density: comfortable
+layoutVariant: standard
+
+assets:
+  bg: "none"
+
+componentStyles:
+  card:
+    boxShadow: "none"
+  header:
+    background: "#16151d"
+
+customCSS: |
+  /* Signature Iris : arc spectral sur l'onglet actif */
+  [data-state="active"][role="tab"],
+  .nav-tab-active {
+    position: relative;
+  }
+  [data-state="active"][role="tab"]::after,
+  .nav-tab-active::after {
+    content: "";
+    position: absolute;
+    left: 10%;
+    right: 10%;
+    bottom: -1px;
+    height: 2px;
+    border-radius: 2px;
+    background: linear-gradient(90deg,#e05a6b,#e8a13c,#2fae72,#3f8fdf,#7668e8,#a75ce0);
+  }
