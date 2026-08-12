@@ -2,7 +2,26 @@
    Colors come from the active theme variables (--color-*): the plugin follows
    iris-dark / iris-light or any other theme automatically. */
 
-.iris-home,.iris-page{display:flex;flex-direction:column;gap:14px}
+.iris-home,.iris-page{display:flex;flex-direction:column;gap:14px;font-size:13.5px}
+
+/* icons (mockup stroke style) */
+.iris-ic{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;
+  stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px}
+.iris-ic.sm{width:14px;height:14px}
+.iris-ic.dim{color:var(--color-muted-foreground,#8c8a9c)}
+.iris-ic.bb{width:20px;height:20px;display:block;margin:0 auto 3px}
+.iris-icbox{width:30px;height:30px;border-radius:9px;flex:none;display:grid;place-items:center;
+  background:color-mix(in srgb,var(--color-foreground,#888) 6%,transparent);
+  border:1px solid var(--color-border,rgba(128,128,128,.2));color:var(--color-muted-foreground,#8c8a9c)}
+.iris-icbox .iris-ic{width:14px;height:14px}
+.iris-icbox.good-i{background:color-mix(in srgb,var(--color-success,#22b573) 12%,transparent);
+  color:var(--color-success,#22b573);border-color:transparent}
+.iris-icbox.warn-i{background:color-mix(in srgb,var(--color-warning,#fab219) 12%,transparent);
+  color:var(--color-warning,#fab219);border-color:transparent}
+.iris-icbox.crit-i{background:color-mix(in srgb,var(--color-destructive,#e05a6b) 12%,transparent);
+  color:var(--color-destructive,#e05a6b);border-color:transparent}
+.iris-icbox.iris-i{background:color-mix(in srgb,var(--color-primary,#5b4bd4) 12%,transparent);
+  color:var(--color-primary,#5b4bd4);border-color:transparent}
 .iris-page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap}
 .iris-page-head h2{font-size:20px;font-weight:700;letter-spacing:-.015em;margin:0}
 .iris-page-head p{color:var(--color-muted-foreground,#8c8a9c);font-size:13px;margin:2px 0 0;max-width:70ch}
@@ -32,7 +51,8 @@
 .iris-empty{font-size:12.5px;color:var(--color-muted-foreground,#8c8a9c);padding:8px 0}
 
 .iris-tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-.iris-tile .iris-t-label{font-size:12px;color:var(--color-muted-foreground,#8c8a9c);font-weight:550}
+.iris-tile .iris-t-label{font-size:12px;color:var(--color-muted-foreground,#8c8a9c);font-weight:550;
+  display:flex;align-items:center;gap:7px}
 .iris-tile .iris-t-value{font-size:24px;font-weight:700;letter-spacing:-.02em;margin:6px 0 2px;
   font-variant-numeric:tabular-nums;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .iris-tile .iris-t-sub{font-size:11.5px;color:var(--color-muted-foreground,#8c8a9c);font-variant-numeric:tabular-nums}
@@ -153,12 +173,15 @@ select.iris-input{background:var(--color-card,#1a1a22)}
   border-radius:50% 50% 0 0/100% 100% 0 0}
 .iris-side-logo b{font-size:15px;font-weight:700;letter-spacing:.01em;line-height:1.1}
 .iris-side-logo small{display:block;font-size:10px;color:var(--color-muted-foreground,#8c8a9c);font-weight:400}
-.iris-nav-label{font-size:10px;font-weight:650;letter-spacing:.1em;text-transform:uppercase;
-  color:var(--color-muted-foreground,#8c8a9c);padding:10px 10px 4px}
+.iris-nav-group{margin-bottom:14px}
+.iris-nav-group + .iris-nav-group{padding-top:2px}
+.iris-nav-label{font-size:10px;font-weight:650;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--color-muted-foreground,#8c8a9c);opacity:.85;padding:0 10px;margin:0 0 5px}
 .iris-nav-item{position:relative;display:flex;align-items:center;gap:10px;width:100%;
   padding:6.5px 10px;border-radius:8px;color:var(--color-muted-foreground,#8c8a9c);
   font-weight:500;font-size:13px;text-align:left;background:none;border:none;cursor:pointer;
   font-family:inherit;text-decoration:none}
+.iris-nav-item .iris-ic{opacity:.9}
 .iris-nav-item:hover{color:var(--color-foreground,inherit);
   background:color-mix(in srgb,var(--color-foreground,#888) 6%,transparent)}
 .iris-nav-item.active{color:var(--color-primary,#5b4bd4);font-weight:600;
@@ -180,8 +203,8 @@ select.iris-input{background:var(--color-card,#1a1a22)}
     display:flex;position:fixed;left:0;right:0;bottom:0;z-index:60;
     background:var(--color-card,#16151d);border-top:1px solid var(--color-border,rgba(128,128,128,.2));
     padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
-  .iris-bb-item{flex:1;text-align:center;font-size:11px;font-weight:600;text-decoration:none;
-    color:var(--color-muted-foreground,#8c8a9c);padding:9px 0;border-radius:8px;background:none;border:none;font-family:inherit}
+  .iris-bb-item{flex:1;text-align:center;font-size:10px;font-weight:600;text-decoration:none;
+    color:var(--color-muted-foreground,#8c8a9c);padding:6px 0 5px;border-radius:8px;background:none;border:none;font-family:inherit}
   .iris-bb-item.active{color:var(--color-primary,#5b4bd4)}
   .iris-table .hide-m{display:none}
 }

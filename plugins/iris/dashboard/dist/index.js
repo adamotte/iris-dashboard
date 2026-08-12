@@ -298,6 +298,54 @@
     return st[0];
   }
 
+  /* ================= icons (ported from the mockup) ================= */
+  function P(d) { return h("path", { key: d.slice(0, 8), d: d }); }
+  function C(cx, cy, r) { return h("circle", { key: "c" + cx + cy, cx: cx, cy: cy, r: r }); }
+  function RC(x, y, w, ht, rx) { return h("rect", { key: "r" + x + y, x: x, y: y, width: w, height: ht, rx: rx }); }
+  var ICONS = {
+    grid: [RC(3, 3, 7, 9, 1.5), RC(14, 3, 7, 5, 1.5), RC(14, 12, 7, 9, 1.5), RC(3, 16, 7, 5, 1.5)],
+    chat: [P("M21 11.5a8.38 8.38 0 0 1-9 8.4 8.5 8.5 0 0 1-3.4-.7L3 21l1.8-4.6a8.38 8.38 0 0 1-1.3-4.4 8.5 8.5 0 0 1 8.5-8.5 8.38 8.38 0 0 1 9 8Z")],
+    hist: [P("M3 12a9 9 0 1 0 3-6.7L3 8"), P("M3 3v5h5"), P("M12 7v5l3 3")],
+    chart: [P("M3 3v18h18"), P("M8 17v-6"), P("M13 17V7"), P("M18 17v-9")],
+    clock: [C(12, 12, 9), P("M12 7v5l3 2")],
+    hook: [P("M13 3l-3 7h4l-3 7"), C(17.5, 17.5, 3.5), C(6.5, 17.5, 3.5)],
+    spark: [P("M12 3l1.9 5.8L20 10l-6.1 1.9L12 18l-1.9-6.1L4 10l6.1-1.2L12 3Z")],
+    plug: [P("M9 7V3"), P("M15 7V3"), P("M6 7h12v4a6 6 0 0 1-12 0V7Z"), P("M12 17v4")],
+    tool: [P("M14.7 6.3a4.5 4.5 0 0 0-6 6L3 18l3 3 5.7-5.7a4.5 4.5 0 0 0 6-6L14 13l-3-3 3.7-3.7Z")],
+    radio: [C(12, 12, 2.5), P("M7.8 16.2a6 6 0 0 1 0-8.4M16.2 7.8a6 6 0 0 1 0 8.4M4.9 19.1a10 10 0 0 1 0-14.2M19.1 4.9a10 10 0 0 1 0 14.2")],
+    link: [P("M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"), P("M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7")],
+    cog: [C(12, 12, 3), P("M19.4 15a1.6 1.6 0 0 0 .3 1.7l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.7-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.2a1.6 1.6 0 0 0-1-1.5 1.6 1.6 0 0 0-1.7.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.7 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.2a1.6 1.6 0 0 0 1.5-1 1.6 1.6 0 0 0-.3-1.7l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.7.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.2a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.7-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.7v.1a1.6 1.6 0 0 0 1.5 1h.3a2 2 0 1 1 0 4h-.2a1.6 1.6 0 0 0-1.5 1Z")],
+    key: [C(7.5, 15.5, 4.5), P("M10.7 12.3 21 2l-3 3 2 2-3 3-2-2-3.3 3.3")],
+    users: [C(9, 8, 3.5), P("M2.5 20a6.5 6.5 0 0 1 13 0"), P("M16 4.6a3.5 3.5 0 0 1 0 6.8"), P("M17.5 14.4a6.5 6.5 0 0 1 4 5.6")],
+    file: [P("M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7Z"), P("M14 2v5h5"), P("M9 13h6M9 17h6")],
+    server: [RC(3, 4, 18, 7, 2), RC(3, 13, 18, 7, 2), P("M7 7.5h.01M7 16.5h.01")],
+    term: [RC(3, 4, 18, 16, 2), P("m7 9 3 3-3 3M13 15h4")],
+    msg: [P("m22 2-11 11"), P("M22 2 15 22l-4-9-9-4L22 2Z")],
+    mail: [RC(3, 5, 18, 14, 2), P("m3 7 9 6 9-6")],
+    coin: [C(12, 12, 9), P("M14.8 9.2A3.2 3.2 0 0 0 12 8c-1.8 0-3.2.9-3.2 2s1.1 1.7 3.2 2 3.2.9 3.2 2-1.4 2-3.2 2a3.2 3.2 0 0 1-2.8-1.2"), P("M12 6.5V8M12 16v1.5")],
+    check: [P("m4 12.5 5.5 5.5L20 6.5")],
+    x: [P("M6 6l12 12M18 6 6 18")],
+    shield: [P("M12 2 4 5.5v5.6c0 5 3.4 8.5 8 10.4 4.6-1.9 8-5.4 8-10.4V5.5Z"), P("m8.5 12 2.5 2.5 4.5-5")],
+    globe: [C(12, 12, 9), P("M3 12h18"), P("M12 3a14.5 14.5 0 0 1 0 18 14.5 14.5 0 0 1 0-18Z")],
+    brain: [P("M12 4a3 3 0 0 0-3 3 3 3 0 0 0-3 3 3 3 0 0 0 .5 5.5A3 3 0 0 0 9 21h6a3 3 0 0 0 2.5-5.5A3 3 0 0 0 18 10a3 3 0 0 0-3-3 3 3 0 0 0-3-3Z"), P("M12 4v17")],
+    alert: [P("M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"), P("M12 9v4M12 17h.01")]
+  };
+  function Icon(name, cls) {
+    return h("svg", { className: "iris-ic " + (cls || ""), viewBox: "0 0 24 24", "aria-hidden": "true" },
+      ICONS[name] || null);
+  }
+  // tile label with a leading icon, as in the mockup
+  function TL(icon, text) {
+    return h(React.Fragment, null, Icon(icon, "dim"), " ", text);
+  }
+  // 30px rounded icon square row (mockup .rowline + .r-ic)
+  function IconRow(icon, kind, title, sub, meta) {
+    return h("div", { className: "iris-row" },
+      h("span", { className: "iris-icbox " + (kind || "") }, Icon(icon)),
+      h("span", { className: "iris-row-body" }, h("b", null, title), sub ? h("small", null, sub) : null),
+      meta != null ? h("span", { className: "iris-row-meta" }, meta) : null);
+  }
+
   /* ================= UI kit ================= */
   function Card(title, extraHead, body, cls) {
     return h("section", { className: "iris-card " + (cls || "") },
@@ -447,7 +495,7 @@
 
     var alerts = [];
     pending.forEach(function (p) {
-      alerts.push(Row("warn", t("pairing") + " " + (p.platform || ""),
+      alerts.push(IconRow("link", "warn-i", t("pairing") + " " + (p.platform || ""),
         (p.user || p.username || p.code || "") + " · " + t("pairingCode") + " " + (p.code || "?"),
         LinkTo("/pairing", t("handle"))));
     });
@@ -455,7 +503,7 @@
       var enabled = p.enabled === true;
       var connected = p.connected === true || p.status === "connected" || p.state === "connected";
       if (enabled && p.configured !== false && !connected) {
-        alerts.push(Row("warn", t("channelDisconnected", p.name || p.label || p.id || "?"),
+        alerts.push(IconRow("radio", "warn-i", t("channelDisconnected", p.name || p.label || p.id || "?"),
           t("channelEnabledNotConnected"), LinkTo("/channels", t("check"))));
       }
     });
@@ -465,18 +513,18 @@
         (gwOnline ? t("gatewayOnline") : t("gatewayDown")) +
         (active != null ? " · " + active + " " + t("activeSessionsSuffix") : "") +
         (status && status.version ? " · v" + status.version : ""),
-        [h("a", { key: "l", className: "iris-btn", href: "/logs", onClick: function (e) { e.preventDefault(); navTo("/logs"); } }, t("logs")),
-         h("a", { key: "c", className: "iris-btn primary", href: "/chat", onClick: function (e) { e.preventDefault(); navTo("/chat"); } }, t("openChat"))]),
+        [h("a", { key: "l", className: "iris-btn", href: "/logs", onClick: function (e) { e.preventDefault(); navTo("/logs"); } }, Icon("file", "sm"), t("logs")),
+         h("a", { key: "c", className: "iris-btn primary", href: "/chat", onClick: function (e) { e.preventDefault(); navTo("/chat"); } }, Icon("chat", "sm"), t("openChat"))]),
 
       h("div", { className: "iris-tiles" },
-        Tile(t("costToday"), last ? fmtCost(last.cost) : "—",
+        Tile(TL("coin", t("costToday")), last ? fmtCost(last.cost) : "—",
           avg7 != null ? t("avg7d", fmtCost(avg7)) : t("viaAnalytics")),
-        Tile(t("tokensLastDay"), last ? fmtTokens(last.tokens) : "—",
+        Tile(TL("chart", t("tokensLastDay")), last ? fmtTokens(last.tokens) : "—",
           last && last.cache != null ? t("cacheRate", Math.round(last.cache)) : " "),
-        Tile(t("activeSessions"), active != null ? String(active) : "—",
+        Tile(TL("hist", t("activeSessions")), active != null ? String(active) : "—",
           sessList.length ? t("recentSessionsCount", sessList.length) : " "),
-        Tile(t("nextAutomation"), nextJob ? (nextJob.name || "job") : (jobs.length ? jobs.length + " " + t("jobs") : "—"),
-          nextJob ? (nextJob.schedule || "") : t("noScheduledJob"))),
+        Tile(TL("clock", t("nextAutomation")), nextJob ? (nextJob.name || "job") : (jobs.length ? jobs[0].name || jobs.length + " " + t("jobs") : "—"),
+          nextJob ? (nextJob.schedule || "") : (jobs.length ? (jobs[0].schedule || "") : t("noScheduledJob")))),
 
       h("div", { className: "iris-cols" },
         h("div", { className: "iris-col-main" },
@@ -485,7 +533,7 @@
               var lastRun = j.last_run || j.lastRun;
               var ok = !(j.last_status === "error" || j.last_error);
               return h(React.Fragment, { key: i },
-                Row(ok ? "good" : "crit", j.name || "job",
+                IconRow(ok ? "check" : "x", ok ? "good-i" : "crit-i", j.name || "job",
                   (j.schedule || "") + (j.deliver ? " → " + j.deliver : ""),
                   Badge(lastRun ? timeAgo(lastRun) || String(lastRun).slice(11, 16) : (j.state || ""), ok ? "good" : "crit")));
             }) : Empty(t("noCronJob"))),
@@ -495,8 +543,10 @@
             h(BarChart, { days: days, t: t })),
           Card(t("recentSessions"), LinkTo("/sessions", t("all")),
             sessList.length ? sessList.slice(0, 6).map(function (s, i) {
+              var src = String(s.source || "");
+              var sic = /cron/.test(src) ? "clock" : /telegram|discord|slack|whatsapp|signal/.test(src) ? "msg" : /mail|email/.test(src) ? "mail" : "term";
               return h(React.Fragment, { key: i },
-                Row("", s.name || s.title || s.preview || s.id || "session",
+                IconRow(sic, "", s.name || s.title || s.preview || s.id || "session",
                   (s.model ? s.model + " · " : "") +
                   (firstNum(s.tokens, s.total_tokens) != null ? fmtTokens(firstNum(s.tokens, s.total_tokens)) + " " + t("tokensUnit") : ""),
                   timeAgo(s.updated_at || s.last_activity || s.timestamp)));
@@ -756,7 +806,7 @@
       h("div", { className: "iris-cards" }, shown.slice(0, 60).map(function (s, i) {
         var on = s.enabled !== false;
         return h("div", { className: "iris-mini", key: i, style: on ? null : { opacity: 0.6 } },
-          h("div", { className: "mc-head" }, h("b", null, s.name),
+          h("div", { className: "mc-head" }, Icon("spark", "dim"), h("b", null, s.name),
             Switch(on, function () { act(t, "/api/skills/toggle", jinit("PUT", { name: s.name, enabled: !on }), reload); })),
           h("p", null, s.description || ""),
           h("div", { className: "mc-foot" },
@@ -797,7 +847,7 @@
         h("div", { className: "iris-nav-label", style: { padding: "6px 0" } }, t("mcpCatalog")),
         h("div", { className: "iris-cards" }, cat.slice(0, 12).map(function (c, i) {
           return h("div", { className: "iris-mini", key: i },
-            h("div", { className: "mc-head" }, h("b", null, c.name || c.id)),
+            h("div", { className: "mc-head" }, Icon("plug", "dim"), h("b", null, c.name || c.id)),
             h("p", null, c.description || ""),
             h("div", { className: "mc-foot" },
               Btn(t("mcpInstall"), function () {
@@ -818,8 +868,9 @@
       PageHead(t("tsTitle"), t("tsDesc"), null),
       h("div", { className: "iris-cards" }, sets.map(function (s2, i) {
         var on = s2.enabled !== false;
+        var tsIcons = { web: "globe", browser: "globe", files: "file", shell: "term", memory: "brain", scheduler: "clock" };
         return h("div", { className: "iris-mini", key: i, style: on ? null : { opacity: 0.6 } },
-          h("div", { className: "mc-head" }, h("b", null, s2.label || s2.name),
+          h("div", { className: "mc-head" }, Icon(tsIcons[s2.name] || "tool", "dim"), h("b", null, s2.label || s2.name),
             Switch(on, function () { act(t, "/api/tools/toolsets/" + s2.name, jinit("PUT", { enabled: !on }), reload); })),
           h("p", null, s2.description || ""),
           h("div", { className: "mc-foot" },
@@ -1096,22 +1147,22 @@
   /* ================= NAVIGATION (overlay slot) ================= */
   function NavItems(t, path, cls, onNav) {
     var groups = [
-      [null, [["/", t("navHome")], ["/chat", t("navChat")], ["/sessions", t("navSessions")], ["/analytics", t("navAnalytics")]]],
-      [t("grpAutomation"), [["/cron", t("navCron")], ["/webhooks", t("navWebhooks")]]],
-      [t("grpCapabilities"), [["/skills", t("navSkills")], ["/mcp", t("navMcp")], ["/toolsets", t("navToolsets")], ["/models", t("navModels")]]],
-      [t("grpConnectivity"), [["/channels", t("navChannels")], ["/pairing", t("navPairing")]]],
-      [t("grpAdmin"), [["/config", t("navConfig")], ["/env", t("navKeys")], ["/profiles", t("navProfiles")],
-        ["/files", t("navFiles")], ["/logs", t("logs")], ["/system", t("navSystem")], ["/docs", t("navDocs")]]]
+      [null, [["/", t("navHome"), "grid"], ["/chat", t("navChat"), "chat"], ["/sessions", t("navSessions"), "hist"], ["/analytics", t("navAnalytics"), "chart"]]],
+      [t("grpAutomation"), [["/cron", t("navCron"), "clock"], ["/webhooks", t("navWebhooks"), "hook"]]],
+      [t("grpCapabilities"), [["/skills", t("navSkills"), "spark"], ["/mcp", t("navMcp"), "plug"], ["/toolsets", t("navToolsets"), "tool"], ["/models", t("navModels"), "brain"]]],
+      [t("grpConnectivity"), [["/channels", t("navChannels"), "radio"], ["/pairing", t("navPairing"), "link"]]],
+      [t("grpAdmin"), [["/config", t("navConfig"), "cog"], ["/env", t("navKeys"), "key"], ["/profiles", t("navProfiles"), "users"],
+        ["/files", t("navFiles"), "file"], ["/logs", t("logs"), "file"], ["/system", t("navSystem"), "server"], ["/docs", t("navDocs"), "globe"]]]
     ];
     return groups.map(function (g, gi) {
-      return h(React.Fragment, { key: gi },
+      return h("div", { key: gi, className: "iris-nav-group" },
         g[0] ? h("div", { className: "iris-nav-label" }, g[0]) : null,
         g[1].map(function (l, li) {
           return h("a", {
             key: li, href: l[0],
             className: cls + (path === l[0] ? " active" : ""),
             onClick: function (e) { e.preventDefault(); onNav(l[0]); }
-          }, l[1]);
+          }, Icon(l[2]), l[1]);
         }));
     });
   }
@@ -1127,12 +1178,12 @@
   function MobileNav() {
     var t = makeT(useLocale());
     var path = usePath();
-    var links = [["/", t("navHome")], ["/chat", t("navChat")], ["/sessions", t("navSessions")], ["/cron", t("navCron")], ["/system", t("navSystem")]];
+    var links = [["/", t("navHome"), "grid"], ["/chat", t("navChat"), "chat"], ["/sessions", t("navSessions"), "hist"], ["/cron", t("navCron"), "clock"], ["/system", t("navSystem"), "server"]];
     return h("nav", { className: "iris-bottombar" }, links.map(function (l, i) {
       return h("a", {
         key: i, href: l[0], className: "iris-bb-item" + (path === l[0] ? " active" : ""),
         onClick: function (e) { e.preventDefault(); navTo(l[0]); }
-      }, l[1]);
+      }, Icon(l[2], "bb"), h("span", null, l[1]));
     }));
   }
   function Overlay() {
