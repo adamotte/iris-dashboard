@@ -216,6 +216,12 @@ tr.iris-rowlink:hover td{background:color-mix(in srgb,var(--color-foreground,#88
 }
 @media (max-width:860px){.iris-sidenav{display:none}}
 
+/* ---- gateway pill (header-right slot, mockup .pill) ---- */
+.iris-gwpill{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:550;
+  padding:5px 11px;border-radius:99px;white-space:nowrap;
+  border:1px solid var(--color-border,rgba(128,128,128,.25))}
+@media (max-width:860px){.iris-gwpill-txt{display:none}}
+
 /* ---- mobile bar (overlay slot) ---- */
 .iris-bottombar{display:none}
 @media (max-width:860px){

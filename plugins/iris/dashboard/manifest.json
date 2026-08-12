@@ -10,5 +10,5 @@
     "path": "/",
     "override": "/"
   },
-  "slots": ["overlay"]
+  "slots": ["overlay", "header-right"]
 }

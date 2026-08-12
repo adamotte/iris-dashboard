@@ -312,6 +312,17 @@
   }
 
   /* ================= navigation ================= */
+  // the native router navigates through history.pushState without firing any
+  // event: patch it once so usePath also follows native-initiated navigation
+  if (!window.__IRIS_NAV_PATCHED__) {
+    window.__IRIS_NAV_PATCHED__ = true;
+    var __origPush = history.pushState.bind(history);
+    history.pushState = function () {
+      var r = __origPush.apply(null, arguments);
+      try { dispatchEvent(new Event("iris:nav")); } catch (e) { /* noop */ }
+      return r;
+    };
+  }
   function navTo(href) {
     try {
       history.pushState({}, "", href);
@@ -323,7 +334,8 @@
     useEffect(function () {
       function on() { st[1](location.pathname); }
       addEventListener("popstate", on);
-      return function () { removeEventListener("popstate", on); };
+      addEventListener("iris:nav", on);
+      return function () { removeEventListener("popstate", on); removeEventListener("iris:nav", on); };
     }, []);
     return st[0];
   }
@@ -1320,8 +1332,52 @@
       }, Icon(l[2], "bb"), h("span", null, l[1]));
     }));
   }
+  function pageTitleFor(path, t) {
+    var map = {
+      "/": t("navHome"), "/chat": t("navChat"), "/sessions": t("navSessions"), "/analytics": t("navAnalytics"),
+      "/cron": t("navCron"), "/webhooks": t("navWebhooks"), "/skills": t("navSkills"), "/mcp": t("navMcp"),
+      "/toolsets": t("navToolsets"), "/plugins": t("navPlugins"), "/models": t("navModels"),
+      "/channels": t("navChannels"), "/pairing": t("navPairing"), "/config": t("navConfig"),
+      "/env": t("navKeys"), "/profiles": t("navProfiles"), "/files": t("navFiles"),
+      "/logs": t("logs"), "/system": t("navSystem"), "/docs": t("navDocs")
+    };
+    return map[path] || null;
+  }
+  // The shell's <h1> tracks its own nav state, which client-side navigation
+  // from the Iris menus never touches: keep it in sync with the route.
+  function NativeTitleSync() {
+    var t = makeT(useLocale());
+    var path = usePath();
+    useEffect(function () {
+      var title = pageTitleFor(path, t);
+      if (!title) return undefined;
+      var header = document.querySelector('header[role="banner"]');
+      if (!header) return undefined;
+      function apply() {
+        var h1 = header.querySelector("h1");
+        if (h1 && h1.textContent !== title) h1.textContent = title;
+      }
+      apply();
+      // the shell re-renders the header with its own (stale) title after us:
+      // re-assert ours until the next route change
+      var mo = new MutationObserver(apply);
+      mo.observe(header, { childList: true, characterData: true, subtree: true });
+      return function () { mo.disconnect(); };
+    }, [path, t("navHome")]);
+    return null;
+  }
   function Overlay() {
-    return h(React.Fragment, null, h(SideNav), h(MobileNav));
+    return h(React.Fragment, null, h(SideNav), h(MobileNav), h(NativeTitleSync));
+  }
+  // gateway pill in the native header (mockup topbar), via the header-right slot
+  function HeaderPill() {
+    var t = makeT(useLocale());
+    var status = useJSON("/api/status", 15000);
+    if (!status) return null;
+    var on = !!(status.gateway_running || status.gateway === "running");
+    return h("span", { className: "iris-gwpill" },
+      h("span", { className: "iris-dot " + (on ? "ok" : "off") }),
+      h("span", { className: "iris-gwpill-txt" }, on ? t("gatewayOnline") : t("gatewayDown")));
   }
 
   /* ================= registration ================= */
@@ -1344,4 +1400,5 @@
   };
   REG.register("iris", HomePage);
   REG.registerSlot("iris", "overlay", Overlay);
+  REG.registerSlot("iris", "header-right", HeaderPill);
 })();
