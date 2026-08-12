@@ -1,0 +1,12 @@
+{
+  "name": "iris-sessions",
+  "label": "Sessions",
+  "description": "Iris redesigned page: Sessions",
+  "icon": "Sparkles",
+  "version": "0.1.0",
+  "entry": "dist/index.js",
+  "tab": {
+    "path": "/sessions",
+    "override": "/sessions"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "name": "iris-channels",
+  "label": "Channels",
+  "description": "Iris redesigned page: Channels",
+  "icon": "Sparkles",
+  "version": "0.1.0",
+  "entry": "dist/index.js",
+  "tab": {
+    "path": "/channels",
+    "override": "/channels"
+  }
+}

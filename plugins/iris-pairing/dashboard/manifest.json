@@ -1,0 +1,12 @@
+{
+  "name": "iris-pairing",
+  "label": "Pairing",
+  "description": "Iris redesigned page: Pairing",
+  "icon": "Sparkles",
+  "version": "0.1.0",
+  "entry": "dist/index.js",
+  "tab": {
+    "path": "/pairing",
+    "override": "/pairing"
+  }
+}

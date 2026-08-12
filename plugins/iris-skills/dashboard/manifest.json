@@ -1,0 +1,12 @@
+{
+  "name": "iris-skills",
+  "label": "Skills",
+  "description": "Iris redesigned page: Skills",
+  "icon": "Sparkles",
+  "version": "0.1.0",
+  "entry": "dist/index.js",
+  "tab": {
+    "path": "/skills",
+    "override": "/skills"
+  }
+}

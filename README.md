@@ -18,13 +18,31 @@
 > with Nous Research. It only uses the **documented** dashboard extension points
 > (UI plugins, YAML themes) and **read-only** core API endpoints.
 
-Iris replaces the default *Status* landing page with a control-center overview —
-cost, automations, sessions, health — and restyles the whole dashboard with two
-accessibility-validated themes. Everything is additive and removable in seconds.
+Iris redesigns the whole dashboard: a control-center home page, redesigned
+versions of every page (Sessions, Analytics, Cron, Webhooks, Skills, MCP,
+Toolsets, Channels, Pairing, Profiles, Config, Keys, Logs, System), a grouped
+sidebar, mobile navigation, and two accessibility-validated themes. Native
+pages (Chat/TUI, Files, Models, Docs) stay untouched and keep working.
+Everything is additive and removable in seconds.
 
 ---
 
 ## ✨ Features
+
+### 🧭 Full redesign
+
+- **Grouped sidebar** (desktop): Home / Chat / Sessions / Analytics, then
+  Automation, Capabilities, Connectivity, Administration — rendered via the
+  `overlay` slot; the native flat nav is hidden on desktop and kept in the
+  mobile drawer
+- **Every page redesigned** as route overrides (one lightweight companion
+  plugin per route sharing a single bundle): Sessions (FTS search, stats,
+  prune/export), Analytics (periods, per-model and daily tables), Cron (create,
+  run/pause/delete), Webhooks, Skills (search, categories, toggles, curator),
+  MCP (test/toggle/catalog), Toolsets, Channels (gateway control, per-platform
+  test), Pairing (approve/revoke), Profiles, Config (editable + raw view), API
+  Keys (grouped, set/delete), Logs (live tail, filters), System (host, memory,
+  checkpoints, operations)
 
 ### 🏠 Control-center home page (plugin)
 

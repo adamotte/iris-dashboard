@@ -36,10 +36,15 @@ if [ ! -d "$HERMES_HOME" ]; then
   exit 1
 fi
 
-echo "→ Installing the iris plugin into $HERMES_HOME/plugins/…"
+IRIS_PLUGINS=$(cd "$SRC_DIR/plugins" && ls -d iris*)
+
+echo "→ Installing the Iris plugins into $HERMES_HOME/plugins/…"
 mkdir -p "$HERMES_HOME/plugins"
-rm -rf "$HERMES_HOME/plugins/iris"
-cp -r "$SRC_DIR/plugins/iris" "$HERMES_HOME/plugins/"
+for p in $IRIS_PLUGINS; do
+  rm -rf "$HERMES_HOME/plugins/$p"
+  cp -r "$SRC_DIR/plugins/$p" "$HERMES_HOME/plugins/"
+done
+echo "  $(echo "$IRIS_PLUGINS" | wc -w) plugins installed."
 
 echo "→ Installing the iris-dark / iris-light themes…"
 mkdir -p "$HERMES_HOME/dashboard-themes"
@@ -48,39 +53,37 @@ cp "$SRC_DIR/themes/iris-dark.yaml" "$SRC_DIR/themes/iris-light.yaml" "$HERMES_H
 # Since the #46435 hardening, user dashboard plugins are only served when
 # listed under plugins.enabled in config.yaml. `hermes plugins enable` does
 # not accept dashboard-only plugins (no plugin.yaml), so write the key here.
-echo "→ Activating the plugin (plugins.enabled in config.yaml)…"
+echo "→ Activating the plugins (plugins.enabled in config.yaml)…"
 CFG="$HERMES_HOME/config.yaml"
-if [ -f "$CFG" ] && grep -qE '^[[:space:]]*-[[:space:]]*"?iris"?[[:space:]]*$' "$CFG"; then
-  echo "  iris is already in plugins.enabled."
-elif python3 - "$CFG" <<'PY' 2>/dev/null
-import sys, pathlib
+if IRIS_PLUGIN_LIST="$IRIS_PLUGINS" python3 - "$CFG" <<'PY' 2>/dev/null
+import os, sys, pathlib
 try:
     import yaml
 except ImportError:
     sys.exit(1)
+names = os.environ["IRIS_PLUGIN_LIST"].split()
 p = pathlib.Path(sys.argv[1])
 cfg = (yaml.safe_load(p.read_text()) if p.exists() else {}) or {}
 plugins = cfg.setdefault("plugins", {})
 enabled = plugins.setdefault("enabled", [])
-if "iris" not in enabled:
-    enabled.append("iris")
+changed = False
+for n in names:
+    if n not in enabled:
+        enabled.append(n)
+        changed = True
+if changed:
     p.write_text(yaml.safe_dump(cfg, sort_keys=False, allow_unicode=True))
 sys.exit(0)
 PY
 then
-  echo "  iris added to plugins.enabled."
-elif [ -f "$CFG" ] && ! grep -qE '^plugins:' "$CFG"; then
-  printf '\nplugins:\n  enabled:\n    - iris\n' >> "$CFG"
-  echo "  iris added to plugins.enabled."
-elif [ ! -f "$CFG" ]; then
-  printf 'plugins:\n  enabled:\n    - iris\n' > "$CFG"
-  echo "  config.yaml created with plugins.enabled: [iris]."
+  echo "  plugins added to plugins.enabled."
+elif [ ! -f "$CFG" ] || ! grep -qE '^plugins:' "$CFG"; then
+  { printf '\nplugins:\n  enabled:\n'; for p in $IRIS_PLUGINS; do printf '    - %s\n' "$p"; done; } >> "$CFG"
+  echo "  plugins added to plugins.enabled."
 else
   echo "  ⚠ Could not edit $CFG automatically (python3+PyYAML unavailable and"
-  echo "    a plugins: section already exists). Add this manually:"
-  echo "      plugins:"
-  echo "        enabled:"
-  echo "          - iris"
+  echo "    a plugins: section already exists). Add each of these under"
+  echo "    plugins.enabled: $IRIS_PLUGINS"
 fi
 
 echo "→ Rescanning plugins…"

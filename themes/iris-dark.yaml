@@ -72,3 +72,10 @@ customCSS: |
     background: linear-gradient(90deg,#e05a6b,#e8a13c,#2fae72,#3f8fdf,#7668e8,#a75ce0);
     opacity: 0.75;
   }
+  /* Desktop: the Iris plugin renders its own grouped nav (overlay slot);
+     hide the native flat list but keep the shell header/footer intact.
+     On mobile the native drawer keeps the flat nav. */
+  @media (min-width: 861px) {
+    #app-sidebar nav { visibility: hidden; }
+    #app-sidebar [aria-label="Collapse"] { display: none; }
+  }
