@@ -241,6 +241,19 @@
     return String(n);
   }
   function fmtCost(n) { return n == null ? "—" : Number(n).toFixed(2) + " $"; }
+  // Never hand a raw API value to React as a child: some fields are objects
+  // (e.g. cron "schedule" is {kind, expr, display} — React error #31).
+  function txt(v) {
+    if (v == null) return "";
+    if (typeof v === "object") return String(v.display || v.expr || v.label || v.name || "");
+    return String(v);
+  }
+  function schedStr(j) {
+    return txt(j.schedule_display) || txt(j.schedule);
+  }
+  function lastRunOf(j) { return j.last_run_at || j.last_run || j.lastRun || null; }
+  function nextRunOf(j) { return j.next_run_at || j.next_run || j.nextRun || j.next || null; }
+  function isPausedJob(j) { return !!(j.paused || j.paused_at || j.state === "paused" || j.enabled === false); }
   function fmtBytes(n, locale) {
     if (n == null) return "—";
     var u = locale === "fr" ? ["o", "Ko", "Mo", "Go"] : ["B", "KB", "MB", "GB"];
@@ -488,9 +501,9 @@
 
     var nextJob = null;
     jobs.forEach(function (j) {
-      var nr = j.next_run || j.nextRun || j.next;
-      if (!nr || j.paused || j.state === "paused") return;
-      if (!nextJob || nr < (nextJob.next_run || nextJob.nextRun || nextJob.next)) nextJob = j;
+      var nr = nextRunOf(j);
+      if (!nr || isPausedJob(j)) return;
+      if (!nextJob || nr < nextRunOf(nextJob)) nextJob = j;
     });
 
     var alerts = [];
@@ -523,19 +536,19 @@
           last && last.cache != null ? t("cacheRate", Math.round(last.cache)) : " "),
         Tile(TL("hist", t("activeSessions")), active != null ? String(active) : "—",
           sessList.length ? t("recentSessionsCount", sessList.length) : " "),
-        Tile(TL("clock", t("nextAutomation")), nextJob ? (nextJob.name || "job") : (jobs.length ? jobs[0].name || jobs.length + " " + t("jobs") : "—"),
-          nextJob ? (nextJob.schedule || "") : (jobs.length ? (jobs[0].schedule || "") : t("noScheduledJob")))),
+        Tile(TL("clock", t("nextAutomation")), nextJob ? txt(nextJob.name) || "job" : (jobs.length ? txt(jobs[0].name) || jobs.length + " " + t("jobs") : "—"),
+          nextJob ? schedStr(nextJob) : (jobs.length ? schedStr(jobs[0]) : t("noScheduledJob")))),
 
       h("div", { className: "iris-cols" },
         h("div", { className: "iris-col-main" },
           Card(t("automationsLastRuns"), LinkTo("/cron", t("cron")),
             jobs.length ? jobs.slice(0, 5).map(function (j, i) {
-              var lastRun = j.last_run || j.lastRun;
+              var lastRun = lastRunOf(j);
               var ok = !(j.last_status === "error" || j.last_error);
               return h(React.Fragment, { key: i },
-                IconRow(ok ? "check" : "x", ok ? "good-i" : "crit-i", j.name || "job",
-                  (j.schedule || "") + (j.deliver ? " → " + j.deliver : ""),
-                  Badge(lastRun ? timeAgo(lastRun) || String(lastRun).slice(11, 16) : (j.state || ""), ok ? "good" : "crit")));
+                IconRow(ok ? "check" : "x", ok ? "good-i" : "crit-i", txt(j.name) || "job",
+                  schedStr(j) + (j.deliver ? " → " + txt(j.deliver) : ""),
+                  Badge(lastRun ? timeAgo(lastRun) || String(lastRun).slice(11, 16) : txt(j.state), ok ? "good" : "crit")));
             }) : Empty(t("noCronJob"))),
           Card(t("usage14d"),
             h("span", { className: "iris-muted" },
@@ -546,8 +559,8 @@
               var src = String(s.source || "");
               var sic = /cron/.test(src) ? "clock" : /telegram|discord|slack|whatsapp|signal/.test(src) ? "msg" : /mail|email/.test(src) ? "mail" : "term";
               return h(React.Fragment, { key: i },
-                IconRow(sic, "", s.name || s.title || s.preview || s.id || "session",
-                  (s.model ? s.model + " · " : "") +
+                IconRow(sic, "", txt(s.name || s.title || s.preview || s.id) || "session",
+                  (s.model ? txt(s.model) + " · " : "") +
                   (firstNum(s.tokens, s.total_tokens) != null ? fmtTokens(firstNum(s.tokens, s.total_tokens)) + " " + t("tokensUnit") : ""),
                   timeAgo(s.updated_at || s.last_activity || s.timestamp)));
             }) : Empty(t("noRecentSession")))),
@@ -625,10 +638,10 @@
         list.length ? list.map(function (sx, i) {
           var id = sx.id || sx.session_id || "";
           return h("tr", { key: i },
-            h("td", null, h("b", null, sx.name || sx.title || id || "session"),
-              h("br"), h("small", { className: "iris-muted" }, (sx.preview || "").slice(0, 80))),
-            h("td", { className: "hide-m" }, sx.source || "—"),
-            h("td", { className: "hide-m" }, sx.model ? h("span", { className: "iris-mono" }, sx.model) : "—"),
+            h("td", null, h("b", null, txt(sx.name || sx.title) || id || "session"),
+              h("br"), h("small", { className: "iris-muted" }, txt(sx.preview).slice(0, 80))),
+            h("td", { className: "hide-m" }, txt(sx.source) || "—"),
+            h("td", { className: "hide-m" }, sx.model ? h("span", { className: "iris-mono" }, txt(sx.model)) : "—"),
             h("td", { className: "r num" }, fmtTokens(firstNum(sx.tokens, sx.total_tokens))),
             h("td", { className: "r num hide-m" }, firstNum(sx.message_count, sx.messages) != null ? String(firstNum(sx.message_count, sx.messages)) : "—"),
             h("td", { className: "r num" }, timeAgo(sx.updated_at || sx.last_activity || sx.created_at) || "—"),
@@ -714,15 +727,16 @@
              { l: t("lastRun"), r: 1, m: 1 }, { l: t("nextRun"), r: 1 }, { l: t("actions"), r: 1 }],
         jobs.length ? jobs.map(function (j, i) {
           var id = j.id || j.job_id || j.name;
-          var isPaused = j.paused || j.state === "paused";
+          var isPaused = isPausedJob(j);
+          var lr = lastRunOf(j), nr = nextRunOf(j);
           return h("tr", { key: i },
-            h("td", null, h("b", null, j.name || id), h("br"),
-              h("small", { className: "iris-muted" }, (j.prompt || "").slice(0, 60))),
-            h("td", { className: "hide-m" }, h("span", { className: "iris-mono" }, j.schedule || "")),
-            h("td", { className: "hide-m" }, j.deliver || j.target || "local"),
+            h("td", null, h("b", null, txt(j.name) || id), h("br"),
+              h("small", { className: "iris-muted" }, txt(j.prompt).slice(0, 60))),
+            h("td", { className: "hide-m" }, h("span", { className: "iris-mono" }, schedStr(j))),
+            h("td", { className: "hide-m" }, txt(j.deliver || j.target) || "local"),
             h("td", null, Badge(isPaused ? t("paused") : t("active"), isPaused ? "neutral" : "good")),
-            h("td", { className: "r num hide-m" }, j.last_run ? (timeAgo(j.last_run) || String(j.last_run).slice(5, 16)) : "—"),
-            h("td", { className: "r num" }, j.next_run ? String(j.next_run).slice(5, 16) : "—"),
+            h("td", { className: "r num hide-m" }, lr ? (timeAgo(lr) || String(lr).slice(5, 16)) : "—"),
+            h("td", { className: "r num" }, nr ? String(nr).slice(5, 16) : "—"),
             h("td", { className: "r" },
               h("button", { className: "iris-link", onClick: function () { act(t, "/api/cron/jobs/" + id + "/trigger", jinit("POST"), reload); } }, t("runNow")), " ",
               h("button", { className: "iris-link", onClick: function () { act(t, "/api/cron/jobs/" + id + (isPaused ? "/resume" : "/pause"), jinit("POST"), reload); } }, isPaused ? t("resume") : t("pause")), " ",
@@ -763,9 +777,9 @@
               onClick: function () { if (confirm(t("confirmDelete", w.name))) act(t, "/api/webhooks/" + w.name, jinit("DELETE"), reload); }
             }, t("deleteS"))),
           h("div", null,
-            h("div", { className: "iris-muted" }, w.description || ""),
-            h("div", { className: "iris-note iris-mono" }, (data && data.base_url ? data.base_url : "") + (w.path || ("/hooks/" + (w.name || "")))),
-            h("div", { className: "iris-note" }, t("whEvents") + " : " + (w.event || w.filter || "*") + " · " + t("target") + " : " + (w.deliver || w.target || "local"))));
+            h("div", { className: "iris-muted" }, txt(w.description)),
+            h("div", { className: "iris-note iris-mono" }, txt(data && data.base_url) + txt(w.path || ("/hooks/" + (w.name || "")))),
+            h("div", { className: "iris-note" }, t("whEvents") + " : " + (txt(w.event || w.filter) || "*") + " · " + t("target") + " : " + (txt(w.deliver || w.target) || "local"))));
       }) : Card(null, null, Empty(t("mcpNone").replace("MCP", "webhook"))));
   }
 
@@ -934,9 +948,9 @@
         Card(t("prPending"), Badge(String(pending.length), pending.length ? "warn" : "neutral"),
           pending.length ? pending.map(function (p, i) {
             return h(React.Fragment, { key: i },
-              Row("warn", p.user || p.username || p.user_id || "?",
-                (p.platform || "") + " · " + t("pairingCode") + " " + (p.code || "?") +
-                (p.age ? " · " + p.age : ""),
+              Row("warn", txt(p.user || p.username || p.user_id) || "?",
+                txt(p.platform) + " · " + t("pairingCode") + " " + (txt(p.code) || "?") +
+                (p.age ? " · " + txt(p.age) : ""),
                 h("span", { style: { display: "flex", gap: "6px" } },
                   Btn(t("approve"), function () { act(t, "/api/pairing/approve", jinit("POST", { platform: p.platform, code: p.code }), reload); }, "sm primary"),
                   Btn(t("reject"), function () { act(t, "/api/pairing/revoke", jinit("POST", { platform: p.platform, user_id: p.user_id || p.user }), reload); }, "sm"))));
