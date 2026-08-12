@@ -56,7 +56,7 @@
       chats: "Chats", automation: "Automation", archived: "Archived", messages: "Messages",
       model: "Model", lastActivity: "Last activity", source: "Source", export: "Export",
       deleteS: "Delete", pruneOld: "Prune > 90 d", confirmPrune: "Delete ended sessions older than 90 days?",
-      noSessions: "No sessions yet", searchResults: "Search results",
+      noSessions: "No sessions yet", searchResults: "Search results", resumeChat: "Resume in chat",
       /* analytics */
       analyticsTitle: "Analytics", analyticsDesc: "Usage, cost and cache computed from session history",
       period: "{0} d", cacheTitle: "Cache rate", sessionsCount: "Sessions", perModel: "By model",
@@ -148,7 +148,7 @@
       chats: "Chats", automation: "Automations", archived: "Archivées", messages: "Messages",
       model: "Modèle", lastActivity: "Dernière activité", source: "Source", export: "Exporter",
       deleteS: "Supprimer", pruneOld: "Purger > 90 j", confirmPrune: "Supprimer les sessions terminées de plus de 90 jours ?",
-      noSessions: "Aucune session pour l'instant", searchResults: "Résultats de recherche",
+      noSessions: "Aucune session pour l'instant", searchResults: "Résultats de recherche", resumeChat: "Reprendre dans le chat",
       analyticsTitle: "Analytics", analyticsDesc: "Consommation, coûts et cache calculés depuis l'historique",
       period: "{0} j", cacheTitle: "Taux de cache", sessionsCount: "Sessions", perModel: "Par modèle",
       estCost: "Coût estimé", dailyDetail: "Détail journalier", date: "Date", cache: "Cache", noUsage: "Aucune utilisation enregistrée",
@@ -610,6 +610,7 @@
     var bp = useState(0); var bump = bp[0], setBump = bp[1];
     var qs = useState(""); var q = qs[0], setQ = qs[1];
     var tab = useState("all"); var flt = tab[0], setFlt = tab[1];
+    var rf = useState(false); var refreshing = rf[0], setRefreshing = rf[1];
     var stats = useJSON("/api/sessions/stats", 30000, bump);
     var data = useJSON("/api/sessions?limit=50", 15000, bump);
     var res = useState(null); var results = res[0], setResults = res[1];
@@ -644,7 +645,10 @@
           onKeyDown: function (e) { if (e.key === "Enter") doSearch(); }
         }),
         Chips([{ v: "all", l: t("all") }, { v: "chats", l: t("chats") }, { v: "auto", l: t("automation") }], flt, setFlt),
-        Btn(t("refresh"), function () { setBump(bump + 1); }, "sm")),
+        Btn(refreshing ? "…" : t("refresh"), function () {
+          setRefreshing(true); setBump(bump + 1);
+          setTimeout(function () { setRefreshing(false); }, 700);
+        }, "sm", refreshing)),
       results ? Card(t("searchResults") + " (" + results.length + ")", null,
         results.length ? results.slice(0, 20).map(function (r, i) {
           return h(React.Fragment, { key: i },
@@ -655,7 +659,11 @@
          { l: t("tokens"), r: 1 }, { l: t("messages"), r: 1, m: 1 }, { l: t("lastActivity"), r: 1 }, { l: "", r: 1 }],
         list.length ? list.map(function (sx, i) {
           var id = sx.id || sx.session_id || "";
-          return h("tr", { key: i },
+          return h("tr", {
+            key: i, className: id ? "iris-rowlink" : null,
+            title: id ? t("resumeChat") : null,
+            onClick: id ? function () { navTo("/chat?resume=" + encodeURIComponent(id)); } : null
+          },
             h("td", null, h("b", null, txt(sx.name || sx.title) || id || "session"),
               h("br"), h("small", { className: "iris-muted" }, txt(sx.preview).slice(0, 80))),
             h("td", { className: "hide-m" }, txt(sx.source) || "—"),
@@ -663,7 +671,7 @@
             h("td", { className: "r num" }, fmtTokens(firstNum(sx.tokens, sx.total_tokens))),
             h("td", { className: "r num hide-m" }, firstNum(sx.message_count, sx.messages) != null ? String(firstNum(sx.message_count, sx.messages)) : "—"),
             h("td", { className: "r num" }, timeAgo(sx.updated_at || sx.last_activity || sx.created_at) || "—"),
-            h("td", { className: "r" },
+            h("td", { className: "r", onClick: function (e) { e.stopPropagation(); } },
               id ? h("a", { className: "iris-link", href: "/api/sessions/" + id + "/export" }, t("export")) : null, " ",
               id ? h("button", {
                 className: "iris-link", style: { color: "var(--color-destructive)" },
@@ -1232,7 +1240,16 @@
     });
     return h("div", { className: "iris-page" },
       PageHead(t("plgTitle"), t("plgDesc"),
-        Btn(t("plgRescan"), function () { act(t, "/api/dashboard/plugins/rescan", undefined, reload); }, "primary")),
+        Btn(t("plgRescan"), function () {
+          // newly discovered plugins only load at boot: drop the manifest
+          // cache and reload the page so the rescan has a visible effect
+          act(t, "/api/dashboard/plugins/rescan", undefined, function (r) {
+            if (r) {
+              try { sessionStorage.removeItem("hermes:plugin-manifests"); } catch (e) { /* noop */ }
+              location.reload();
+            }
+          });
+        }, "primary")),
       h("div", { className: "iris-tiles" },
         Tile(TL("puzzle", t("plgDash")), dash.length, t("plgVisible", dash.length - hiddenCount)),
         Tile(TL("plug", t("plgAgents")), agents.length, t("plgActive", activeAgents.length)),

@@ -151,6 +151,10 @@ select.iris-input{background:var(--color-card,#1a1a22)}
 .iris-mini .mc-foot{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--color-muted-foreground,#8c8a9c);flex-wrap:wrap}
 
 /* ---- logs ---- */
+/* clickable table rows (sessions: open in chat) */
+tr.iris-rowlink{cursor:pointer}
+tr.iris-rowlink:hover td{background:color-mix(in srgb,var(--color-foreground,#888) 4%,transparent)}
+
 .iris-logbox{background:color-mix(in srgb,var(--color-foreground,#000) 4%,transparent);
   border:1px solid var(--color-border,rgba(128,128,128,.2));border-radius:10px;
   font-family:var(--theme-font-mono,ui-monospace,monospace);font-size:11.5px;line-height:1.75;
@@ -162,35 +166,40 @@ select.iris-input{background:var(--color-card,#1a1a22)}
 /* ---- sidebar (desktop, overlay slot) ----
    The native aside is z-50: stay above it (z-51) or clicks never reach us. */
 .iris-sidenav{position:fixed;left:0;top:0;bottom:186px;width:240px;z-index:51;
-  overflow:hidden;padding:0 0 8px 10px;display:flex;flex-direction:column}
+  overflow:hidden;padding:6px 0 8px;display:flex;flex-direction:column;
+  background:var(--color-card,#16151d);border-right:1px solid var(--color-border,rgba(128,128,128,.15))}
 /* Scrolling lives on an inner wrapper inset 10px from the content boundary,
-   so the thumb stays inside the menu; it only shows while the menu is hovered. */
-.iris-nav-scroll{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;margin-right:10px;
+   so the thumb stays inside the menu; it only shows while the menu is hovered.
+   The wrapper owns the 10px left gutter so the active item's spectral bar
+   (::before at left:-10px) reaches the sidebar edge without being clipped. */
+.iris-nav-scroll{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;
+  padding-left:10px;margin-right:10px;
   scrollbar-width:thin;scrollbar-color:transparent transparent}
 .iris-sidenav:hover .iris-nav-scroll{
   scrollbar-color:color-mix(in srgb,var(--color-foreground,#888) 25%,transparent) transparent}
-.iris-side-logo{display:flex;align-items:center;gap:10px;padding:10px 10px 8px;margin:0 10px 6px 0;
+.iris-side-logo{display:flex;align-items:center;gap:11px;padding:10px 10px 8px;margin:0 10px 6px 10px;
   border-bottom:1px solid var(--color-border,rgba(128,128,128,.2))}
-.iris-side-logo .mark{width:26px;height:26px;border-radius:8px;flex:none;position:relative;overflow:hidden;
+.iris-side-logo .mark{width:30px;height:30px;border-radius:9px;flex:none;position:relative;overflow:hidden;
   border:1px solid var(--color-border,rgba(128,128,128,.3));
   background:var(--color-card,rgba(128,128,128,.08))}
 .iris-side-logo .mark::before{content:"";position:absolute;left:-40%;right:-40%;top:52%;height:120%;
   background:linear-gradient(90deg,#e05a6b,#e8a13c,#2fae72,#3f8fdf,#7668e8,#a75ce0);opacity:.85;
   border-radius:50% 50% 0 0/100% 100% 0 0}
-.iris-side-logo b{font-size:15px;font-weight:700;letter-spacing:.01em;line-height:1.1}
+.iris-side-logo b{font-size:16px;font-weight:700;letter-spacing:.01em;line-height:1.1}
 .iris-side-logo small{display:block;font-size:10px;color:var(--color-muted-foreground,#8c8a9c);font-weight:400}
-.iris-nav-group{margin-bottom:10px}
-.iris-nav-label{font-size:10px;font-weight:650;letter-spacing:.11em;text-transform:uppercase;
-  color:var(--color-muted-foreground,#8c8a9c);opacity:.85;padding:0 10px;margin:0 0 5px}
+.iris-nav-group{margin-bottom:13px}
+.iris-nav-label{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--color-muted-foreground,#8c8a9c);padding:0 10px;margin:0 0 4px}
 .iris-nav-item{position:relative;display:flex;align-items:center;gap:10px;width:100%;
-  padding:5px 10px;border-radius:8px;color:var(--color-muted-foreground,#8c8a9c);
+  padding:6.5px 10px;border-radius:8px;
+  color:var(--color-secondary-foreground,var(--color-muted-foreground,#8c8a9c));
   font-weight:500;font-size:13px;text-align:left;background:none;border:none;cursor:pointer;
-  font-family:inherit;text-decoration:none}
+  font-family:inherit;text-decoration:none;transition:background .12s,color .12s}
 .iris-nav-item .iris-ic{opacity:.9}
 .iris-nav-item:hover{color:var(--color-foreground,inherit);
-  background:color-mix(in srgb,var(--color-foreground,#888) 6%,transparent)}
+  background:color-mix(in srgb,var(--color-foreground,#888) 5%,transparent)}
 .iris-nav-item.active{color:var(--color-primary,#5b4bd4);font-weight:600;
-  background:color-mix(in srgb,var(--color-primary,#5b4bd4) 12%,transparent)}
+  background:color-mix(in srgb,var(--color-primary,#5b4bd4) 11%,transparent)}
 .iris-nav-item.active::before{content:"";position:absolute;left:-10px;top:20%;bottom:20%;width:3px;
   border-radius:0 3px 3px 0;
   background:linear-gradient(180deg,#e05a6b,#e8a13c,#2fae72,#3f8fdf,#7668e8)}

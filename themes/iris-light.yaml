@@ -38,7 +38,7 @@ typography:
   fontSans: "'Schibsted Grotesk', system-ui, sans-serif"
   fontMono: "'JetBrains Mono', ui-monospace, monospace"
   fontUrl: "https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:ital,wght@0,400..900;1,400&family=JetBrains+Mono:wght@400;500&display=swap"
-  baseSize: "14px"
+  baseSize: "13.5px"
   lineHeight: "1.5"
   letterSpacing: "0"
 
@@ -60,6 +60,32 @@ componentStyles:
     background: "#ffffff"
 
 customCSS: |
+  /* The v0.20 shell derives every --color-* token from the palette alone and
+     ignores the colors/layout blocks above: force the Iris tokens here. */
+  :root:root {
+    --color-primary: #5b4bd4 !important;
+    --color-primary-foreground: #ffffff !important;
+    --color-accent: #5b4bd4 !important;
+    --color-accent-foreground: #ffffff !important;
+    --color-ring: #5b4bd4 !important;
+    --color-destructive: #c03545 !important;
+    --color-success: #0a7d0a !important;
+    --color-warning: #8a5c00 !important;
+    --color-card: #ffffff !important;
+    --color-card-foreground: #1b1926 !important;
+    --color-popover: #ffffff !important;
+    --color-popover-foreground: #1b1926 !important;
+    --color-secondary: #efeef5 !important;
+    --color-secondary-foreground: #514e63 !important;
+    --color-muted: #efeef5 !important;
+    --color-muted-foreground: #8c8a9c !important;
+    --color-border: rgba(26,24,44,.09) !important;
+    --color-input: #ffffff !important;
+    --theme-font-mono: 'JetBrains Mono', ui-monospace, monospace !important;
+    --theme-line-height: 1.5 !important;
+    --theme-radius: .8rem !important;
+    --radius: .8rem !important;
+  }
   /* Iris signature: thin spectral arc across the top of the shell */
   body::after {
     content: "";
@@ -76,6 +102,8 @@ customCSS: |
   /* Desktop: the Iris plugin renders its own grouped nav (overlay slot);
      hide the native flat list but keep the shell header/footer intact. */
   @media (min-width: 861px) {
+    /* mockup sidebar width: 240px (w-64 shrinks with the 13.5px base size) */
+    #app-sidebar { width: 240px !important; }
     #app-sidebar nav { visibility: hidden; }
     #app-sidebar > div:first-child { visibility: hidden; }
     #app-sidebar [aria-label="Collapse"] { display: none; }
