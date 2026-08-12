@@ -139,9 +139,20 @@ select.iris-input{background:var(--color-card,#1a1a22)}
 .iris-lg-e{color:var(--color-destructive,#e05a6b)}
 .iris-lg-d{opacity:.6}
 
-/* ---- sidebar (desktop, overlay slot) ---- */
-.iris-sidenav{position:fixed;left:0;top:52px;bottom:196px;width:240px;z-index:40;
-  overflow-y:auto;overflow-x:hidden;padding:8px 10px;display:flex;flex-direction:column}
+/* ---- sidebar (desktop, overlay slot) ----
+   The native aside is z-50: stay above it (z-51) or clicks never reach us. */
+.iris-sidenav{position:fixed;left:0;top:0;bottom:186px;width:240px;z-index:51;
+  overflow-y:auto;overflow-x:hidden;padding:0 10px 8px;display:flex;flex-direction:column}
+.iris-side-logo{display:flex;align-items:center;gap:10px;padding:12px 10px 10px;margin-bottom:4px;
+  border-bottom:1px solid var(--color-border,rgba(128,128,128,.2))}
+.iris-side-logo .mark{width:26px;height:26px;border-radius:8px;flex:none;position:relative;overflow:hidden;
+  border:1px solid var(--color-border,rgba(128,128,128,.3));
+  background:var(--color-card,rgba(128,128,128,.08))}
+.iris-side-logo .mark::before{content:"";position:absolute;left:-40%;right:-40%;top:52%;height:120%;
+  background:linear-gradient(90deg,#e05a6b,#e8a13c,#2fae72,#3f8fdf,#7668e8,#a75ce0);opacity:.85;
+  border-radius:50% 50% 0 0/100% 100% 0 0}
+.iris-side-logo b{font-size:15px;font-weight:700;letter-spacing:.01em;line-height:1.1}
+.iris-side-logo small{display:block;font-size:10px;color:var(--color-muted-foreground,#8c8a9c);font-weight:400}
 .iris-nav-label{font-size:10px;font-weight:650;letter-spacing:.1em;text-transform:uppercase;
   color:var(--color-muted-foreground,#8c8a9c);padding:10px 10px 4px}
 .iris-nav-item{position:relative;display:flex;align-items:center;gap:10px;width:100%;

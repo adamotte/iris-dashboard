@@ -1118,7 +1118,11 @@
   function SideNav() {
     var t = makeT(useLocale());
     var path = usePath();
-    return h("nav", { className: "iris-sidenav" }, NavItems(t, path, "iris-nav-item", navTo));
+    return h("nav", { className: "iris-sidenav" },
+      h("div", { className: "iris-side-logo" },
+        h("span", { className: "mark" }),
+        h("span", null, h("b", null, "Iris"), h("small", null, "Control Center"))),
+      NavItems(t, path, "iris-nav-item", navTo));
   }
   function MobileNav() {
     var t = makeT(useLocale());

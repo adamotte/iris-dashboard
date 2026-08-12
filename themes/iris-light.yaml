@@ -4,9 +4,10 @@ name: iris-light
 label: Iris (clair)
 description: Fond clair légèrement violacé, accent iris profond.
 
+# midground is the shell's PRIMARY TEXT color (accents come from colors.*)
 palette:
   background: "#f7f6fa"
-  midground: "#5b4bd4"
+  midground: "#1b1926"
   foreground:
     hex: "#1b1926"
     alpha: 1
@@ -74,5 +75,6 @@ customCSS: |
      hide the native flat list but keep the shell header/footer intact. */
   @media (min-width: 861px) {
     #app-sidebar nav { visibility: hidden; }
+    #app-sidebar > div:first-child { visibility: hidden; }
     #app-sidebar [aria-label="Collapse"] { display: none; }
   }

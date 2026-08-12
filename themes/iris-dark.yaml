@@ -6,9 +6,10 @@ name: iris-dark
 label: Iris (sombre)
 description: Base violacée profonde, accent iris, arc spectral discret.
 
+# midground is the shell's PRIMARY TEXT color (accents come from colors.*)
 palette:
   background: "#0f0e15"
-  midground: "#8b80f9"
+  midground: "#f0eff7"
   foreground:
     hex: "#f0eff7"
     alpha: 1
@@ -77,5 +78,6 @@ customCSS: |
      On mobile the native drawer keeps the flat nav. */
   @media (min-width: 861px) {
     #app-sidebar nav { visibility: hidden; }
+    #app-sidebar > div:first-child { visibility: hidden; }
     #app-sidebar [aria-label="Collapse"] { display: none; }
   }
