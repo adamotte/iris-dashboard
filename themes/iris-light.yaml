@@ -33,15 +33,18 @@ colors:
   input: "#ffffff"
   ring: "#5b4bd4"
 
-fontSans: "'Schibsted Grotesk', system-ui, sans-serif"
-fontMono: "'JetBrains Mono', ui-monospace, monospace"
-fontUrl: "https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:ital,wght@0,400..900;1,400&family=JetBrains+Mono:wght@400;500&display=swap"
-baseSize: "14px"
-lineHeight: "1.5"
-letterSpacing: "0"
+typography:
+  fontSans: "'Schibsted Grotesk', system-ui, sans-serif"
+  fontMono: "'JetBrains Mono', ui-monospace, monospace"
+  fontUrl: "https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:ital,wght@0,400..900;1,400&family=JetBrains+Mono:wght@400;500&display=swap"
+  baseSize: "14px"
+  lineHeight: "1.5"
+  letterSpacing: "0"
 
-radius: "0.8rem"
-density: comfortable
+layout:
+  radius: "0.8rem"
+  density: comfortable
+
 layoutVariant: standard
 
 assets:
@@ -54,18 +57,16 @@ componentStyles:
     background: "#ffffff"
 
 customCSS: |
-  [data-state="active"][role="tab"],
-  .nav-tab-active {
-    position: relative;
-  }
-  [data-state="active"][role="tab"]::after,
-  .nav-tab-active::after {
+  /* Iris signature: thin spectral arc across the top of the shell */
+  body::after {
     content: "";
-    position: absolute;
-    left: 10%;
-    right: 10%;
-    bottom: -1px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
     height: 2px;
-    border-radius: 2px;
+    z-index: 9999;
+    pointer-events: none;
     background: linear-gradient(90deg,#c94f5e,#cf8a1e,#1f9a60,#2f7fd0,#5b4bd4,#9048c9);
+    opacity: 0.85;
   }

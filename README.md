@@ -39,7 +39,7 @@ accessibility-validated themes. Everything is additive and removable in seconds.
 ### 🎨 Themes
 
 - 🌙 `iris-dark` / ☀️ `iris-light` — deep violet-tinted neutrals, single iris accent,
-  a discreet **spectral arc** on the active tab as the Iris signature
+  a discreet **spectral arc** across the top of the shell as the Iris signature
 - ✅ Chart & status colors validated for contrast and color-blindness in both themes
 - 🔤 Schibsted Grotesk + JetBrains Mono, clean backdrop (no background image)
 
@@ -85,16 +85,20 @@ cp themes/iris-*.yaml ~/.hermes/dashboard-themes/
 curl http://127.0.0.1:9119/api/dashboard/plugins/rescan
 ```
 
-### 🐳 Docker
+### 🐳 Docker (tested against the official image)
 
-If Hermes runs in a container, its data directory (`~/.hermes` inside the
-container) is normally a host-mounted volume. Two options:
+The official image is **`nousresearch/hermes-agent`** (Docker Hub). Inside it,
+the Hermes home is **`/opt/data`** (not `~/.hermes`) and is declared as the
+container volume. The dashboard runs as a supervised service gated by env vars:
+`HERMES_DASHBOARD=1`, plus either a loopback bind (`HERMES_DASHBOARD_HOST=127.0.0.1`
+behind your own reverse proxy / host network) or an auth provider
+(`HERMES_DASHBOARD_BASIC_AUTH_USERNAME` + `_PASSWORD`) for non-loopback binds.
 
 **Option A — copy into the volume (simplest).** No compose change needed:
 
 ```bash
 ./install.sh --docker /path/to/hermes-data
-docker restart hermes   # if the rescan endpoint is unreachable
+docker restart hermes   # the rescan endpoint is auth-gated; a restart always works
 ```
 
 **Option B — mount the git clone (git-pull updates).** Keep the clone on the
@@ -104,9 +108,14 @@ host and bind-mount only the plugin directory:
 # docker-compose.yml
 services:
   hermes:
+    image: nousresearch/hermes-agent
+    environment:
+      HERMES_DASHBOARD: "1"
+      HERMES_DASHBOARD_BASIC_AUTH_USERNAME: "admin"
+      HERMES_DASHBOARD_BASIC_AUTH_PASSWORD: "change-me"
     volumes:
-      - ./hermes-data:/root/.hermes
-      - /opt/iris-dashboard/plugins/iris:/root/.hermes/plugins/iris:ro
+      - ./hermes-data:/opt/data
+      - /opt/iris-dashboard/plugins/iris:/opt/data/plugins/iris:ro
 ```
 
 Themes are still copied into the volume (`./install.sh --docker ./hermes-data`):
@@ -114,21 +123,23 @@ bind-mounting individual files is fragile — `git pull` replaces the inode and
 the container keeps seeing the old content.
 
 Notes:
-- Check where the container home lives in your image (`/root/.hermes` vs
-  `/home/<user>/.hermes`) and adjust the target path.
-- The plugin is read-only for the dashboard, so `:ro` should be safe; if plugin
-  discovery misbehaves (known dashboard quirks on read-only filesystems in
-  Docker), drop `:ro` first.
-- After the first mount, restart the container — a rescan alone does not always
-  pick up a brand-new volume.
+- Non-official images may keep the home at `~/.hermes` — adjust the mount
+  target accordingly.
+- The plugin is read-only for the dashboard, so `:ro` is safe (verified).
+- After the first mount, restart the container — the rescan endpoint sits
+  behind the dashboard auth gate and a brand-new directory needs a fresh scan.
 
 ## 🔧 Configuration
 
-1. Open the dashboard (`hermes dashboard`) and reload the page — the Iris home
-   page replaces the *Status* page.
-2. Click the **palette icon** in the header and select **Iris (sombre)** or
+1. `install.sh` activates the plugin by adding `iris` to `plugins.enabled` in
+   `config.yaml` — a mandatory step for user dashboard plugins (security
+   hardening in recent Hermes versions; without it the plugin is discovered
+   but never served).
+2. Open the dashboard (`hermes dashboard`) and reload the page — the Iris home
+   page replaces the built-in home page.
+3. Click the **palette icon** in the header and select **Iris (sombre)** or
    **Iris (clair)**.
-3. That's it — there is nothing else to configure.
+4. That's it — there is nothing else to configure.
 
 ## 🧭 Data sources
 
@@ -146,14 +157,20 @@ Every block of the home page maps to a documented core API endpoint:
 | Skills | `GET /api/skills` |
 | CPU / memory / disk | `GET /api/system/stats` |
 
+## ✅ Verified against a real instance
+
+Tested end-to-end on **hermes-agent v0.20.0** (official Docker image): plugin
+discovery + activation, home-page override on `/`, live data rendering, theme
+palette/fonts/radius, spectral arc, EN/FR labels following the dashboard
+language, and mobile at 375 px (zero horizontal overflow, bottom bar active).
+
 ## ⚠️ Known limitations
 
-- Exact JSON response shapes are not specified by the documentation; unrecognized
-  fields degrade to `—` (open an issue with a sample response and it gets fixed).
-- The spectral-arc `customCSS` targets tab selectors that may change across
-  dashboard versions — purely cosmetic if it stops matching.
-- The native dashboard shell (header) has no documented mobile behavior; Iris
-  screens and the bottom bar are responsive regardless.
+- Exact JSON response shapes are not pinned by the documentation; the shapes of
+  v0.20.0 are covered and unrecognized fields degrade to `—` (open an issue
+  with a sample response and it gets fixed).
+- The native dashboard shell (header/sidebar) handles narrow viewports on its
+  own terms; Iris screens and the bottom bar are responsive regardless.
 - Only one plugin can override `/` — if another plugin claims it, the first one
   loaded wins.
 - The exact shape of the `SDK.useI18n` hook is undocumented: the plugin probes
