@@ -162,14 +162,14 @@ select.iris-input{background:var(--color-card,#1a1a22)}
 /* ---- sidebar (desktop, overlay slot) ----
    The native aside is z-50: stay above it (z-51) or clicks never reach us. */
 .iris-sidenav{position:fixed;left:0;top:0;bottom:186px;width:240px;z-index:51;
-  overflow-y:auto;overflow-x:hidden;padding:0 10px 8px;display:flex;flex-direction:column;
-  scrollbar-width:thin;
-  scrollbar-color:color-mix(in srgb,var(--color-foreground,#888) 18%,transparent) transparent}
-.iris-sidenav::-webkit-scrollbar{width:6px}
-.iris-sidenav::-webkit-scrollbar-track{background:transparent}
-.iris-sidenav::-webkit-scrollbar-thumb{border-radius:3px;
-  background:color-mix(in srgb,var(--color-foreground,#888) 18%,transparent)}
-.iris-side-logo{display:flex;align-items:center;gap:10px;padding:10px 10px 8px;margin-bottom:6px;
+  overflow:hidden;padding:0 0 8px 10px;display:flex;flex-direction:column}
+/* Scrolling lives on an inner wrapper inset 10px from the content boundary,
+   so the thumb stays inside the menu; it only shows while the menu is hovered. */
+.iris-nav-scroll{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;margin-right:10px;
+  scrollbar-width:thin;scrollbar-color:transparent transparent}
+.iris-sidenav:hover .iris-nav-scroll{
+  scrollbar-color:color-mix(in srgb,var(--color-foreground,#888) 25%,transparent) transparent}
+.iris-side-logo{display:flex;align-items:center;gap:10px;padding:10px 10px 8px;margin:0 10px 6px 0;
   border-bottom:1px solid var(--color-border,rgba(128,128,128,.2))}
 .iris-side-logo .mark{width:26px;height:26px;border-radius:8px;flex:none;position:relative;overflow:hidden;
   border:1px solid var(--color-border,rgba(128,128,128,.3));

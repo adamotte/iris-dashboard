@@ -20,7 +20,7 @@
 
 Iris redesigns the whole dashboard: a control-center home page, redesigned
 versions of every page (Sessions, Analytics, Cron, Webhooks, Skills, MCP,
-Toolsets, Channels, Pairing, Profiles, Config, Keys, Logs, System), a grouped
+Toolsets, Plugins, Channels, Pairing, Profiles, Config, Keys, Logs, System), a grouped
 sidebar, mobile navigation, and two accessibility-validated themes. Native
 pages (Chat/TUI, Files, Models, Docs) stay untouched and keep working.
 Everything is additive and removable in seconds.
@@ -40,9 +40,10 @@ Everything is additive and removable in seconds.
   prune/export), Analytics (periods, per-model and daily tables), Cron (create,
   run/pause/delete), Webhooks, Skills (search, categories, toggles, curator),
   MCP (test/toggle/catalog), Toolsets, Channels (gateway control, per-platform
-  test), Pairing (approve/revoke), Profiles, Config (editable + raw view), API
-  Keys (grouped, set/delete), Logs (live tail, filters), System (host, memory,
-  checkpoints, operations)
+  test), Plugins (dashboard + agent plugins, hide/show, rescan), Pairing
+  (approve/revoke), Profiles, Config (editable + raw view), API Keys (grouped,
+  set/delete), Logs (live tail, filters), System (host, memory, checkpoints,
+  operations)
 
 ### 🏠 Control-center home page (plugin)
 

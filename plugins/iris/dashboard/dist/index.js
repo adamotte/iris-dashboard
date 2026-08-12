@@ -108,7 +108,16 @@
       host: "Host", uptime: "up {0}", checkpoints: "Checkpoints", pruneCp: "Prune checkpoints",
       opsTitle: "Operations", doctor: "Doctor", audit: "Security audit", backup: "Backup",
       dump: "Support dump", memReset: "Reset memory", confirmReset: "Reset the built-in memory store?",
-      launched: "{0} launched — check the logs", curatorPause: "Pause", curatorResume: "Resume"
+      launched: "{0} launched — check the logs", curatorPause: "Pause", curatorResume: "Resume",
+      /* plugins */
+      plgTitle: "Plugins", plgDesc: "Dashboard pages, agent plugins and providers",
+      plgRescan: "Rescan", plgDash: "Dashboard plugins", plgAgents: "Agent plugins",
+      plgActive: "{0} active", plgVisible: "{0} visible", plgHiddenT: "Hidden",
+      plgHidden: "hidden", plgOverride: "overrides {0}", plgTab: "tab {0}",
+      plgSlotsN: "{0} slot(s)", plgApi: "backend API", plgAuth: "auth required",
+      plgNote: "Hidden plugins stay installed but are no longer loaded — hide an Iris page to get the native page back.",
+      plgAll: "All", plgProviders: "Providers", plgPlatforms: "Platforms",
+      plgWeb: "Web search", plgBrowser: "Browser", plgOther: "Other"
     },
     fr: {
       overview: "Vue d'ensemble", gatewayOnline: "Passerelle en ligne", gatewayDown: "Passerelle arrêtée",
@@ -178,7 +187,15 @@
       host: "Hôte", uptime: "en ligne {0}", checkpoints: "Checkpoints", pruneCp: "Élaguer les checkpoints",
       opsTitle: "Opérations", doctor: "Doctor", audit: "Audit sécurité", backup: "Sauvegarde",
       dump: "Dump support", memReset: "Réinitialiser la mémoire", confirmReset: "Réinitialiser le store mémoire intégré ?",
-      launched: "{0} lancé — voir les logs", curatorPause: "Pause", curatorResume: "Reprendre"
+      launched: "{0} lancé — voir les logs", curatorPause: "Pause", curatorResume: "Reprendre",
+      plgTitle: "Plugins", plgDesc: "Pages du dashboard, plugins agent et providers",
+      plgRescan: "Rescanner", plgDash: "Plugins dashboard", plgAgents: "Plugins agent",
+      plgActive: "{0} actifs", plgVisible: "{0} visibles", plgHiddenT: "Masqués",
+      plgHidden: "masqué", plgOverride: "surcharge {0}", plgTab: "onglet {0}",
+      plgSlotsN: "{0} slot(s)", plgApi: "API backend", plgAuth: "auth requise",
+      plgNote: "Un plugin masqué reste installé mais n'est plus chargé — masquez une page Iris pour retrouver la page native.",
+      plgAll: "Tous", plgProviders: "Providers", plgPlatforms: "Plateformes",
+      plgWeb: "Recherche web", plgBrowser: "Navigateur", plgOther: "Autres"
     }
   };
 
@@ -1159,6 +1176,90 @@
           op(t("backup"), "/api/ops/backup"), op(t("dump"), "/api/ops/dump"))));
   }
 
+  /* ================= PLUGINS ================= */
+  // A dashboard plugin hidden via /visibility drops out of GET /api/dashboard/plugins
+  // but stays in the hub's orphan list: hidden = in hub, not in the loader list.
+  function agentCat(name) {
+    var n = String(name);
+    if (/-provider$/.test(n)) return "providers";
+    if (/-platform$/.test(n)) return "platforms";
+    if (n.indexOf("web-") === 0) return "web";
+    if (n.indexOf("browser-") === 0) return "browser";
+    return "other";
+  }
+  function PluginsPage() {
+    var locale = useLocale(); var t = makeT(locale);
+    var bp = useState(0); var bump = bp[0], setBump = bp[1];
+    var qs = useState(""); var q = qs[0], setQ = qs[1];
+    var cs = useState("all"); var cat = cs[0], setCat = cs[1];
+    var loaded = useJSON("/api/dashboard/plugins", 60000, bump);
+    var hub = useJSON("/api/dashboard/plugins/hub", 60000, bump);
+    var reload = function () { setBump(bump + 1); };
+    var loadedSet = {};
+    asList(loaded, []).forEach(function (p) { loadedSet[p.name] = 1; });
+    // hub knows hidden plugins too; before it answers, fall back to the loader list
+    var dash = hub ? asList(hub.orphan_dashboard_plugins, []) : asList(loaded, []);
+    var agents = hub ? asList(hub.plugins, []) : [];
+    var hiddenCount = hub ? dash.filter(function (p) { return !loadedSet[p.name]; }).length : 0;
+    var activeAgents = agents.filter(function (p) { return p.runtime_status === "active"; });
+    function setHidden(name, hidden) {
+      act(t, "/api/dashboard/plugins/" + encodeURIComponent(name) + "/visibility",
+        jinit("POST", { hidden: hidden }), reload);
+    }
+    function dashCard(p) {
+      var hidden = hub ? !loadedSet[p.name] : false;
+      var tab = p.tab || {};
+      return h("div", { className: "iris-mini", key: p.name, style: hidden ? { opacity: 0.55 } : null },
+        h("div", { className: "mc-head" }, Icon("puzzle", "dim"), h("b", null, p.label || p.name),
+          Switch(!hidden, function () { setHidden(p.name, !hidden); })),
+        h("p", null, p.description || ""),
+        h("div", { className: "mc-foot" },
+          h("span", { className: "num" }, p.name + (p.version ? " · v" + p.version : "")),
+          tab.override ? Badge(t("plgOverride", tab.override), "iris")
+            : (tab.path ? Badge(t("plgTab", tab.path), "neutral") : null),
+          p.slots && p.slots.length ? Badge(t("plgSlotsN", p.slots.length), "neutral") : null,
+          p.has_api ? Badge(t("plgApi"), "warn") : null,
+          hidden ? Badge(t("plgHidden"), "neutral") : null));
+    }
+    var catOpts = [
+      { v: "all", l: t("plgAll") }, { v: "providers", l: t("plgProviders") },
+      { v: "platforms", l: t("plgPlatforms") }, { v: "web", l: t("plgWeb") },
+      { v: "browser", l: t("plgBrowser") }, { v: "other", l: t("plgOther") }];
+    var shown = agents.filter(function (p) {
+      if (cat !== "all" && agentCat(p.name) !== cat) return false;
+      if (q && (p.name + " " + (p.description || "")).toLowerCase().indexOf(q.toLowerCase()) < 0) return false;
+      return true;
+    });
+    return h("div", { className: "iris-page" },
+      PageHead(t("plgTitle"), t("plgDesc"),
+        Btn(t("plgRescan"), function () { act(t, "/api/dashboard/plugins/rescan", undefined, reload); }, "primary")),
+      h("div", { className: "iris-tiles" },
+        Tile(TL("puzzle", t("plgDash")), dash.length, t("plgVisible", dash.length - hiddenCount)),
+        Tile(TL("plug", t("plgAgents")), agents.length, t("plgActive", activeAgents.length)),
+        Tile(TL("x", t("plgHiddenT")), hiddenCount, " "),
+        Tile(TL("brain", t("provider")), (hub && hub.providers && hub.providers.memory_provider) || "built-in",
+          hub && hub.providers ? (hub.providers.context_engine || " ") : " ")),
+      h("div", null,
+        h("div", { className: "iris-nav-label", style: { padding: "6px 0" } }, t("plgDash")),
+        h("div", { className: "iris-cards" }, dash.map(dashCard)),
+        h("div", { className: "iris-note" }, t("plgNote"))),
+      agents.length ? h("div", null,
+        h("div", { className: "iris-nav-label", style: { padding: "10px 0 6px" } },
+          t("plgAgents") + " (" + agents.length + ")"),
+        h("div", { className: "iris-filterbar", style: { marginBottom: 10 } },
+          h("input", { className: "iris-input", type: "search", placeholder: t("search"), value: q, onChange: function (e) { setQ(e.target.value); } }),
+          Chips(catOpts, cat, setCat)),
+        Card(null, null, shown.length ? shown.slice(0, 120).map(function (p, i) {
+          return h(React.Fragment, { key: p.name + i },
+            Row(p.runtime_status === "active" ? "good" : "",
+              p.name + (p.version ? " · v" + p.version : ""),
+              p.description || "",
+              h("span", null,
+                p.auth_required ? Badge(t("plgAuth"), "warn") : null,
+                Badge(p.runtime_status || "?", p.runtime_status === "active" ? "good" : "neutral"))));
+        }) : Empty("—"))) : null);
+  }
+
   /* ================= NAVIGATION (overlay slot) ================= */
   function NavItems(t, path, cls, onNav) {
     var groups = [
@@ -1188,7 +1289,8 @@
       h("div", { className: "iris-side-logo" },
         h("span", { className: "mark" }),
         h("span", null, h("b", null, "Iris"), h("small", null, "Control Center"))),
-      NavItems(t, path, "iris-nav-item", navTo));
+      h("div", { className: "iris-nav-scroll" },
+        NavItems(t, path, "iris-nav-item", navTo)));
   }
   function MobileNav() {
     var t = makeT(useLocale());
@@ -1220,7 +1322,8 @@
     "iris-config": ConfigPage,
     "iris-keys": KeysPage,
     "iris-logs": LogsPage,
-    "iris-system": SystemPage
+    "iris-system": SystemPage,
+    "iris-plugins": PluginsPage
   };
   REG.register("iris", HomePage);
   REG.registerSlot("iris", "overlay", Overlay);
