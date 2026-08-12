@@ -162,8 +162,14 @@ select.iris-input{background:var(--color-card,#1a1a22)}
 /* ---- sidebar (desktop, overlay slot) ----
    The native aside is z-50: stay above it (z-51) or clicks never reach us. */
 .iris-sidenav{position:fixed;left:0;top:0;bottom:186px;width:240px;z-index:51;
-  overflow-y:auto;overflow-x:hidden;padding:0 10px 8px;display:flex;flex-direction:column}
-.iris-side-logo{display:flex;align-items:center;gap:10px;padding:12px 10px 10px;margin-bottom:4px;
+  overflow-y:auto;overflow-x:hidden;padding:0 10px 8px;display:flex;flex-direction:column;
+  scrollbar-width:thin;
+  scrollbar-color:color-mix(in srgb,var(--color-foreground,#888) 18%,transparent) transparent}
+.iris-sidenav::-webkit-scrollbar{width:6px}
+.iris-sidenav::-webkit-scrollbar-track{background:transparent}
+.iris-sidenav::-webkit-scrollbar-thumb{border-radius:3px;
+  background:color-mix(in srgb,var(--color-foreground,#888) 18%,transparent)}
+.iris-side-logo{display:flex;align-items:center;gap:10px;padding:10px 10px 8px;margin-bottom:6px;
   border-bottom:1px solid var(--color-border,rgba(128,128,128,.2))}
 .iris-side-logo .mark{width:26px;height:26px;border-radius:8px;flex:none;position:relative;overflow:hidden;
   border:1px solid var(--color-border,rgba(128,128,128,.3));
@@ -173,12 +179,11 @@ select.iris-input{background:var(--color-card,#1a1a22)}
   border-radius:50% 50% 0 0/100% 100% 0 0}
 .iris-side-logo b{font-size:15px;font-weight:700;letter-spacing:.01em;line-height:1.1}
 .iris-side-logo small{display:block;font-size:10px;color:var(--color-muted-foreground,#8c8a9c);font-weight:400}
-.iris-nav-group{margin-bottom:14px}
-.iris-nav-group + .iris-nav-group{padding-top:2px}
+.iris-nav-group{margin-bottom:10px}
 .iris-nav-label{font-size:10px;font-weight:650;letter-spacing:.11em;text-transform:uppercase;
   color:var(--color-muted-foreground,#8c8a9c);opacity:.85;padding:0 10px;margin:0 0 5px}
 .iris-nav-item{position:relative;display:flex;align-items:center;gap:10px;width:100%;
-  padding:6.5px 10px;border-radius:8px;color:var(--color-muted-foreground,#8c8a9c);
+  padding:5px 10px;border-radius:8px;color:var(--color-muted-foreground,#8c8a9c);
   font-weight:500;font-size:13px;text-align:left;background:none;border:none;cursor:pointer;
   font-family:inherit;text-decoration:none}
 .iris-nav-item .iris-ic{opacity:.9}
@@ -192,6 +197,14 @@ select.iris-input{background:var(--color-card,#1a1a22)}
 .iris-nav-badge{margin-left:auto;font-size:10.5px;font-weight:650;
   background:color-mix(in srgb,var(--color-warning,#fab219) 15%,transparent);
   color:var(--color-warning,#fab219);padding:1px 7px;border-radius:99px}
+/* short viewports: densify so the nav fits without scrolling */
+@media (max-height:840px){
+  .iris-nav-item{padding:3.5px 10px;font-size:12.5px}
+  .iris-nav-item .iris-ic{width:14px;height:14px}
+  .iris-nav-group{margin-bottom:7px}
+  .iris-nav-label{margin-bottom:3px}
+  .iris-side-logo{padding:8px 10px 6px}
+}
 @media (max-width:860px){.iris-sidenav{display:none}}
 
 /* ---- mobile bar (overlay slot) ---- */

@@ -45,7 +45,7 @@
       navAnalytics: "Analytics", navWebhooks: "Webhooks", navSkills: "Skills", navMcp: "MCP",
       navToolsets: "Toolsets", navModels: "Models", navChannels: "Channels", navPairing: "Pairing",
       navProfiles: "Profiles", navKeys: "API Keys", navFiles: "Files", navSystem: "System",
-      navDocs: "Documentation", grpAutomation: "Automation", grpCapabilities: "Capabilities",
+      navDocs: "Documentation", navPlugins: "Plugins", grpAutomation: "Automation", grpCapabilities: "Capabilities",
       grpConnectivity: "Connectivity", grpAdmin: "Administration",
       /* common */
       search: "Search…", refresh: "Refresh", enabled: "enabled", disabled: "disabled",
@@ -130,7 +130,7 @@
       navAnalytics: "Analytics", navWebhooks: "Webhooks", navSkills: "Skills", navMcp: "MCP",
       navToolsets: "Toolsets", navModels: "Modèles", navChannels: "Canaux", navPairing: "Appairage",
       navProfiles: "Profils", navKeys: "Clés API", navFiles: "Fichiers", navSystem: "Système",
-      navDocs: "Documentation", grpAutomation: "Automatisation", grpCapabilities: "Capacités",
+      navDocs: "Documentation", navPlugins: "Plugins", grpAutomation: "Automatisation", grpCapabilities: "Capacités",
       grpConnectivity: "Connectivité", grpAdmin: "Administration",
       search: "Rechercher…", refresh: "Actualiser", enabled: "activé", disabled: "désactivé",
       actions: "Actions", name: "Nom", description: "Description", status: "État",
@@ -341,7 +341,8 @@
     shield: [P("M12 2 4 5.5v5.6c0 5 3.4 8.5 8 10.4 4.6-1.9 8-5.4 8-10.4V5.5Z"), P("m8.5 12 2.5 2.5 4.5-5")],
     globe: [C(12, 12, 9), P("M3 12h18"), P("M12 3a14.5 14.5 0 0 1 0 18 14.5 14.5 0 0 1 0-18Z")],
     brain: [P("M12 4a3 3 0 0 0-3 3 3 3 0 0 0-3 3 3 3 0 0 0 .5 5.5A3 3 0 0 0 9 21h6a3 3 0 0 0 2.5-5.5A3 3 0 0 0 18 10a3 3 0 0 0-3-3 3 3 0 0 0-3-3Z"), P("M12 4v17")],
-    alert: [P("M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"), P("M12 9v4M12 17h.01")]
+    alert: [P("M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"), P("M12 9v4M12 17h.01")],
+    puzzle: [P("M14 7h2a2 2 0 0 1 2 2v2h1.5a1.5 1.5 0 0 1 0 3H18v2a2 2 0 0 1-2 2h-2v-1.5a1.5 1.5 0 0 0-3 0V18H9a2 2 0 0 1-2-2v-2H5.5a1.5 1.5 0 0 1 0-3H7V9a2 2 0 0 1 2-2h2V5.5a1.5 1.5 0 0 1 3 0V7Z")]
   };
   function Icon(name, cls) {
     return h("svg", { className: "iris-ic " + (cls || ""), viewBox: "0 0 24 24", "aria-hidden": "true" },
@@ -1163,7 +1164,7 @@
     var groups = [
       [null, [["/", t("navHome"), "grid"], ["/chat", t("navChat"), "chat"], ["/sessions", t("navSessions"), "hist"], ["/analytics", t("navAnalytics"), "chart"]]],
       [t("grpAutomation"), [["/cron", t("navCron"), "clock"], ["/webhooks", t("navWebhooks"), "hook"]]],
-      [t("grpCapabilities"), [["/skills", t("navSkills"), "spark"], ["/mcp", t("navMcp"), "plug"], ["/toolsets", t("navToolsets"), "tool"], ["/models", t("navModels"), "brain"]]],
+      [t("grpCapabilities"), [["/skills", t("navSkills"), "spark"], ["/mcp", t("navMcp"), "plug"], ["/toolsets", t("navToolsets"), "tool"], ["/plugins", t("navPlugins"), "puzzle"], ["/models", t("navModels"), "brain"]]],
       [t("grpConnectivity"), [["/channels", t("navChannels"), "radio"], ["/pairing", t("navPairing"), "link"]]],
       [t("grpAdmin"), [["/config", t("navConfig"), "cog"], ["/env", t("navKeys"), "key"], ["/profiles", t("navProfiles"), "users"],
         ["/files", t("navFiles"), "file"], ["/logs", t("logs"), "file"], ["/system", t("navSystem"), "server"], ["/docs", t("navDocs"), "globe"]]]
