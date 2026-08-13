@@ -87,6 +87,14 @@ customCSS: |
     --theme-line-height: 1.5 !important;
     --theme-radius: .8rem !important;
     --radius: .8rem !important;
+    /* Iris chart/series + surface tokens (mockup) */
+    --iris-series-1: #7668e8;
+    --iris-series-2: #199e70;
+    --iris-series-3: #c98500;
+    --iris-grid: rgba(255,255,255,.06);
+    --iris-hover: rgba(255,255,255,.045);
+    --iris-shadow: none;
+    --iris-shadow-pop: 0 8px 32px rgba(0,0,0,.45);
   }
   /* Iris signature: thin spectral arc across the top of the shell */
   body::after {

@@ -28,10 +28,10 @@
       overview: "Overview", gatewayOnline: "Gateway online", gatewayDown: "Gateway stopped",
       activeSessionsSuffix: "active session(s)", logs: "Logs", openChat: "Open chat",
       costToday: "Cost today", avg7d: "7-day average: {0} / day", viaAnalytics: "via /api/analytics/usage",
-      tokensLastDay: "Tokens · last day", cacheRate: "cache rate {0} %", activeSessions: "Active sessions",
+      tokensLastDay: "Tokens · 24 h", cacheRate: "cache rate {0} %", activeSessions: "Active sessions",
       recentSessionsCount: "{0} recent sessions", nextAutomation: "Next automation", jobs: "jobs",
       noScheduledJob: "no scheduled job", automationsLastRuns: "Automations · latest runs", cron: "Cron",
-      noCronJob: "No cron job configured", usage14d: "Usage · 14 days", total: "total",
+      noCronJob: "No cron job configured", usage14d: "Usage", total: "total",
       recentSessions: "Recent sessions", all: "All", noRecentSession: "No recent session",
       needsAttention: "Needs attention", nothingPending: "Nothing pending ✓", pairing: "Pairing",
       pairingCode: "code", handle: "Handle", channelDisconnected: "{0}: disconnected",
@@ -93,21 +93,21 @@
       pfTitle: "Profiles", pfDesc: "Isolated Iris instances — dedicated config, skills and sessions",
       pfDefault: "default", pfSkills: "{0} skills",
       /* config */
-      cfgTitle: "Configuration", cfgDesc: "Edit config.yaml without touching YAML",
+      cfgTitle: "Configuration", cfgDesc: "Edit config.yaml without touching YAML — 150+ organized settings",
       cfgModel: "Default model", cfgMaxLive: "Max live sessions", cfgMaxTurns: "Max agent turns",
       cfgRawView: "Raw view (read-only)", cfgSaveNote: "Saves via PUT /api/config",
       /* keys */
       keysTitle: "API Keys", keysDesc: "Manage the .env file — values never leave your server",
-      keySet: "set", keyUnset: "unset", keyEdit: "Edit", keyDefine: "Set", keyDelete: "Delete",
+      keySet: "set", keyUnset: "missing", keyEdit: "Edit", keyDefine: "Set", keyDelete: "Delete",
       keyShowAdvanced: "Show advanced keys", keyPrompt: "Value for {0}:",
       /* logs */
-      logsTitle: "Logs", logsDesc: "Agent, gateway and errors — live tail",
+      logsTitle: "Logs", logsDesc: "Agent, gateway and errors consolidated — live tail",
       liveTail: "Live tail", lines: "lines",
       /* system */
-      sysTitle: "System", sysDesc: "Host, gateway, memory and operations",
-      host: "Host", uptime: "up {0}", checkpoints: "Checkpoints", pruneCp: "Prune checkpoints",
+      sysTitle: "System", sysDesc: "Installation administration — host, gateway, memory, operations",
+      host: "Host", uptime: "up {0}", checkpoints: "Checkpoints", pruneCp: "Prune old checkpoints",
       opsTitle: "Operations", doctor: "Doctor", audit: "Security audit", backup: "Backup",
-      dump: "Support dump", memReset: "Reset memory", confirmReset: "Reset the built-in memory store?",
+      dump: "Support dump", memReset: "Reset", confirmReset: "Reset the built-in memory store?",
       launched: "{0} launched — check the logs", curatorPause: "Pause", curatorResume: "Resume",
       /* plugins */
       plgTitle: "Plugins", plgDesc: "Dashboard pages, agent plugins and providers",
@@ -117,16 +117,42 @@
       plgSlotsN: "{0} slot(s)", plgApi: "backend API", plgAuth: "auth required",
       plgNote: "Hidden plugins stay installed but are no longer loaded — hide an Iris page to get the native page back.",
       plgAll: "All", plgProviders: "Providers", plgPlatforms: "Platforms",
-      plgWeb: "Web search", plgBrowser: "Browser", plgOther: "Other"
+      plgWeb: "Web search", plgBrowser: "Browser", plgOther: "Other",
+      /* mockup-fidelity pass */
+      hello: "Hello", newSession: "New session", sessionsToday: "{0} sessions today",
+      jobsActive: "{0} active jobs", inTime: "in {0}", executed: "Executed",
+      cacheAvg: "Avg cache", missingKey: "Missing API key", configure: "Configure",
+      authExpired: "auth expired", lastConsolidation: "last consolidation: {0}",
+      sessActive: "{0} active", searchFTS: "Search messages… (FTS)",
+      allModels: "All models", allSources: "All sources",
+      vsPrev: "vs previous period", perDayAvg: "{0} / day on average", avgPerDay: "avg {0} / day",
+      share: "Share", cronSub: "{0} active jobs · {1} paused",
+      whNone: "No webhook configured", copy: "Copy", copied: "Copied ✓",
+      curatorNote: "Automatic consolidation of agent-created skills.",
+      curatorRunNow: "Run now", searchSkill: "Search skills…",
+      mcpError: "error", verifiedNous: "Nous verified",
+      owner: "owner", admin: "admin", since: "since {0}",
+      cfgImport: "Import", cfgExport: "Export",
+      tabModel: "Model", tabAgent: "Agent", tabMemory: "Memory",
+      tabApprovals: "Approvals", tabGateway: "Gateway", tabDisplay: "Display",
+      cfgProvider: "Provider", cfgCtx: "Context window",
+      cfgModelHint: "Used for chat and new sessions.",
+      cfgCronModel: "Cron / background model", cfgApprovalMode: "Approval mode",
+      logAll: "All", logInfo: "Info", logWarn: "Warn", logError: "Error",
+      gwConnStat: "{0} platform(s) connected", memPersist: "Persistent memory",
+      providersAvail: "Available providers:", activeMark: "(active)",
+      gwRestart: "Restart", gwStop: "Stop", gwStart: "Start",
+      navMore: "More", online: "online", offline: "stopped",
+      catProvider: "LLM providers", catTool: "Tools", catMessaging: "Messaging", catSetting: "Settings"
     },
     fr: {
       overview: "Vue d'ensemble", gatewayOnline: "Passerelle en ligne", gatewayDown: "Passerelle arrêtée",
       activeSessionsSuffix: "session(s) active(s)", logs: "Logs", openChat: "Ouvrir le chat",
       costToday: "Coût aujourd'hui", avg7d: "moyenne 7 j : {0} / jour", viaAnalytics: "via /api/analytics/usage",
-      tokensLastDay: "Tokens · dernier jour", cacheRate: "taux de cache {0} %", activeSessions: "Sessions actives",
+      tokensLastDay: "Tokens · 24 h", cacheRate: "taux de cache {0} %", activeSessions: "Sessions actives",
       recentSessionsCount: "{0} sessions récentes", nextAutomation: "Prochaine automatisation", jobs: "jobs",
       noScheduledJob: "aucun job planifié", automationsLastRuns: "Automatisations · dernières exécutions", cron: "Cron",
-      noCronJob: "Aucun job cron configuré", usage14d: "Utilisation · 14 jours", total: "total",
+      noCronJob: "Aucun job cron configuré", usage14d: "Utilisation", total: "total",
       recentSessions: "Sessions récentes", all: "Toutes", noRecentSession: "Aucune session récente",
       needsAttention: "À traiter", nothingPending: "Rien à traiter ✓", pairing: "Appairage",
       pairingCode: "code", handle: "Traiter", channelDisconnected: "{0} : déconnecté",
@@ -149,7 +175,7 @@
       model: "Modèle", lastActivity: "Dernière activité", source: "Source", export: "Exporter",
       deleteS: "Supprimer", pruneOld: "Purger > 90 j", confirmPrune: "Supprimer les sessions terminées de plus de 90 jours ?",
       noSessions: "Aucune session pour l'instant", searchResults: "Résultats de recherche", resumeChat: "Reprendre dans le chat",
-      analyticsTitle: "Analytics", analyticsDesc: "Consommation, coûts et cache calculés depuis l'historique",
+      analyticsTitle: "Analytics", analyticsDesc: "Consommation, coûts et taux de cache calculés depuis l'historique des sessions",
       period: "{0} j", cacheTitle: "Taux de cache", sessionsCount: "Sessions", perModel: "Par modèle",
       estCost: "Coût estimé", dailyDetail: "Détail journalier", date: "Date", cache: "Cache", noUsage: "Aucune utilisation enregistrée",
       cronTitle: "Automatisations planifiées", cronDesc: "Les jobs tournent même pendant votre sommeil — résultats sur vos canaux",
@@ -162,12 +188,12 @@
       whSecretNote: "Le secret de signature n'est montré qu'à la création.",
       skillsTitle: "Skills", skillsDesc: "{0} installées · {1} activées · le curateur consolide chaque nuit",
       curator: "Curateur de skills", curatorRun: "Exécuter", categoryAll: "Toutes", usageN: "{0} utilisations",
-      mcpTitle: "Serveurs MCP", mcpDesc: "Étendez Iris avec des serveurs Model Context Protocol — sans YAML",
+      mcpTitle: "Serveurs MCP", mcpDesc: "Étendez Iris avec des serveurs Model Context Protocol — sans toucher au YAML",
       mcpAdd: "Ajouter un serveur", mcpTest: "Tester", mcpCatalog: "Catalogue Nous — installation en un clic",
       mcpInstall: "Installer", mcpNone: "Aucun serveur MCP configuré", verified: "vérifié",
-      tsTitle: "Toolsets", tsDesc: "Groupes d'outils intégrés — activez uniquement le nécessaire",
+      tsTitle: "Toolsets", tsDesc: "Groupes d'outils intégrés — activez uniquement ce dont l'agent a besoin",
       toolsN: "{0} outils", notConfigured: "clé manquante",
-      chTitle: "Canaux de messagerie", chDesc: "Une seule Iris, tous vos canaux — même mémoire, même contexte",
+      chTitle: "Canaux de messagerie", chDesc: "Une seule Iris, tous vos canaux — même mémoire, même contexte partout",
       chRestart: "Redémarrer la passerelle", chStart: "Démarrer la passerelle", chStop: "Arrêter la passerelle", chTest: "Tester",
       connected: "connecté", configured: "configuré", notSetUp: "non configuré",
       prTitle: "Appairage", prDesc: "Contrôlez qui peut parler à Iris sur chaque plateforme",
@@ -175,18 +201,18 @@
       revoke: "Révoquer", clearPending: "Vider les demandes", noPending: "Aucune demande en attente",
       pfTitle: "Profils", pfDesc: "Instances isolées d'Iris — config, skills et sessions dédiées",
       pfDefault: "par défaut", pfSkills: "{0} skills",
-      cfgTitle: "Configuration", cfgDesc: "Éditez config.yaml sans toucher au YAML",
+      cfgTitle: "Configuration", cfgDesc: "Éditez config.yaml sans toucher au YAML — 150+ réglages organisés",
       cfgModel: "Modèle par défaut", cfgMaxLive: "Sessions simultanées max", cfgMaxTurns: "Tours agent max",
       cfgRawView: "Vue brute (lecture seule)", cfgSaveNote: "Enregistre via PUT /api/config",
       keysTitle: "Clés API", keysDesc: "Gérez le fichier .env — les valeurs ne quittent jamais votre serveur",
-      keySet: "définie", keyUnset: "absente", keyEdit: "Modifier", keyDefine: "Définir", keyDelete: "Supprimer",
+      keySet: "définie", keyUnset: "manquante", keyEdit: "Modifier", keyDefine: "Définir", keyDelete: "Supprimer",
       keyShowAdvanced: "Afficher les clés avancées", keyPrompt: "Valeur pour {0} :",
-      logsTitle: "Logs", logsDesc: "Agent, passerelle et erreurs — suivi en direct",
+      logsTitle: "Logs", logsDesc: "Agent, passerelle et erreurs consolidés — suivi en direct",
       liveTail: "Suivi live", lines: "lignes",
-      sysTitle: "Système", sysDesc: "Hôte, passerelle, mémoire et opérations",
-      host: "Hôte", uptime: "en ligne {0}", checkpoints: "Checkpoints", pruneCp: "Élaguer les checkpoints",
+      sysTitle: "Système", sysDesc: "Administration de l'installation — hôte, passerelle, mémoire, opérations",
+      host: "Hôte", uptime: "en ligne {0}", checkpoints: "Checkpoints", pruneCp: "Élaguer les anciens checkpoints",
       opsTitle: "Opérations", doctor: "Doctor", audit: "Audit sécurité", backup: "Sauvegarde",
-      dump: "Dump support", memReset: "Réinitialiser la mémoire", confirmReset: "Réinitialiser le store mémoire intégré ?",
+      dump: "Dump support", memReset: "Réinitialiser", confirmReset: "Réinitialiser le store mémoire intégré ?",
       launched: "{0} lancé — voir les logs", curatorPause: "Pause", curatorResume: "Reprendre",
       plgTitle: "Plugins", plgDesc: "Pages du dashboard, plugins agent et providers",
       plgRescan: "Rescanner", plgDash: "Plugins dashboard", plgAgents: "Plugins agent",
@@ -195,7 +221,32 @@
       plgSlotsN: "{0} slot(s)", plgApi: "API backend", plgAuth: "auth requise",
       plgNote: "Un plugin masqué reste installé mais n'est plus chargé — masquez une page Iris pour retrouver la page native.",
       plgAll: "Tous", plgProviders: "Providers", plgPlatforms: "Plateformes",
-      plgWeb: "Recherche web", plgBrowser: "Navigateur", plgOther: "Autres"
+      plgWeb: "Recherche web", plgBrowser: "Navigateur", plgOther: "Autres",
+      hello: "Bonjour", newSession: "Nouvelle session", sessionsToday: "{0} sessions aujourd'hui",
+      jobsActive: "{0} jobs actifs", inTime: "dans {0}", executed: "Exécuté",
+      cacheAvg: "Cache moyen", missingKey: "Clé API manquante", configure: "Configurer",
+      authExpired: "auth expirée", lastConsolidation: "dernière consolidation : {0}",
+      sessActive: "{0} actives", searchFTS: "Rechercher dans les messages… (FTS)",
+      allModels: "Tous les modèles", allSources: "Toutes sources",
+      vsPrev: "vs période préc.", perDayAvg: "{0} / jour en moyenne", avgPerDay: "moy. {0} / jour",
+      share: "Part", cronSub: "{0} jobs actifs · {1} en pause",
+      whNone: "Aucun webhook configuré", copy: "Copier", copied: "Copié ✓",
+      curatorNote: "Consolidation automatique des skills créées par l'agent.",
+      curatorRunNow: "Exécuter maintenant", searchSkill: "Rechercher une skill…",
+      mcpError: "erreur", verifiedNous: "vérifié Nous",
+      owner: "propriétaire", admin: "admin", since: "depuis le {0}",
+      cfgImport: "Importer", cfgExport: "Exporter",
+      tabModel: "Modèle", tabAgent: "Agent", tabMemory: "Mémoire",
+      tabApprovals: "Approbations", tabGateway: "Passerelle", tabDisplay: "Affichage",
+      cfgProvider: "Fournisseur", cfgCtx: "Fenêtre de contexte",
+      cfgModelHint: "Utilisé pour le chat et les nouvelles sessions.",
+      cfgCronModel: "Modèle cron / tâches de fond", cfgApprovalMode: "Mode d'approbation",
+      logAll: "Tout", logInfo: "Info", logWarn: "Warn", logError: "Erreur",
+      gwConnStat: "{0} plateforme(s) connectée(s)", memPersist: "Mémoire persistante",
+      providersAvail: "Providers disponibles :", activeMark: "(actif)",
+      gwRestart: "Redémarrer", gwStop: "Arrêter", gwStart: "Démarrer",
+      navMore: "Plus", online: "en ligne", offline: "arrêtée",
+      catProvider: "Fournisseurs LLM", catTool: "Outils", catMessaging: "Messagerie", catSetting: "Réglages"
     }
   };
 
@@ -251,13 +302,30 @@
     }
     return null;
   }
-  function fmtTokens(n) {
+  // locale-aware decimal (mockup shows "1,87 $" in French)
+  function dec(n, digits, locale) {
+    var s = Number(n).toFixed(digits);
+    return locale === "fr" ? s.replace(".", ",") : s;
+  }
+  function fmtTokens(n, locale) {
     if (n == null) return "—";
-    if (n >= 1e6) return (n / 1e6).toFixed(2) + " M";
+    if (n >= 1e6) return dec(n / 1e6, 2, locale) + " M";
     if (n >= 1e3) return Math.round(n / 1e3) + " K";
     return String(n);
   }
-  function fmtCost(n) { return n == null ? "—" : Number(n).toFixed(2) + " $"; }
+  function fmtCost(n, locale) { return n == null ? "—" : dec(n, 2, locale) + " $"; }
+  // future counterpart of timeAgo: "42 min", "3 h", "2 j 4 h"
+  function timeUntil(v, locale) {
+    try {
+      var ms = new Date(v).getTime() - Date.now();
+      if (!isFinite(ms) || ms <= 0) return "";
+      var m = Math.round(ms / 60000);
+      if (m < 60) return m + " min";
+      var hLbl = " h", dLbl = locale === "fr" ? " j" : " d";
+      if (m < 1440) return Math.floor(m / 60) + hLbl + (m % 60 ? " " + (m % 60).toString().padStart(2, "0") : "");
+      return Math.floor(m / 1440) + dLbl + (Math.floor((m % 1440) / 60) ? " " + Math.floor((m % 1440) / 60) + hLbl : "");
+    } catch (e) { return ""; }
+  }
   // Never hand a raw API value to React as a child: some fields are objects
   // (e.g. cron "schedule" is {kind, expr, display} — React error #31).
   function txt(v) {
@@ -371,7 +439,19 @@
     globe: [C(12, 12, 9), P("M3 12h18"), P("M12 3a14.5 14.5 0 0 1 0 18 14.5 14.5 0 0 1 0-18Z")],
     brain: [P("M12 4a3 3 0 0 0-3 3 3 3 0 0 0-3 3 3 3 0 0 0 .5 5.5A3 3 0 0 0 9 21h6a3 3 0 0 0 2.5-5.5A3 3 0 0 0 18 10a3 3 0 0 0-3-3 3 3 0 0 0-3-3Z"), P("M12 4v17")],
     alert: [P("M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"), P("M12 9v4M12 17h.01")],
-    puzzle: [P("M14 7h2a2 2 0 0 1 2 2v2h1.5a1.5 1.5 0 0 1 0 3H18v2a2 2 0 0 1-2 2h-2v-1.5a1.5 1.5 0 0 0-3 0V18H9a2 2 0 0 1-2-2v-2H5.5a1.5 1.5 0 0 1 0-3H7V9a2 2 0 0 1 2-2h2V5.5a1.5 1.5 0 0 1 3 0V7Z")]
+    puzzle: [P("M14 7h2a2 2 0 0 1 2 2v2h1.5a1.5 1.5 0 0 1 0 3H18v2a2 2 0 0 1-2 2h-2v-1.5a1.5 1.5 0 0 0-3 0V18H9a2 2 0 0 1-2-2v-2H5.5a1.5 1.5 0 0 1 0-3H7V9a2 2 0 0 1 2-2h2V5.5a1.5 1.5 0 0 1 3 0V7Z")],
+    plus: [P("M12 5v14M5 12h14")],
+    trash: [P("M4 7h16"), P("M9 7V4h6v3"), P("M6 7l1 13h10l1-13"), P("M10 11v6M14 11v6")],
+    download: [P("M12 3v12"), P("m7 10 5 5 5-5"), P("M4 20h16")],
+    upload: [P("M12 15V3"), P("m7 8 5-5 5 5"), P("M4 20h16")],
+    refresh: [P("M21 12a9 9 0 1 1-2.6-6.4L21 8"), P("M21 3v5h-5")],
+    eye: [P("M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12Z"), C(12, 12, 2.8)],
+    play: [P("M7 4.5v15l12-7.5L7 4.5Z")],
+    pause: [P("M8 5v14M16 5v14")],
+    dots: [C(5, 12, 1.6), C(12, 12, 1.6), C(19, 12, 1.6)],
+    copy: [RC(9, 9, 12, 12, 2), P("M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1")],
+    mic: [RC(9, 3, 6, 11, 3), P("M5 11a7 7 0 0 0 14 0"), P("M12 18v3")],
+    caret: [P("m8 10 4 4 4-4")]
   };
   function Icon(name, cls) {
     return h("svg", { className: "iris-ic " + (cls || ""), viewBox: "0 0 24 24", "aria-hidden": "true" },
@@ -416,8 +496,11 @@
   }
   function Dot(state) { return h("span", { className: "iris-dot " + state }); }
   function Badge(txt, kind) { return h("span", { className: "iris-badge " + (kind || "neutral") }, txt); }
-  function Btn(label, onClick, kind, disabled) {
-    return h("button", { className: "iris-btn " + (kind || ""), onClick: onClick, disabled: !!disabled }, label);
+  // icon comes last so existing call sites stay valid (mockup buttons all carry one)
+  function Btn(label, onClick, kind, disabled, icon) {
+    return h("button", { className: "iris-btn " + (kind || ""), onClick: onClick, disabled: !!disabled },
+      icon ? Icon(icon, "sm") : null,
+      h("span", { className: "iris-btn-txt" }, label));
   }
   function LinkTo(href, label) {
     return h("a", {
@@ -442,6 +525,14 @@
     }));
   }
   function Empty(msg) { return h("div", { className: "iris-empty" }, msg); }
+  // mockup primitives: 28px letter avatar, pulsing live dot, model pill, section subhead
+  function Avatar(text, kind) { return h("span", { className: "iris-avatar " + (kind || "") }, text); }
+  function LiveDot() { return h("span", { className: "iris-live-dot" }); }
+  function ModelBadge(text, cls) { return h("span", { className: "iris-model-badge " + (cls || "") }, text); }
+  function Subhead(text) { return h("div", { className: "iris-subhead" }, text); }
+  function IconBtn(icon, onClick, title) {
+    return h("button", { className: "iris-icon-btn", onClick: onClick, title: title || undefined }, Icon(icon, "sm"));
+  }
   function Table(cols, rows) {
     return h("div", { className: "iris-card iris-table-card", style: { overflowX: "auto" } },
       h("table", { className: "iris-table" },
@@ -457,31 +548,48 @@
     var hv = useState(-1); var hover = hv[0], setHover = hv[1];
     if (!days.length) return Empty(t("usageUnavailable"));
     var W = 640, H = 190, padL = 42, padR = 6, padT = 12, padB = 22;
-    var max = Math.max.apply(null, days.map(function (d) { return d.tokens; })) * 1.15 || 1;
+    // round the axis ceiling up to a "nice" value (1/2/2.5/5/10 x 10^n) above the data max
+    function niceMax(v) {
+      if (!v || !isFinite(v) || v <= 0) return 1;
+      var exp = Math.floor(Math.log(v) / Math.LN10);
+      var f = v / Math.pow(10, exp);
+      var nf = f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10;
+      return nf * Math.pow(10, exp);
+    }
+    var dataMax = Math.max.apply(null, days.map(function (d) { return d.tokens || 0; })) || 0;
+    var max = niceMax(dataMax) || 1;
     var plotW = W - padL - padR, plotH = H - padT - padB;
     var slot = plotW / days.length, bw = Math.min(30, slot * 0.58);
     var kids = [];
-    [0, 0.5, 1].forEach(function (f, gi) {
+    [0, 1 / 3, 2 / 3, 1].forEach(function (f, gi) {
       var y = padT + plotH - f * plotH;
       kids.push(h("line", { key: "g" + gi, x1: padL, x2: W - padR, y1: y, y2: y, className: "iris-grid" }));
       kids.push(h("text", { key: "t" + gi, x: padL - 8, y: y + 3.5, textAnchor: "end", className: "iris-axis" },
         fmtTokens(Math.round(max * f))));
     });
+    var peak = 0;
+    days.forEach(function (d, i) { if ((d.tokens || 0) > (days[peak].tokens || 0)) peak = i; });
     days.forEach(function (d, i) {
       var bh = Math.max(4, (d.tokens / max) * plotH);
       var x = padL + i * slot + (slot - bw) / 2, y = padT + plotH - bh;
       kids.push(h("rect", {
         key: "b" + i, x: x, y: y, width: bw, height: bh, rx: 3,
         className: "iris-bar" + (hover === i ? " hover" : ""),
+        style: { fill: "var(--iris-series-1, var(--color-primary))" },
         onMouseEnter: function () { setHover(i); }, onMouseLeave: function () { setHover(-1); }
       }));
+      if (i === peak) kids.push(h("text", {
+        key: "pk", x: x + bw / 2, y: Math.max(10, y - 7), textAnchor: "middle",
+        style: { fontSize: "10px", fontWeight: 600, fill: "var(--color-foreground, inherit)" }
+      }, fmtTokens(d.tokens)));
       if (i % 2 === 1) kids.push(h("text", { key: "x" + i, x: x + bw / 2, y: H - 6, textAnchor: "middle", className: "iris-axis" },
         String(d.date).slice(5)));
     });
     var tip = hover >= 0 ? h("div", { className: "iris-tt" },
       h("b", null, days[hover].date),
       h("div", null, t("tokens") + " : " + fmtTokens(days[hover].tokens)),
-      days[hover].cost != null ? h("div", null, t("cost") + " : " + fmtCost(days[hover].cost)) : null) : null;
+      h("div", null, t("cost") + " : " + fmtCost(days[hover].cost)),
+      days[hover].cache != null ? h("div", null, t("cache") + " : " + Math.round(days[hover].cache) + " %") : null) : null;
     return h("div", { className: "iris-chart-wrap" },
       h("svg", { viewBox: "0 0 " + W + " " + H, className: "iris-chart", role: "img", "aria-label": t("chartAria") }, kids), tip);
   }
@@ -491,38 +599,56 @@
     return days.map(function (d) {
       var tokens = firstNum(d.total_tokens, d.tokens,
         (firstNum(d.input_tokens, d.input) || 0) + (firstNum(d.output_tokens, d.output) || 0) || undefined);
-      return { date: d.date || d.day || "", tokens: tokens, cost: firstNum(d.cost, d.estimated_cost), cache: firstNum(d.cache_rate, d.cache) };
+      var cacheRead = firstNum(d.cache_read_tokens, d.cache_read);
+      return {
+        date: d.date || d.day || "",
+        tokens: tokens,
+        cost: firstNum(d.cost, d.estimated_cost),
+        cache: firstNum(d.cache_rate, d.cache, (cacheRead != null && tokens) ? cacheRead / tokens * 100 : undefined),
+        sessions: firstNum(d.sessions, d.session_count)
+      };
     }).filter(function (d) { return d.tokens != null; });
   }
 
   /* ================= HOME ================= */
   function HomePage() {
     var locale = useLocale(); var t = makeT(locale);
+    var bp = useState(0); var bump = bp[0], setBump = bp[1];
+    var pd = useState(14); var period = pd[0], setPeriod = pd[1];
     var status = useJSON("/api/status", 5000);
     var sessions = useJSON("/api/sessions", 15000);
-    var usage = useJSON("/api/analytics/usage?days=14", 60000);
+    var usage14 = useJSON("/api/analytics/usage?days=14", 60000);
+    var usagePeriod = useJSON("/api/analytics/usage?days=" + period, 60000);
     var cron = useJSON("/api/cron/jobs", 30000);
-    var pairing = useJSON("/api/pairing", 30000);
+    var pairing = useJSON("/api/pairing", 30000, bump);
     var memory = useJSON("/api/memory", 120000);
     var skills = useJSON("/api/skills", 120000);
+    var curator = useJSON("/api/curator", 60000);
     var sysStats = useJSON("/api/system/stats", 20000);
     var platforms = useJSON("/api/messaging/platforms", 30000);
+    var env = useJSON("/api/env", 60000);
 
-    var days = useMemo(function () { return normDaily(usage); }, [usage]);
-    var last = days.length ? days[days.length - 1] : null;
+    // tiles always read a fixed 14-day window; the usage card below has its
+    // own period-driven fetch (7 / 14 / 30 j chips) so switching periods
+    // there doesn't perturb the "cost/tokens today" tiles.
+    var days14 = useMemo(function () { return normDaily(usage14); }, [usage14]);
+    var last = days14.length ? days14[days14.length - 1] : null;
     var avg7 = null;
-    if (days.length >= 2) {
-      var w = days.slice(-8, -1).filter(function (d) { return d.cost != null; });
+    if (days14.length >= 2) {
+      var w = days14.slice(-8, -1).filter(function (d) { return d.cost != null; });
       if (w.length) avg7 = w.reduce(function (s, d) { return s + d.cost; }, 0) / w.length;
     }
+    var daysPeriod = useMemo(function () { return normDaily(usagePeriod); }, [usagePeriod]);
+
     var sessList = asList(sessions, ["sessions", "items", "recent"]);
     var active = firstNum(status && status.active_sessions, status && status.activeSessions);
     var jobs = asList(cron, ["jobs", "items"]);
+    var activeJobs = jobs.filter(function (j) { return !isPausedJob(j); }).length;
     var pending = asList(pairing, ["pending", "requests"]);
     var plats = asList(platforms, ["platforms", "items"]);
     var skillList = asList(skills, ["skills", "items"]);
     var enabledSkills = skillList.filter(function (s) { return s.enabled !== false; }).length;
-    var memFiles = memory ? asList(memory, ["files", "sizes", "stores"]) : [];
+    var memFiles = memory ? asList(memory.builtin_files, ["builtin_files", "files", "sizes", "stores"]) : [];
     var memTotal = memFiles.length ? memFiles.reduce(function (s, f) { return s + (firstNum(f.size, f.bytes) || 0); }, 0) || null : null;
     var cpu = sysStats && firstNum(sysStats.cpu_percent, sysStats.cpu && sysStats.cpu.percent);
     var mem = sysStats && firstNum(sysStats.memory_percent, sysStats.memory && sysStats.memory.percent);
@@ -536,12 +662,48 @@
       if (!nextJob || nr < nextRunOf(nextJob)) nextJob = j;
     });
 
+    var todayKey = new Date().toDateString();
+    function isToday(v) {
+      if (!v) return false;
+      try { return new Date(v).toDateString() === todayKey; } catch (e) { return false; }
+    }
+    var sessionsToday = sessList.filter(function (s) { return isToday(s.last_activity_at || s.started_at); }).length;
+
+    // big-number-with-small-unit tile value, e.g. "1,87" + small(" $")
+    function splitUnit(str) {
+      var m = /^(.*\S)\s+(\S+)$/.exec(str || "");
+      return m ? h(React.Fragment, null, m[1], h("small", null, " " + m[2])) : (str || "—");
+    }
+
+    function reload() { setBump(bump + 1); }
+
     var alerts = [];
-    pending.forEach(function (p) {
-      alerts.push(IconRow("link", "warn-i", t("pairing") + " " + (p.platform || ""),
-        (p.user || p.username || p.code || "") + " · " + t("pairingCode") + " " + (p.code || "?"),
-        LinkTo("/pairing", t("handle"))));
+    pending.forEach(function (p, i) {
+      alerts.push(h("div", { className: "iris-row", key: "pr" + i },
+        h("span", { className: "iris-icbox warn-i" }, Icon("link")),
+        h("span", { className: "iris-row-body" },
+          h("b", null, t("pairing") + " " + (txt(p.platform) || "")),
+          h("small", null, (txt(p.user || p.username || p.code) || "") + " · " + t("pairingCode") + " " + (txt(p.code) || "?")),
+          h("span", { style: { display: "flex", gap: "6px", marginTop: "7px" } },
+            Btn(t("approve"), function () {
+              act(t, "/api/pairing/approve", jinit("POST", { platform: p.platform, code: p.code }), reload);
+            }, "sm primary"),
+            Btn(t("reject"), function () {
+              act(t, "/api/pairing/revoke", jinit("POST", { platform: p.platform, user_id: p.user_id || p.user }), reload);
+            }, "sm")))));
     });
+    if (env) {
+      // cap at 2 alerts: real instances expose hundreds of optional unset keys
+      var missingShown = 0;
+      Object.keys(env).forEach(function (k) {
+        var v = env[k] || {};
+        if (missingShown < 2 && v.is_set === false && v.required) {
+          missingShown++;
+          alerts.push(IconRow("key", "iris-i", t("missingKey"), k,
+            Btn(t("configure"), function () { navTo("/env"); }, "sm")));
+        }
+      });
+    }
     plats.forEach(function (p) {
       var enabled = p.enabled === true;
       var connected = p.connected === true || p.status === "connected" || p.state === "connected";
@@ -551,69 +713,131 @@
       }
     });
 
+    // usage-card totals (period-driven)
+    var sumTokens = daysPeriod.reduce(function (s, d) { return s + (d.tokens || 0); }, 0);
+    var costDays = daysPeriod.filter(function (d) { return d.cost != null; });
+    var sumCost = costDays.length ? costDays.reduce(function (s, d) { return s + d.cost; }, 0) : null;
+    var cacheDays = daysPeriod.filter(function (d) { return d.cache != null; });
+    var avgCache = cacheDays.length ? cacheDays.reduce(function (s, d) { return s + d.cache; }, 0) / cacheDays.length : null;
+
+    // channels & system grouping (mockup style)
+    function isConn(p) { return p.connected === true || p.status === "connected" || p.state === "connected"; }
+    var connectedPlats = plats.filter(function (p) { return p.enabled && isConn(p) && !p.error_message; });
+    var errorPlats = plats.filter(function (p) { return !!p.error_message; });
+    var otherPlats = plats.filter(function (p) {
+      if (p.error_message) return false;
+      if (p.enabled && isConn(p)) return false;
+      return p.enabled || p.configured;
+    });
+    function ChanRow(state, label, meta, metaStyle) {
+      return h("div", { className: "iris-row", key: "c" + label },
+        Dot(state),
+        h("span", { className: "iris-row-body" }, h("b", null, label)),
+        meta != null ? h("span", { className: "iris-row-meta", style: metaStyle || null }, meta) : null);
+    }
+    var chanRows = [ChanRow(gwOnline ? "ok" : "err", t("gateway"),
+      gwOnline ? (t("online") + (status && status.gateway_updated_at ? " · " + timeAgo(status.gateway_updated_at) : "")) : t("gatewayDown"))];
+    if (connectedPlats.length) {
+      chanRows.push(ChanRow("ok", connectedPlats.map(function (p) { return txt(p.name || p.label || p.id); }).join(" · "), t("connected")));
+    }
+    errorPlats.forEach(function (p, i) {
+      chanRows.push(h("div", { className: "iris-row", key: "e" + i },
+        Dot("err"),
+        h("span", { className: "iris-row-body" }, h("b", null, txt(p.name || p.label || p.id) || "?")),
+        h("span", { className: "iris-row-meta", style: { color: "var(--color-warning)" } }, txt(p.error_message) || t("authExpired"))));
+    });
+    if (otherPlats.length) {
+      chanRows.push(ChanRow("off", otherPlats.map(function (p) { return txt(p.name || p.label || p.id); }).join(" · "), t("disabled")));
+    }
+
+    var providerName = txt(memory && (memory.provider || memory.active)) || "—";
+    var curatorPaused = !!(curator && curator.paused);
+
     return h("div", { className: "iris-home" },
-      PageHead(t("overview"),
+      PageHead(t("hello"),
         (gwOnline ? t("gatewayOnline") : t("gatewayDown")) +
         (active != null ? " · " + active + " " + t("activeSessionsSuffix") : "") +
         (status && status.version ? " · v" + status.version : ""),
-        [h("a", { key: "l", className: "iris-btn", href: "/logs", onClick: function (e) { e.preventDefault(); navTo("/logs"); } }, Icon("file", "sm"), t("logs")),
-         h("a", { key: "c", className: "iris-btn primary", href: "/chat", onClick: function (e) { e.preventDefault(); navTo("/chat"); } }, Icon("chat", "sm"), t("openChat"))]),
+        [Btn(t("doctor"), function () {
+          act(t, "/api/ops/doctor", jinit("POST"), function (r) { if (r !== null) alert(t("launched", t("doctor"))); });
+        }, "", false, "term"),
+         Btn(t("newSession"), function () { navTo("/chat"); }, "primary", false, "plus")]),
 
       h("div", { className: "iris-tiles" },
-        Tile(TL("coin", t("costToday")), last ? fmtCost(last.cost) : "—",
-          avg7 != null ? t("avg7d", fmtCost(avg7)) : t("viaAnalytics")),
-        Tile(TL("chart", t("tokensLastDay")), last ? fmtTokens(last.tokens) : "—",
+        Tile(TL("coin", t("costToday")), last ? splitUnit(fmtCost(last.cost, locale)) : "—",
+          avg7 != null ? t("avg7d", fmtCost(avg7, locale)) : t("viaAnalytics")),
+        Tile(TL("chart", t("tokensLastDay")), last ? splitUnit(fmtTokens(last.tokens, locale)) : "—",
           last && last.cache != null ? t("cacheRate", Math.round(last.cache)) : " "),
         Tile(TL("hist", t("activeSessions")), active != null ? String(active) : "—",
-          sessList.length ? t("recentSessionsCount", sessList.length) : " "),
+          t("sessionsToday", sessionsToday)),
         Tile(TL("clock", t("nextAutomation")), nextJob ? txt(nextJob.name) || "job" : (jobs.length ? txt(jobs[0].name) || jobs.length + " " + t("jobs") : "—"),
-          nextJob ? schedStr(nextJob) : (jobs.length ? schedStr(jobs[0]) : t("noScheduledJob")))),
+          nextJob && nextRunOf(nextJob) ? t("inTime", timeUntil(nextRunOf(nextJob), locale)) + " · " + t("jobsActive", activeJobs)
+            : (jobs.length ? schedStr(jobs[0]) : t("noScheduledJob")))),
 
       h("div", { className: "iris-cols" },
         h("div", { className: "iris-col-main" },
           Card(t("automationsLastRuns"), LinkTo("/cron", t("cron")),
             jobs.length ? jobs.slice(0, 5).map(function (j, i) {
               var lastRun = lastRunOf(j);
-              var ok = !(j.last_status === "error" || j.last_error);
+              var ok = !(j.last_status === "error" || j.last_status === "failed" || j.last_error);
+              var hhmm = "";
+              if (lastRun) {
+                try { hhmm = new Date(lastRun).toLocaleTimeString(locale === "fr" ? "fr-FR" : "en-US", { hour: "2-digit", minute: "2-digit" }); }
+                catch (e) { /* noop */ }
+              }
               return h(React.Fragment, { key: i },
                 IconRow(ok ? "check" : "x", ok ? "good-i" : "crit-i", txt(j.name) || "job",
-                  schedStr(j) + (j.deliver ? " → " + txt(j.deliver) : ""),
-                  Badge(lastRun ? timeAgo(lastRun) || String(lastRun).slice(11, 16) : txt(j.state), ok ? "good" : "crit")));
+                  (ok ? t("executed") : txt(j.last_error || j.last_status)) + (j.deliver ? " · " + txt(j.deliver) : ""),
+                  h(React.Fragment, null, hhmm, " ", Badge(ok ? "ok" : "err", ok ? "good" : "crit"))));
             }) : Empty(t("noCronJob"))),
           Card(t("usage14d"),
-            h("span", { className: "iris-muted" },
-              days.length ? t("total") + " " + fmtTokens(days.reduce(function (s, d) { return s + d.tokens; }, 0)) : ""),
-            h(BarChart, { days: days, t: t })),
+            [h("span", { className: "iris-muted", key: "m" }, t("chartAria").toLowerCase()),
+             h("span", { className: "iris-spacer", key: "sp" }),
+             Chips([{ v: 7, l: t("period", 7) }, { v: 14, l: t("period", 14) }, { v: 30, l: t("period", 30) }], period, setPeriod)],
+            [h(BarChart, { days: daysPeriod, t: t, key: "bc" }),
+             h("div", { className: "iris-chart-foot", key: "f" },
+               h("span", null, t("total") + " ", h("b", null, fmtTokens(sumTokens, locale))),
+               h("span", null, t("cost") + " ", h("b", null, fmtCost(sumCost, locale))),
+               h("span", null, t("cacheAvg") + " ", h("b", null, avgCache != null ? Math.round(avgCache) + " %" : "—")),
+               h("span", { style: { marginLeft: "auto" } }, LinkTo("/analytics", t("navAnalytics"))))]),
           Card(t("recentSessions"), LinkTo("/sessions", t("all")),
-            sessList.length ? sessList.slice(0, 6).map(function (s, i) {
-              var src = String(s.source || "");
-              var sic = /cron/.test(src) ? "clock" : /telegram|discord|slack|whatsapp|signal/.test(src) ? "msg" : /mail|email/.test(src) ? "mail" : "term";
-              return h(React.Fragment, { key: i },
-                IconRow(sic, "", txt(s.name || s.title || s.preview || s.id) || "session",
-                  (s.model ? txt(s.model) + " · " : "") +
-                  (firstNum(s.tokens, s.total_tokens) != null ? fmtTokens(firstNum(s.tokens, s.total_tokens)) + " " + t("tokensUnit") : ""),
-                  timeAgo(s.updated_at || s.last_activity || s.timestamp)));
-            }) : Empty(t("noRecentSession")))),
+            sessList.length ? (function () {
+              var live = sessList.filter(function (s) { return s.is_active === true; });
+              return (live.length ? live : sessList).slice(0, 6).map(function (s, i) {
+                var src = String(s.source || "");
+                var sic = /cron/.test(src) ? "clock" : /telegram|discord|slack|whatsapp|signal/.test(src) ? "msg" : /mail|email/.test(src) ? "mail" : "term";
+                var id = s.id || "";
+                var inTok = firstNum(s.input_tokens), outTok = firstNum(s.output_tokens);
+                var tok = (inTok != null || outTok != null) ? (inTok || 0) + (outTok || 0) : null;
+                return h("div", {
+                  key: i, onClick: id ? function () { navTo("/chat?resume=" + encodeURIComponent(id)); } : null,
+                  style: { cursor: id ? "pointer" : "default" }
+                },
+                  IconRow(sic, "",
+                    h(React.Fragment, null, s.is_active ? LiveDot() : null, txt(s.title || s.display_name || s.preview || id) || "session"),
+                    txt(s.preview) || timeAgo(s.last_activity_at) || "",
+                    h("span", { style: { display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "3px" } },
+                      ModelBadge(txt(s.model)), h("b", { className: "num" }, fmtTokens(tok, locale)))));
+              });
+            })() : Empty(t("noRecentSession")))),
         h("div", { className: "iris-col-side" },
           Card(t("needsAttention"), Badge(String(alerts.length), alerts.length ? "warn" : "good"),
             alerts.length ? alerts : Empty(t("nothingPending"))),
           Card(t("memorySkills"), LinkTo("/system", t("manage")),
             [Meter(t("memory"), memTotal != null ? Math.min(100, memTotal / 2e9 * 100) : 0, fmtBytes(memTotal, locale)),
-             Meter(t("skills"), skillList.length ? enabledSkills / skillList.length * 100 : 0,
-               skillList.length ? enabledSkills + "/" + skillList.length : "—"),
-             h("div", { className: "iris-note", key: "n" },
-               memory && (memory.provider || memory.active) ? t("provider") + " : " + (memory.provider || memory.active) : " ")]),
-          Card(t("channelsSystem"), null,
-            [Row(gwOnline ? "good" : "crit", t("gateway"), null, Dot(gwOnline ? "ok" : "err")),
-             plats.filter(function (p) { return p.enabled || p.configured; }).slice(0, 5).map(function (p, i) {
-               var connected = p.connected === true || p.status === "connected" || p.state === "connected";
-               return h(React.Fragment, { key: i },
-                 Row("", p.name || p.label || p.id || "?", null, Dot(connected ? "ok" : (p.enabled ? "err" : "off"))));
-             }),
+             Meter(t("skills"), skillList.length ? enabledSkills / skillList.length * 100 : 0, String(skillList.length)),
              h("hr", { className: "iris-sep", key: "s" }),
-             Meter(t("cpu"), cpu, cpu != null ? Math.round(cpu) + " %" : "—"),
-             Meter(t("ram"), mem, mem != null ? Math.round(mem) + " %" : "—"),
-             Meter(t("disk"), disk, disk != null ? Math.round(disk) + " %" : "—")]))));
+             h("div", { key: "n", style: { fontSize: "11.5px", color: "var(--color-muted-foreground,#8c8a9c)", lineHeight: "1.6" } },
+               t("provider") + " : ", h("b", { style: { color: "var(--color-secondary-foreground,#aaa8bb)" } }, providerName), " · ", t("curator") + " ",
+               Badge(curatorPaused ? t("paused") : t("active"), curatorPaused ? "neutral" : "good"),
+               h("br"),
+               enabledSkills + " " + t("skills") + " " + t("enabled") + " · " + t("lastConsolidation", timeAgo(curator && curator.last_run_at) || "—"))]),
+          Card(t("channelsSystem"), null,
+            chanRows.concat([
+              h("hr", { className: "iris-sep", key: "s2" }),
+              Meter(t("cpu"), cpu, cpu != null ? Math.round(cpu) + " %" : "—"),
+              Meter(t("ram"), mem, mem != null ? Math.round(mem) + " %" : "—"),
+              Meter(t("disk"), disk, disk != null ? Math.round(disk) + " %" : "—")])))));
   }
 
   /* ================= SESSIONS ================= */
@@ -622,14 +846,43 @@
     var bp = useState(0); var bump = bp[0], setBump = bp[1];
     var qs = useState(""); var q = qs[0], setQ = qs[1];
     var tab = useState("all"); var flt = tab[0], setFlt = tab[1];
+    var mf = useState(""); var modelFlt = mf[0], setModelFlt = mf[1];
+    var sf = useState(""); var sourceFlt = sf[0], setSourceFlt = sf[1];
     var rf = useState(false); var refreshing = rf[0], setRefreshing = rf[1];
     var stats = useJSON("/api/sessions/stats", 30000, bump);
     var data = useJSON("/api/sessions?limit=50", 15000, bump);
     var res = useState(null); var results = res[0], setResults = res[1];
 
+    function distinctVals(arr, key) {
+      var seen = {}, out = [];
+      arr.forEach(function (r) {
+        var v = r[key];
+        if (v && !seen[v]) { seen[v] = 1; out.push(v); }
+      });
+      return out;
+    }
+
+    // tab bar: "archived" shows archived rows only; every other tab excludes them
     var list = asList(data, ["sessions", "items"]);
-    if (flt === "chats") list = list.filter(function (s) { return !/cron|webhook|tool|api/.test(String(s.source || "")); });
-    if (flt === "auto") list = list.filter(function (s) { return /cron|webhook|tool|api/.test(String(s.source || "")); });
+    if (flt === "archived") {
+      list = list.filter(function (s) { return !!s.archived; });
+    } else {
+      list = list.filter(function (s) { return !s.archived; });
+      if (flt === "chats") list = list.filter(function (s) { return !/cron|webhook|tool|api/.test(String(s.source || "")); });
+      if (flt === "auto") list = list.filter(function (s) { return /cron|webhook|tool|api/.test(String(s.source || "")); });
+    }
+    var modelOpts = distinctVals(list, "model");
+    var sourceOpts = distinctVals(list, "source");
+    if (modelFlt) list = list.filter(function (s) { return s.model === modelFlt; });
+    if (sourceFlt) list = list.filter(function (s) { return s.source === sourceFlt; });
+
+    function modelShort(m) {
+      var sv = String(m || "");
+      var slash = sv.lastIndexOf("/");
+      if (slash >= 0) sv = sv.slice(slash + 1);
+      var parts = sv.split("-");
+      return parts[parts.length - 1] || sv;
+    }
 
     function doSearch() {
       if (!q) { setResults(null); return; }
@@ -641,22 +894,35 @@
     return h("div", { className: "iris-page" },
       PageHead(t("sessionsTitle"),
         (s.total != null ? s.total + " " + t("sessionsTitle").toLowerCase() + " · " : "") +
+        (s.active_store != null ? t("sessActive", s.active_store) + " · " : "") +
         (s.archived != null ? s.archived + " " + t("archived").toLowerCase() + " · " : "") + t("sessionsDesc"),
         Btn(t("pruneOld"), function () {
           if (confirm(t("confirmPrune"))) act(t, "/api/sessions/prune", jinit("POST", { days: 90 }), function () { setBump(bump + 1); });
         })),
-      h("div", { className: "iris-tiles" },
-        Tile(t("all"), s.total != null ? String(s.total) : "—", ""),
-        Tile(t("activeSessions"), s.active_store != null ? String(s.active_store) : "—", ""),
-        Tile(t("archived"), s.archived != null ? String(s.archived) : "—", ""),
-        Tile(t("messages"), s.messages != null ? String(s.messages) : "—", "")),
+      h("div", { className: "iris-tabs" },
+        [{ v: "all", l: t("all") }, { v: "chats", l: t("chats") }, { v: "auto", l: t("automation") }, { v: "archived", l: t("archived") }]
+          .map(function (o, i) {
+            return h("button", {
+              key: i, className: "iris-tab" + (flt === o.v ? " on" : ""),
+              onClick: function () { setFlt(o.v); }
+            }, o.l);
+          })),
       h("div", { className: "iris-filterbar" },
         h("input", {
-          className: "iris-input", type: "search", placeholder: t("search"), value: q,
+          className: "iris-input", type: "search", placeholder: t("searchFTS"), value: q,
           onChange: function (e) { setQ(e.target.value); },
           onKeyDown: function (e) { if (e.key === "Enter") doSearch(); }
         }),
-        Chips([{ v: "all", l: t("all") }, { v: "chats", l: t("chats") }, { v: "auto", l: t("automation") }], flt, setFlt),
+        h("select", {
+          className: "iris-input", value: modelFlt,
+          onChange: function (e) { setModelFlt(e.target.value); }
+        }, [h("option", { key: "_all", value: "" }, t("allModels"))].concat(
+          modelOpts.map(function (m, i) { return h("option", { key: i, value: m }, m); }))),
+        h("select", {
+          className: "iris-input", value: sourceFlt,
+          onChange: function (e) { setSourceFlt(e.target.value); }
+        }, [h("option", { key: "_all", value: "" }, t("allSources"))].concat(
+          sourceOpts.map(function (m, i) { return h("option", { key: i, value: m }, m); }))),
         Btn(refreshing ? "…" : t("refresh"), function () {
           setRefreshing(true); setBump(bump + 1);
           setTimeout(function () { setRefreshing(false); }, 700);
@@ -676,10 +942,10 @@
             title: id ? t("resumeChat") : null,
             onClick: id ? function () { navTo("/chat?resume=" + encodeURIComponent(id)); } : null
           },
-            h("td", null, h("b", null, txt(sx.name || sx.title) || id || "session"),
+            h("td", null, h("b", null, sx.is_active ? LiveDot() : null, txt(sx.name || sx.title) || id || "session"),
               h("br"), h("small", { className: "iris-muted" }, txt(sx.preview).slice(0, 80))),
             h("td", { className: "hide-m" }, txt(sx.source) || "—"),
-            h("td", { className: "hide-m" }, sx.model ? h("span", { className: "iris-mono" }, txt(sx.model)) : "—"),
+            h("td", { className: "hide-m" }, sx.model ? ModelBadge(modelShort(sx.model)) : "—"),
             h("td", { className: "r num" }, fmtTokens(firstNum(sx.tokens, sx.total_tokens))),
             h("td", { className: "r num hide-m" }, firstNum(sx.message_count, sx.messages) != null ? String(firstNum(sx.message_count, sx.messages)) : "—"),
             h("td", { className: "r num" }, timeAgo(sx.updated_at || sx.last_activity || sx.created_at) || "—"),
@@ -696,38 +962,68 @@
   function AnalyticsPage() {
     var locale = useLocale(); var t = makeT(locale);
     var pd = useState(7); var days = pd[0], setDays = pd[1];
-    var usage = useJSON("/api/analytics/usage?days=" + days, 60000);
+    // one fetch spans both the current period and the equal-length one before it
+    var usage = useJSON("/api/analytics/usage?days=" + (days * 2), 60000);
     var daily = useMemo(function () { return normDaily(usage); }, [usage]);
-    var totals = (usage && usage.totals) || {};
+    var curDaily = daily.slice(-days);
+    var rawDaily = asList(usage, ["daily", "days", "usage", "chart"]);
+    var curRaw = rawDaily.slice(-days);
+    var prevRaw = rawDaily.slice(0, Math.max(0, rawDaily.length - days));
+    function sumHalf(arr) {
+      var o = { input: 0, output: 0, cost: 0, cacheRead: 0, sessions: 0 };
+      arr.forEach(function (d) {
+        o.input += firstNum(d.input_tokens, d.input) || 0;
+        o.output += firstNum(d.output_tokens, d.output) || 0;
+        o.cost += firstNum(d.estimated_cost, d.cost) || 0;
+        o.cacheRead += firstNum(d.cache_read_tokens, d.cache_read) || 0;
+        o.sessions += firstNum(d.sessions, d.session_count) || 0;
+      });
+      return o;
+    }
+    var cur = sumHalf(curRaw), prev = sumHalf(prevRaw);
+    var curTok = cur.input + cur.output, prevTok = prev.input + prev.output;
+    var curCache = curTok ? cur.cacheRead / curTok * 100 : null;
+    var prevCache = prevTok ? prev.cacheRead / prevTok * 100 : null;
+    var tokPct = prevTok ? Math.round((curTok - prevTok) / prevTok * 100) : null;
+    // by_model has no per-half breakdown in the API — this covers the full 2N-day fetch
     var models = asList(usage && usage.by_model, ["by_model"]);
-    var totTok = firstNum(totals.total_tokens,
-      (firstNum(totals.total_input) || 0) + (firstNum(totals.total_output) || 0) || undefined);
+    var totModelTok = models.reduce(function (sum, m) { return sum + (firstNum(m.total_tokens, m.tokens) || 0); }, 0);
     return h("div", { className: "iris-page" },
       PageHead(t("analyticsTitle"), t("analyticsDesc"),
         Chips([{ v: 7, l: t("period", 7) }, { v: 30, l: t("period", 30) }, { v: 90, l: t("period", 90) }], days, setDays)),
       h("div", { className: "iris-tiles" },
-        Tile(t("tokens"), fmtTokens(totTok), ""),
-        Tile(t("cost"), fmtCost(firstNum(totals.total_estimated_cost, totals.total_actual_cost)), t("estCost")),
-        Tile(t("cacheTitle"), totals.total_cache_read != null && totTok ? Math.round(totals.total_cache_read / totTok * 100) + " %" : "—", ""),
-        Tile(t("sessionsCount"), totals.total_sessions != null ? String(totals.total_sessions) : "—", "")),
-      Card(t("chartAria"), null, h(BarChart, { days: daily, t: t })),
+        Tile(t("tokens"), fmtTokens(curTok, locale),
+          tokPct != null ? h(React.Fragment, null,
+            h("span", { className: "iris-delta " + (tokPct >= 0 ? "up" : "down") }, (tokPct >= 0 ? "+" : "") + tokPct + " %"),
+            " " + t("vsPrev")) : ""),
+        Tile(t("cost"), fmtCost(cur.cost, locale), t("avgPerDay", fmtCost(cur.cost / days, locale))),
+        Tile(t("cacheTitle"), curCache != null ? Math.round(curCache) + " %" : "—",
+          (curCache != null && prevCache != null) ? h("span", { className: "iris-delta " + (curCache >= prevCache ? "up" : "down") },
+            (curCache >= prevCache ? "+" : "") + Math.round(curCache - prevCache) + " pts") : ""),
+        Tile(t("sessionsCount"), String(cur.sessions), t("perDayAvg", dec(cur.sessions / days, 1, locale)))),
+      Card(t("chartAria"), null, h(BarChart, { days: curDaily, t: t })),
       h("div", { className: "iris-grid-2" },
-        Table([{ l: t("perModel") }, { l: t("tokens"), r: 1 }, { l: t("sessionsCount"), r: 1, m: 1 }, { l: t("cost"), r: 1 }],
+        Table([{ l: t("perModel") }, { l: t("tokens"), r: 1 }, { l: t("sessionsCount"), r: 1, m: 1 }, { l: t("cost"), r: 1 }, { l: t("share"), r: 1, m: 1 }],
           models.length ? models.map(function (m, i) {
+            var mTok = firstNum(m.total_tokens, m.tokens);
             return h("tr", { key: i },
-              h("td", null, h("span", { className: "iris-mono" }, m.model || m.name || "?")),
-              h("td", { className: "r num" }, fmtTokens(firstNum(m.total_tokens, m.tokens))),
+              h("td", null,
+                h("span", { className: "iris-sw", style: { background: "var(--iris-series-" + (i % 3 + 1) + ")" } }),
+                h("span", { className: "iris-mono" }, m.model || m.name || "?")),
+              h("td", { className: "r num" }, fmtTokens(mTok, locale)),
               h("td", { className: "r num hide-m" }, firstNum(m.sessions, m.session_count) != null ? String(firstNum(m.sessions, m.session_count)) : "—"),
-              h("td", { className: "r num" }, fmtCost(firstNum(m.estimated_cost, m.cost))));
-          }) : h("tr", null, h("td", { colSpan: 4 }, Empty(t("noUsage"))))),
-        Table([{ l: t("dailyDetail") }, { l: t("tokens"), r: 1 }, { l: t("cache"), r: 1, m: 1 }, { l: t("cost"), r: 1 }],
-          daily.length ? daily.slice(-10).reverse().map(function (d, i) {
+              h("td", { className: "r num" }, fmtCost(firstNum(m.estimated_cost, m.cost), locale)),
+              h("td", { className: "r num hide-m" }, totModelTok && mTok != null ? Math.round(mTok / totModelTok * 100) + " %" : "—"));
+          }) : h("tr", null, h("td", { colSpan: 5 }, Empty(t("noUsage"))))),
+        Table([{ l: t("dailyDetail") }, { l: t("sessionsCount"), r: 1 }, { l: t("tokens"), r: 1 }, { l: t("cache"), r: 1, m: 1 }, { l: t("cost"), r: 1 }],
+          curDaily.length ? curDaily.slice(-10).reverse().map(function (d, i) {
             return h("tr", { key: i },
               h("td", { className: "num" }, d.date),
-              h("td", { className: "r num" }, fmtTokens(d.tokens)),
+              h("td", { className: "r num" }, d.sessions != null ? String(d.sessions) : "—"),
+              h("td", { className: "r num" }, fmtTokens(d.tokens, locale)),
               h("td", { className: "r num hide-m" }, d.cache != null ? Math.round(d.cache) + " %" : "—"),
-              h("td", { className: "r num" }, fmtCost(d.cost)));
-          }) : h("tr", null, h("td", { colSpan: 4 }, Empty(t("noUsage")))))));
+              h("td", { className: "r num" }, fmtCost(d.cost, locale)));
+          }) : h("tr", null, h("td", { colSpan: 5 }, Empty(t("noUsage")))))));
   }
 
   /* ================= CRON ================= */
@@ -738,6 +1034,19 @@
     var data = useJSON("/api/cron/jobs", 20000, bump);
     var jobs = asList(data, ["jobs", "items"]);
     var reload = function () { setBump(bump + 1); };
+
+    function fmtNextRun(v) {
+      try {
+        var d = new Date(v);
+        if (!isFinite(d.getTime())) return null;
+        var now = new Date();
+        var sameDay = d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate();
+        var loc = locale === "fr" ? "fr-FR" : "en-US";
+        return sameDay
+          ? d.toLocaleTimeString(loc, { hour: "2-digit", minute: "2-digit" })
+          : d.toLocaleDateString(loc, { day: "2-digit", month: "2-digit" });
+      } catch (e) { return null; }
+    }
 
     function JobForm() {
       var n = useState(""); var p = useState(""); var s = useState("0 7 * * *"); var d = useState("local");
@@ -754,12 +1063,21 @@
           Btn(t("create"), function () {
             act(t, "/api/cron/jobs", jinit("POST", { name: n[0], prompt: p[0], schedule: s[0], deliver: d[0] }),
               function () { setShowForm(false); reload(); });
-          }, "primary"),
+          }, "primary", false, "plus"),
           Btn(t("cancel"), function () { setShowForm(false); }))));
     }
 
+    var activeCount = jobs.filter(function (j) { return !isPausedJob(j); }).length;
+    var pausedCount = jobs.length - activeCount;
+    var nextTimes = jobs.filter(function (j) { return !isPausedJob(j); })
+      .map(function (j) { var v = nextRunOf(j); return v ? new Date(v).getTime() : NaN; })
+      .filter(function (ms) { return isFinite(ms); });
+    var minNext = nextTimes.length ? Math.min.apply(null, nextTimes) : null;
+    var untilNext = minNext ? timeUntil(minNext, locale) : "";
+    var sub = t("cronSub", activeCount, pausedCount) + (untilNext ? " · " + t("nextRun").toLowerCase() + " " + t("inTime", untilNext) : "");
+
     return h("div", { className: "iris-page" },
-      PageHead(t("cronTitle"), t("cronDesc"), Btn(t("newJob"), function () { setShowForm(!showForm); }, "primary")),
+      PageHead(t("cronTitle"), sub, Btn(t("newJob"), function () { setShowForm(!showForm); }, "primary", false, "plus")),
       showForm ? h(JobForm) : null,
       Table([{ l: t("job") }, { l: t("schedule"), m: 1 }, { l: t("target"), m: 1 }, { l: t("status") },
              { l: t("lastRun"), r: 1, m: 1 }, { l: t("nextRun"), r: 1 }, { l: t("actions"), r: 1 }],
@@ -767,21 +1085,45 @@
           var id = j.id || j.job_id || j.name;
           var isPaused = isPausedJob(j);
           var lr = lastRunOf(j), nr = nextRunOf(j);
-          return h("tr", { key: i },
+          var promptTxt = txt(j.prompt);
+          var promptShown = promptTxt.length > 60 ? promptTxt.slice(0, 60) + "…" : promptTxt;
+          var exprStr = txt(j.schedule && j.schedule.expr) || txt(j.schedule);
+          var dispStr = txt(j.schedule_display);
+          var lastStatus = j.last_status;
+          var lastBadge = null;
+          if (lastStatus) {
+            var ls = String(lastStatus).toLowerCase();
+            if (ls === "ok" || ls === "success") lastBadge = Badge("ok", "good");
+            else if (ls === "error" || ls === "failed") lastBadge = Badge(txt(lastStatus), "crit");
+            else lastBadge = Badge(txt(lastStatus), "warn");
+          }
+          var jUntil = nr ? timeUntil(nr, locale) : "";
+          return h("tr", { key: i, style: isPaused ? { opacity: .55 } : undefined },
             h("td", null, h("b", null, txt(j.name) || id), h("br"),
-              h("small", { className: "iris-muted" }, txt(j.prompt).slice(0, 60))),
-            h("td", { className: "hide-m" }, h("span", { className: "iris-mono" }, schedStr(j))),
+              h("small", { className: "iris-muted" }, promptShown)),
+            h("td", { className: "hide-m" }, dispStr && dispStr !== exprStr
+              ? h(React.Fragment, null, h("span", { className: "iris-mono" }, exprStr), h("br"), h("small", { className: "iris-muted" }, dispStr))
+              : h("span", { className: "iris-mono" }, exprStr || dispStr)),
             h("td", { className: "hide-m" }, txt(j.deliver || j.target) || "local"),
             h("td", null, Badge(isPaused ? t("paused") : t("active"), isPaused ? "neutral" : "good")),
-            h("td", { className: "r num hide-m" }, lr ? (timeAgo(lr) || String(lr).slice(5, 16)) : "—"),
-            h("td", { className: "r num" }, nr ? String(nr).slice(5, 16) : "—"),
+            h("td", { className: "r num hide-m" }, lr
+              ? h(React.Fragment, null, timeAgo(lr) || String(lr).slice(5, 16), lastBadge ? " " : null, lastBadge)
+              : "—"),
+            h("td", { className: "r num" }, (!isPaused && nr)
+              ? h(React.Fragment, null, h("b", null, fmtNextRun(nr) || "—"),
+                  jUntil ? h("br") : null, jUntil ? h("small", null, t("inTime", jUntil)) : null)
+              : "—"),
             h("td", { className: "r" },
-              h("button", { className: "iris-link", onClick: function () { act(t, "/api/cron/jobs/" + id + "/trigger", jinit("POST"), reload); } }, t("runNow")), " ",
-              h("button", { className: "iris-link", onClick: function () { act(t, "/api/cron/jobs/" + id + (isPaused ? "/resume" : "/pause"), jinit("POST"), reload); } }, isPaused ? t("resume") : t("pause")), " ",
+              h("button", { className: "iris-icon-btn sm", title: t("runNow"), onClick: function () { act(t, "/api/cron/jobs/" + id + "/trigger", jinit("POST"), reload); } }, Icon("play", "sm")), " ",
               h("button", {
-                className: "iris-link", style: { color: "var(--color-destructive)" },
+                className: "iris-icon-btn sm", title: isPaused ? t("resume") : t("pause"),
+                onClick: function () { act(t, "/api/cron/jobs/" + id + (isPaused ? "/resume" : "/pause"), jinit("POST"), reload); }
+              }, Icon(isPaused ? "play" : "pause", "sm")),
+              isPaused ? " " : null,
+              isPaused ? h("button", {
+                className: "iris-icon-btn sm", title: t("deleteS"), style: { color: "var(--color-destructive)" },
                 onClick: function () { if (confirm(t("confirmDelete", j.name || id))) act(t, "/api/cron/jobs/" + id, jinit("DELETE"), reload); }
-              }, t("deleteS"))));
+              }, Icon("trash", "sm")) : null));
         }) : h("tr", null, h("td", { colSpan: 7 }, Empty(t("noCronJob"))))));
   }
 
@@ -789,36 +1131,69 @@
   function WebhooksPage() {
     var locale = useLocale(); var t = makeT(locale);
     var bp = useState(0); var bump = bp[0], setBump = bp[1];
+    var frm = useState(false); var showForm = frm[0], setShowForm = frm[1];
     var data = useJSON("/api/webhooks", 30000, bump);
     var subs = asList(data && data.subscriptions, ["subscriptions"]);
     var reload = function () { setBump(bump + 1); };
+
+    function WebhookForm() {
+      var n = useState(""); var f = useState("");
+      return Card(t("whNew"), null, h("div", null,
+        h("div", { className: "iris-field" }, h("label", null, t("nameLbl")),
+          h("input", { className: "iris-input", value: n[0], onChange: function (e) { n[1](e.target.value); } })),
+        h("div", { className: "iris-field" }, h("label", null, t("whEvents")),
+          h("input", { className: "iris-input", value: f[0], onChange: function (e) { f[1](e.target.value); } })),
+        h("div", { className: "iris-actions" },
+          Btn(t("create"), function () {
+            if (!n[0]) return;
+            act(t, "/api/webhooks", jinit("POST", { name: n[0], event: f[0] }), function (r) {
+              if (r && (r.secret || r.signing_secret)) alert("Secret: " + (r.secret || r.signing_secret) + "\n" + t("whSecretNote"));
+              setShowForm(false); reload();
+            });
+          }, "primary", false, "plus"),
+          Btn(t("cancel"), function () { setShowForm(false); }))));
+    }
+
+    function WebhookCard(props) {
+      var w = props.w;
+      var enabled = w.enabled !== false;
+      var cp = useState(false); var copied = cp[0], setCopied = cp[1];
+      var url = txt(data && data.base_url) + txt(w.path || ("/hooks/" + (w.name || "")));
+      return h("section", { className: "iris-card", style: enabled ? undefined : { opacity: .6 } },
+        h("div", { className: "iris-card-head" },
+          h("h3", null, w.name || "webhook"),
+          Badge(enabled ? t("active") : t("disabled"), enabled ? "good" : "neutral"),
+          h("span", { className: "iris-spacer" }),
+          Switch(enabled, function () { act(t, "/api/webhooks/" + (w.name) + "/enabled", jinit("PUT", { enabled: !enabled }), reload); }),
+          h("button", {
+            className: "iris-link", style: { color: "var(--color-destructive)" },
+            onClick: function () { if (confirm(t("confirmDelete", w.name))) act(t, "/api/webhooks/" + w.name, jinit("DELETE"), reload); }
+          }, t("deleteS"))),
+        h("div", null,
+          h("div", { style: { fontSize: "12px", color: "var(--color-muted-foreground,#8c8a9c)", marginBottom: "9px" } }, txt(w.description)),
+          enabled ? h(React.Fragment, null,
+            h("div", { className: "iris-input-row" },
+              h("span", { className: "iris-key-val", style: { flex: 1 } }, url),
+              Btn(copied ? t("copied") : t("copy"), function () {
+                try {
+                  navigator.clipboard.writeText(url).then(function () {
+                    setCopied(true); setTimeout(function () { setCopied(false); }, 1500);
+                  });
+                } catch (e) { /* noop */ }
+              }, "sm", false, "copy")),
+            h("div", { className: "num", style: { display: "flex", gap: "14px", marginTop: "10px", fontSize: "11px", color: "var(--color-muted-foreground,#8c8a9c)" } },
+              h("span", null, t("whEvents") + " : ", h("b", null, txt(w.event || w.filter) || "*")),
+              h("span", null, t("target") + " : ", h("b", null, txt(w.deliver || w.target) || "local")))
+          ) : null));
+    }
+
     return h("div", { className: "iris-page" },
-      PageHead(t("whTitle"), t("whDesc"),
-        Btn(t("whNew"), function () {
-          var name = prompt(t("nameLbl")); if (!name) return;
-          act(t, "/api/webhooks", jinit("POST", { name: name }), function (r) {
-            if (r && (r.secret || r.signing_secret)) alert("Secret: " + (r.secret || r.signing_secret) + "\n" + t("whSecretNote"));
-            reload();
-          });
-        }, "primary")),
+      PageHead(t("whTitle"), t("whDesc"), Btn(t("whNew"), function () { setShowForm(!showForm); }, "primary", false, "plus")),
+      showForm ? h(WebhookForm) : null,
       data ? Card(t("whEnableSys"), Switch(data.enabled === true, function () {
         act(t, "/api/webhooks/enable", jinit("POST", { enabled: !data.enabled }), reload);
       }), h("div", { className: "iris-note" }, t("whUrl") + " : " + (data.base_url || "—"))) : null,
-      subs.length ? subs.map(function (w, i) {
-        var enabled = w.enabled !== false;
-        return Card.call(null, w.name || "webhook",
-          h("span", { style: { display: "flex", gap: "8px", alignItems: "center" } },
-            Badge(enabled ? t("enabled") : t("disabled"), enabled ? "good" : "neutral"),
-            Switch(enabled, function () { act(t, "/api/webhooks/" + (w.name) + "/enabled", jinit("PUT", { enabled: !enabled }), reload); }),
-            h("button", {
-              className: "iris-link", style: { color: "var(--color-destructive)" },
-              onClick: function () { if (confirm(t("confirmDelete", w.name))) act(t, "/api/webhooks/" + w.name, jinit("DELETE"), reload); }
-            }, t("deleteS"))),
-          h("div", null,
-            h("div", { className: "iris-muted" }, txt(w.description)),
-            h("div", { className: "iris-note iris-mono" }, txt(data && data.base_url) + txt(w.path || ("/hooks/" + (w.name || "")))),
-            h("div", { className: "iris-note" }, t("whEvents") + " : " + (txt(w.event || w.filter) || "*") + " · " + t("target") + " : " + (txt(w.deliver || w.target) || "local"))));
-      }) : Card(null, null, Empty(t("mcpNone").replace("MCP", "webhook"))));
+      subs.length ? subs.map(function (w, i) { return h(WebhookCard, { w: w, key: i }); }) : Card(null, null, Empty(t("whNone"))));
   }
 
   /* ================= SKILLS ================= */
@@ -840,25 +1215,38 @@
       return true;
     });
     var catOpts = [{ v: "all", l: t("categoryAll") }].concat(Object.keys(cats).sort().slice(0, 6).map(function (c) { return { v: c, l: c }; }));
+    var skillIcon = function (s) {
+      var k = ((s.category || "") + " " + (s.name || "")).toLowerCase();
+      if (k.indexOf("mail") >= 0 || k.indexOf("email") >= 0) return "mail";
+      if (k.indexOf("code") >= 0 || k.indexOf("dev") >= 0 || k.indexOf("review") >= 0) return "term";
+      if (k.indexOf("web") >= 0 || k.indexOf("brief") >= 0 || k.indexOf("news") >= 0) return "globe";
+      if (k.indexOf("infra") >= 0 || k.indexOf("monitor") >= 0 || k.indexOf("server") >= 0) return "server";
+      if (k.indexOf("market") >= 0 || k.indexOf("data") >= 0 || k.indexOf("chart") >= 0) return "chart";
+      return "spark";
+    };
+    // header actions ("Parcourir le hub" / "Tout mettre à jour") have no backing API — intentionally omitted
     return h("div", { className: "iris-page" },
       PageHead(t("skillsTitle"), t("skillsDesc", skills.length, enabledCount), null),
-      curator ? Card(t("curator"),
-        h("span", { style: { display: "flex", gap: "8px", alignItems: "center" } },
-          Badge(curator.paused ? t("paused") : t("active"), curator.paused ? "neutral" : "iris"),
-          Btn(curator.paused ? t("curatorResume") : t("curatorPause"), function () {
-            act(t, "/api/curator/paused", jinit("PUT", { paused: !curator.paused }), reload);
-          }, "sm"),
-          Btn(t("curatorRun"), function () { act(t, "/api/curator/run", jinit("POST"), reload); }, "sm")),
-        h("div", { className: "iris-note" },
-          (curator.interval_hours ? "interval " + curator.interval_hours + " h" : "") +
-          (curator.last_run_at ? " · " + t("lastRun").toLowerCase() + " " + (timeAgo(curator.last_run_at) || curator.last_run_at) : ""))) : null,
+      curator ? Card(
+        h(React.Fragment, null, Icon("spark", "sm dim"), " ", t("curator")),
+        Badge(curator.paused ? t("paused") : t("active"), curator.paused ? "neutral" : "iris"),
+        h("div", null,
+          h("div", { style: { fontSize: "11.5px", color: "var(--color-muted-foreground)", lineHeight: "1.6" } },
+            t("curatorNote") + " " + t("lastConsolidation", timeAgo(curator.last_run_at) || "—") +
+            (curator.interval_hours ? " · interval " + curator.interval_hours + " h" : "")),
+          h("div", { style: { display: "flex", gap: "8px", marginTop: "8px" } },
+            Btn(t("curatorRunNow"), function () { act(t, "/api/curator/run", jinit("POST"), reload); }, "sm"),
+            Btn(curator.paused ? t("curatorResume") : t("curatorPause"), function () {
+              act(t, "/api/curator/paused", jinit("PUT", { paused: !curator.paused }), reload);
+            }, "sm"))),
+        "tinted") : null,
       h("div", { className: "iris-filterbar" },
-        h("input", { className: "iris-input", type: "search", placeholder: t("search"), value: q, onChange: function (e) { setQ(e.target.value); } }),
+        h("input", { className: "iris-input", type: "search", placeholder: t("searchSkill"), value: q, onChange: function (e) { setQ(e.target.value); } }),
         Chips(catOpts, cat, setCat)),
       h("div", { className: "iris-cards" }, shown.slice(0, 60).map(function (s, i) {
         var on = s.enabled !== false;
         return h("div", { className: "iris-mini", key: i, style: on ? null : { opacity: 0.6 } },
-          h("div", { className: "mc-head" }, Icon("spark", "dim"), h("b", null, s.name),
+          h("div", { className: "mc-head" }, Icon(skillIcon(s), "dim"), h("b", null, s.name),
             Switch(on, function () { act(t, "/api/skills/toggle", jinit("PUT", { name: s.name, enabled: !on }), reload); })),
           h("p", null, s.description || ""),
           h("div", { className: "mc-foot" },
@@ -876,13 +1264,29 @@
     var reload = function () { setBump(bump + 1); };
     var servers = asList(data, ["servers", "items"]);
     var cat = asList(catalog, ["catalog", "entries", "items"]);
+    var catalogIcon = function (c) {
+      var k = ((c.name || c.id || "") + "").toLowerCase();
+      if (k.indexOf("search") >= 0 || k.indexOf("brave") >= 0 || k.indexOf("web") >= 0) return "globe";
+      if (k.indexOf("file") >= 0 || k.indexOf("fs") >= 0) return "file";
+      if (k.indexOf("slack") >= 0 || k.indexOf("discord") >= 0 || k.indexOf("chat") >= 0 || k.indexOf("msg") >= 0) return "msg";
+      if (k.indexOf("db") >= 0 || k.indexOf("postgres") >= 0 || k.indexOf("sql") >= 0) return "server";
+      return "plug";
+    };
+    // header actions ("Catalogue" / "Ajouter un serveur") have no backing API — intentionally omitted
     return h("div", { className: "iris-page" },
       PageHead(t("mcpTitle"), t("mcpDesc"), null),
       servers.length ? servers.map(function (s2, i) {
         var enabled = s2.enabled !== false;
-        return Card.call(null, s2.name,
+        var connected = s2.status === "connected" || s2.state === "connected" || s2.connected === true;
+        var errored = s2.status === "error" || s2.state === "error" || !!s2.error;
+        var statusBadge = connected ? Badge(t("connected"), "good") : (errored ? Badge(t("mcpError"), "crit") : null);
+        var toolCount = (s2.tools && s2.tools.length) || s2.tool_count;
+        var errMsg = s2.error || s2.last_error;
+        return Card(s2.name,
           h("span", { style: { display: "flex", gap: "8px", alignItems: "center" } },
-            Badge(s2.url ? "HTTP" : "STDIO", "neutral"),
+            statusBadge,
+            h("span", { className: "iris-badge neutral iris-mono", style: { fontSize: "9.5px" } }, s2.url ? "HTTP" : "STDIO"),
+            h("span", { className: "iris-spacer" }),
             Btn(t("mcpTest"), function () {
               act(t, "/api/mcp/servers/" + s2.name + "/test", jinit("POST"), function (r) {
                 alert(r ? JSON.stringify(r).slice(0, 300) : "?");
@@ -893,19 +1297,22 @@
               className: "iris-link", style: { color: "var(--color-destructive)" },
               onClick: function () { if (confirm(t("confirmDelete", s2.name))) act(t, "/api/mcp/servers/" + s2.name, jinit("DELETE"), reload); }
             }, t("deleteS"))),
-          h("div", { className: "iris-note iris-mono" }, s2.url || s2.command || ""));
+          h("div", null,
+            h("div", { className: "iris-key-val" }, s2.url || s2.command || ""),
+            toolCount ? h("span", { className: "iris-note" }, t("toolsN", toolCount)) : null,
+            errMsg ? h("div", { className: "iris-note", style: { color: "var(--color-destructive)" } }, txt(errMsg)) : null));
       }) : Card(null, null, Empty(t("mcpNone"))),
       cat.length ? h("div", null,
-        h("div", { className: "iris-nav-label", style: { padding: "6px 0" } }, t("mcpCatalog")),
+        Subhead(t("mcpCatalog")),
         h("div", { className: "iris-cards" }, cat.slice(0, 12).map(function (c, i) {
           return h("div", { className: "iris-mini", key: i },
-            h("div", { className: "mc-head" }, Icon("plug", "dim"), h("b", null, c.name || c.id)),
+            h("div", { className: "mc-head" }, Icon(catalogIcon(c), "dim"), h("b", null, c.name || c.id)),
             h("p", null, c.description || ""),
             h("div", { className: "mc-foot" },
               Btn(t("mcpInstall"), function () {
                 act(t, "/api/mcp/catalog/install", jinit("POST", { name: c.name || c.id }), reload);
               }, "sm primary"),
-              h("span", null, t("verified"))));
+              h("span", null, t("verifiedNous"))));
         }))) : null);
   }
 
@@ -920,15 +1327,14 @@
       PageHead(t("tsTitle"), t("tsDesc"), null),
       h("div", { className: "iris-cards" }, sets.map(function (s2, i) {
         var on = s2.enabled !== false;
-        var tsIcons = { web: "globe", browser: "globe", files: "file", shell: "term", memory: "brain", scheduler: "clock" };
+        var tsIcons = { web: "globe", browser: "globe", files: "file", shell: "term", memory: "brain", scheduler: "clock", voice: "mic" };
         return h("div", { className: "iris-mini", key: i, style: on ? null : { opacity: 0.6 } },
           h("div", { className: "mc-head" }, Icon(tsIcons[s2.name] || "tool", "dim"), h("b", null, s2.label || s2.name),
             Switch(on, function () { act(t, "/api/tools/toolsets/" + s2.name, jinit("PUT", { enabled: !on }), reload); })),
           h("p", null, s2.description || ""),
           h("div", { className: "mc-foot" },
             h("span", null, t("toolsN", (s2.tools || []).length)),
-            s2.configured === false ? Badge(t("notConfigured"), "warn") : null,
-            s2.platform_label ? Badge(s2.platform_label, "neutral") : null));
+            s2.configured === false ? Badge(t("notConfigured"), "warn") : null));
       })));
   }
 
@@ -941,34 +1347,65 @@
     var reload = function () { setBump(bump + 1); };
     var plats = asList(data, ["platforms", "items"]);
     var gwOnline = !!(status && (status.gateway_running || status.gateway === "running"));
-    var shown = plats.slice().sort(function (a, b) {
-      return (b.enabled === true) - (a.enabled === true) || (b.configured === true) - (a.configured === true);
-    });
+    // start/stop of the gateway itself lives on the System page now; here we only
+    // offer a restart (or a start, if it's down) scoped to the messaging channels.
+    var shown = plats.filter(function (p) { return p.enabled || p.configured; });
+    var rest = plats.filter(function (p) { return !(p.enabled || p.configured); });
+    function setEnvVar(k) {
+      // mirrors KeysPage's setKey() exactly, so editing a platform's env var behaves
+      // identically to editing it from the Keys page.
+      var v = prompt(t("keyPrompt", k)); if (v == null || v === "") return;
+      act(t, "/api/env", jinit("PUT", { key: k, value: v }), reload);
+    }
     return h("div", { className: "iris-page" },
       PageHead(t("chTitle"), t("chDesc"),
-        [Btn(gwOnline ? t("chRestart") : t("chStart"), function () {
-          act(t, gwOnline ? "/api/gateway/restart" : "/api/gateway/start", jinit("POST"), reload);
-        }, "primary", false),
-         gwOnline ? Btn(t("chStop"), function () { act(t, "/api/gateway/stop", jinit("POST"), reload); }, "danger") : null]),
-      Card(t("gateway"), Badge(gwOnline ? t("gatewayOnline") : t("gatewayDown"), gwOnline ? "good" : "crit"), null),
+        gwOnline
+          ? Btn(t("chRestart"), function () { act(t, "/api/gateway/restart", jinit("POST"), reload); }, "", false, "refresh")
+          : Btn(t("chStart"), function () { act(t, "/api/gateway/start", jinit("POST"), reload); }, "primary", false, "refresh")),
       shown.slice(0, 24).map(function (p, i) {
-        var connected = p.connected === true || p.state === "connected";
-        var state = connected ? t("connected") : (p.configured ? t("configured") : t("notSetUp"));
-        return Card.call(null,
-          h("span", { style: { display: "flex", alignItems: "center", gap: "9px" } },
-            Dot(connected ? "ok" : (p.enabled ? "err" : "off")), p.name || p.id),
-          h("span", { style: { display: "flex", gap: "8px", alignItems: "center" } },
-            Badge(state, connected ? "good" : (p.enabled ? "warn" : "neutral")),
-            Btn(t("chTest"), function () {
-              act(t, "/api/messaging/platforms/" + p.id + "/test", jinit("POST"), function (r) {
-                alert(r ? JSON.stringify(r).slice(0, 250) : "?");
-              });
-            }, "sm"),
+        var errMsg = txt(p.error_message);
+        var errCode = txt(p.error_code);
+        var connState = (p.gateway_running && p.enabled && p.state !== "error") ? "ok" : (errMsg ? "err" : "off");
+        var badge;
+        if (errMsg) {
+          var isAuth = /auth/i.test(errCode) || /auth/i.test(errMsg);
+          badge = Badge(isAuth ? t("authExpired") : (txt(errCode) || t("authExpired")), "warn");
+        } else if (p.enabled && p.configured && p.gateway_running) {
+          badge = Badge(t("connected"), "good");
+        } else if (p.configured && !p.enabled) {
+          badge = Badge(t("disabled"), "neutral");
+        } else if (!p.configured) {
+          badge = Badge(t("notSetUp"), "neutral");
+        } else {
+          badge = null;
+        }
+        var envVars = (p.env_vars || []).filter(function (v) { return !v.advanced; });
+        return h("section", { className: "iris-card", key: p.id || i, style: p.enabled ? null : { opacity: 0.65 } },
+          h("div", { className: "iris-card-head" },
+            Dot(connState), h("h3", null, p.name || p.id), badge,
+            h("span", { className: "iris-spacer" }),
+            !p.configured
+              ? Btn(t("configure"), function () { navTo("/env"); }, "sm")
+              : Btn(t("chTest"), function () {
+                  act(t, "/api/messaging/platforms/" + p.id + "/test", jinit("POST"), function (r) {
+                    alert(r ? JSON.stringify(r).slice(0, 250) : "?");
+                  });
+                }, "sm"),
             Switch(p.enabled === true, function () {
               act(t, "/api/messaging/platforms/" + p.id, jinit("PUT", { enabled: !p.enabled }), reload);
             })),
-          h("div", { className: "iris-muted" }, p.description || ""));
-      }));
+          h("div", { className: "iris-muted" }, p.description || ""),
+          envVars.map(function (v, vi) {
+            return h("div", { className: "iris-input-row", style: { marginTop: 6 }, key: vi },
+              h("span", { className: "iris-muted", style: { width: 180, flex: "none" } }, txt(v.prompt || v.key)),
+              h("span", { className: "iris-key-val", style: { flex: 1 } }, v.is_set ? (v.redacted_value || "••••••") : "—"),
+              Btn(v.is_set ? t("keyEdit") : t("keyDefine"), function () { setEnvVar(v.key); }, "sm" + (v.is_set ? "" : " primary")));
+          }),
+          errMsg ? h("div", { style: { color: "var(--color-warning)" }, key: "err" }, errMsg) : null);
+      }),
+      rest.length ? h("div", { className: "iris-muted", style: { marginTop: 10 } },
+        "+ " + rest.length + (locale === "fr" ? " autres plateformes disponibles : " : " more platforms available: ") +
+        rest.slice(0, 8).map(function (p) { return p.name || p.id; }).join(", ")) : null);
   }
 
   /* ================= PAIRING ================= */
@@ -979,27 +1416,47 @@
     var reload = function () { setBump(bump + 1); };
     var pending = asList(data && data.pending, ["pending"]);
     var approved = asList(data && data.approved, ["approved"]);
+    // "up to 2 words" per the mockup's "AD" / "MD" style initials; strip a leading
+    // @ or # (handle prefixes) before splitting so "@marie_d" -> "MD" not "@D".
+    function initials(name) {
+      var words = String(name || "").replace(/^[@#]/, "").split(/[\s._#-]+/).filter(Boolean);
+      if (!words.length) return "?";
+      return words.slice(0, 2).map(function (w) { return w.charAt(0); }).join("").toUpperCase();
+    }
+    function shortDate(v) {
+      if (!v) return "";
+      try { return new Date(v).toLocaleDateString(locale === "fr" ? "fr-FR" : "en-US"); } catch (e) { return txt(v); }
+    }
     return h("div", { className: "iris-page" },
       PageHead(t("prTitle"), t("prDesc"),
-        pending.length ? Btn(t("clearPending"), function () { act(t, "/api/pairing/clear-pending", jinit("POST"), reload); }) : null),
+        Btn(t("clearPending"), function () { act(t, "/api/pairing/clear-pending", jinit("POST"), reload); }, "", pending.length === 0, "trash")),
       h("div", { className: "iris-grid-2" },
         Card(t("prPending"), Badge(String(pending.length), pending.length ? "warn" : "neutral"),
           pending.length ? pending.map(function (p, i) {
+            var sub = h(React.Fragment, null,
+              txt(p.platform), " · ", t("pairingCode") + " ",
+              h("span", { className: "iris-mono" }, txt(p.code) || "?"),
+              " · ", timeAgo(p.created_at || p.requested_at || p.timestamp) || txt(p.age));
             return h(React.Fragment, { key: i },
-              Row("warn", txt(p.user || p.username || p.user_id) || "?",
-                txt(p.platform) + " · " + t("pairingCode") + " " + (txt(p.code) || "?") +
-                (p.age ? " · " + txt(p.age) : ""),
+              IconRow("link", "warn-i", txt(p.user || p.username || p.user_id) || "?", sub,
                 h("span", { style: { display: "flex", gap: "6px" } },
                   Btn(t("approve"), function () { act(t, "/api/pairing/approve", jinit("POST", { platform: p.platform, code: p.code }), reload); }, "sm primary"),
                   Btn(t("reject"), function () { act(t, "/api/pairing/revoke", jinit("POST", { platform: p.platform, user_id: p.user_id || p.user }), reload); }, "sm"))));
           }) : Empty(t("noPending"))),
         Card(t("prApproved"), h("span", { className: "iris-muted" }, String(approved.length)),
           approved.length ? approved.map(function (p, i) {
-            return h(React.Fragment, { key: i },
-              Row("good", p.user || p.username || p.user_id || "?", p.platform || "",
-                Btn(t("revoke"), function () {
-                  if (confirm(t("confirmDelete", p.user || p.user_id))) act(t, "/api/pairing/revoke", jinit("POST", { platform: p.platform, user_id: p.user_id || p.user }), reload);
-                }, "sm danger")));
+            var name = txt(p.user || p.username || p.user_id || p.name) || "?";
+            var isOwner = !!(p.role === "owner" || p.is_owner || p.owner);
+            var dateVal = p.approved_at || p.since;
+            return h("div", { className: "iris-row", key: i },
+              Avatar(initials(name)),
+              h("span", { className: "iris-row-body" }, h("b", null, name),
+                h("small", null, txt(p.platform) + (dateVal ? " · " + t("since", shortDate(dateVal)) : ""))),
+              h("span", { className: "iris-row-meta" },
+                isOwner ? Badge(t("admin"), "iris") :
+                  Btn(t("revoke"), function () {
+                    if (confirm(t("confirmDelete", name))) act(t, "/api/pairing/revoke", jinit("POST", { platform: p.platform, user_id: p.user_id || p.user }), reload);
+                  }, "sm danger")));
           }) : Empty("—"))));
   }
 
@@ -1008,17 +1465,24 @@
     var locale = useLocale(); var t = makeT(locale);
     var data = useJSON("/api/profiles", 60000);
     var profiles = asList(data, ["profiles", "items"]);
+    var avatarKinds = ["", "good", "warn"];
+    // no create-profile API exists yet, so (unlike the mockup) there is no
+    // "Nouveau profil" header button here.
     return h("div", { className: "iris-page" },
       PageHead(t("pfTitle"), t("pfDesc"), null),
       h("div", { className: "iris-cards", style: { gridTemplateColumns: "repeat(auto-fill,minmax(270px,1fr))" } },
         profiles.map(function (p, i) {
+          var name = txt(p.name) || "?";
           return h("div", { className: "iris-mini", key: i, style: p.is_default ? { borderColor: "var(--color-primary)" } : null },
-            h("div", { className: "mc-head" }, h("b", null, p.name), p.is_default ? Badge(t("pfDefault"), "iris") : null),
+            h("div", { className: "mc-head" },
+              Avatar(name.charAt(0).toUpperCase(), avatarKinds[i % avatarKinds.length]),
+              h("b", null, name), p.is_default ? Badge(t("pfDefault"), "iris") : null),
             h("p", null, p.description || (p.model ? h("span", { className: "iris-mono" }, p.model) : "")),
-            h("div", { className: "mc-foot" },
-              h("span", { className: "iris-mono" }, p.model || ""),
-              h("span", null, t("pfSkills", p.skill_count != null ? p.skill_count : "—")),
-              Badge(p.gateway_running ? "gateway on" : "gateway off", p.gateway_running ? "good" : "neutral")));
+            h("div", { className: "mc-foot num" },
+              h("span", { className: "iris-mono" }, p.model || ""), " · ",
+              t("pfSkills", p.skill_count != null ? p.skill_count : "—"), " · ",
+              t("gateway").toLowerCase() + " ",
+              Badge(p.gateway_running ? "on" : "off", p.gateway_running ? "good" : "neutral")));
         })));
   }
 
@@ -1029,38 +1493,133 @@
     var data = useJSON("/api/config", 0, bump);
     var edit = useState({}); var ed = edit[0], setEd = edit[1];
     var sv = useState(""); var savedMsg = sv[0], setSaved = sv[1];
+    var tabSt = useState("model"); var activeTab = tabSt[0], setActiveTab = tabSt[1];
     if (!data) return h("div", { className: "iris-page" }, PageHead(t("cfgTitle"), t("cfgDesc"), null), Empty("…"));
-    function val(k, dflt) { return ed[k] !== undefined ? ed[k] : (data[k] != null ? data[k] : dflt); }
-    function field(k, label, hint, type) {
-      return h("div", { className: "iris-field" }, h("label", null, label),
+    function getPath(obj, path) {
+      var parts = path.split("."), cur = obj;
+      for (var i = 0; i < parts.length; i++) { if (cur == null) return undefined; cur = cur[parts[i]]; }
+      return cur;
+    }
+    function setPath(obj, path, value) {
+      var parts = path.split("."), cur = obj;
+      for (var i = 0; i < parts.length - 1; i++) {
+        if (cur[parts[i]] == null || typeof cur[parts[i]] !== "object") cur[parts[i]] = {};
+        cur = cur[parts[i]];
+      }
+      cur[parts[parts.length - 1]] = value;
+    }
+    function val(path, dflt) {
+      if (ed[path] !== undefined) return ed[path];
+      var v = getPath(data, path);
+      return v != null ? v : dflt;
+    }
+    function setEdit(path, value) { var n = {}; for (var x in ed) n[x] = ed[x]; n[path] = value; setEd(n); }
+    function field(path, label, hint) {
+      var raw = val(path, "");
+      return h("div", { className: "iris-field", key: path }, h("label", null, label),
         h("input", {
-          className: "iris-input" + (type === "mono" ? " iris-mono" : ""), value: String(val(k, "") == null ? "" : val(k, "")),
-          onChange: function (e) { var n = {}; for (var x in ed) n[x] = ed[x]; n[k] = e.target.value; setEd(n); }
+          className: "iris-input", value: raw == null ? "" : String(raw),
+          onChange: function (e) { setEdit(path, e.target.value); }
         }),
         hint ? h("div", { className: "iris-hint" }, hint) : null);
     }
-    function save() {
+    function switchField(path, label) {
+      var cur = !!val(path, false);
+      return h("div", { className: "iris-field", key: path },
+        h("div", { className: "iris-input-row", style: { justifyContent: "space-between" } },
+          h("label", { style: { margin: 0 } }, label),
+          Switch(cur, function () { setEdit(path, !cur); })));
+    }
+    function genericSection(sectionKey) {
+      var obj = (data && data[sectionKey]) || {};
+      var keys = Object.keys(obj).filter(function (k) {
+        var v = obj[k];
+        return typeof v === "string" || typeof v === "number" || typeof v === "boolean";
+      }).slice(0, 8);
+      if (!keys.length) return Empty("—");
+      return keys.map(function (k) {
+        var path = sectionKey + "." + k;
+        return typeof obj[k] === "boolean" ? switchField(path, k) : field(path, k, null);
+      });
+    }
+    function buildMerged() {
       var cfg = JSON.parse(JSON.stringify(data));
-      if (ed.model !== undefined) cfg.model = ed.model;
-      if (ed.max_live_sessions !== undefined) cfg.max_live_sessions = parseInt(ed.max_live_sessions, 10) || null;
-      if (ed.maxTurns !== undefined) { cfg.agent = cfg.agent || {}; cfg.agent.max_turns = parseInt(ed.maxTurns, 10) || cfg.agent.max_turns; }
-      act(t, "/api/config", jinit("PUT", { config: cfg }), function (r) {
+      Object.keys(ed).forEach(function (path) {
+        var v = ed[path];
+        var orig = getPath(data, path);
+        if (typeof orig === "number" && typeof v === "string") {
+          var n = parseFloat(v);
+          v = isNaN(n) ? orig : n;
+        }
+        setPath(cfg, path, v);
+      });
+      return cfg;
+    }
+    function save() {
+      act(t, "/api/config", jinit("PUT", { config: buildMerged() }), function (r) {
         if (r !== null) { setSaved(t("saved")); setEd({}); setBump(bump + 1); setTimeout(function () { setSaved(""); }, 3000); }
       });
     }
+    function doImport() {
+      var inp = document.createElement("input");
+      inp.type = "file"; inp.accept = ".json,application/json";
+      inp.onchange = function (e) {
+        var f = e.target.files && e.target.files[0];
+        if (!f) return;
+        var reader = new FileReader();
+        reader.onload = function () {
+          var cfg;
+          try { cfg = JSON.parse(String(reader.result)); }
+          catch (err) { alert(t("error", (err && err.message) || String(err))); return; }
+          act(t, "/api/config", jinit("PUT", { config: cfg }), function (r) {
+            if (r !== null) { setSaved(t("saved")); setEd({}); setBump(bump + 1); setTimeout(function () { setSaved(""); }, 3000); }
+          });
+        };
+        reader.readAsText(f);
+      };
+      inp.click();
+    }
+    function doExport() {
+      var blob = new Blob([JSON.stringify(buildMerged(), null, 2)], { type: "application/json" });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url; a.download = "config.json";
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+    var TABS = [["model", "tabModel"], ["agent", "tabAgent"], ["memory", "tabMemory"],
+      ["approvals", "tabApprovals"], ["gateway", "tabGateway"], ["display", "tabDisplay"]];
+    var tabLabel = t(TABS.filter(function (tb) { return tb[0] === activeTab; })[0][1]);
+    var tabBody;
+    if (activeTab === "model") {
+      tabBody = h("div", null,
+        field("model", t("cfgModel"), t("cfgModelHint")),
+        field("model_context_length", t("cfgCtx"), null),
+        (data.cron && typeof data.cron.model === "string") ? field("cron.model", t("cfgCronModel"), null) : null);
+    } else if (activeTab === "agent") {
+      tabBody = h("div", null,
+        field("agent.max_turns", t("cfgMaxTurns"), null),
+        field("max_live_sessions", t("cfgMaxLive"), null));
+    } else if (activeTab === "approvals") {
+      tabBody = h("div", null,
+        field("approvals.mode", t("cfgApprovalMode"), null),
+        field("approvals.cron_mode", "cron_mode", null));
+    } else {
+      tabBody = h("div", null, genericSection(activeTab));
+    }
     return h("div", { className: "iris-page" },
       PageHead(t("cfgTitle"), t("cfgDesc"),
-        [savedMsg ? Badge(savedMsg, "good") : null, Btn(t("save"), save, "primary")]),
-      h("div", { className: "iris-grid-2" },
-        Card(t("cfgModel"), null, h("div", null,
-          field("model", t("cfgModel"), t("cfgSaveNote"), "mono"),
-          field("max_live_sessions", t("cfgMaxLive"), null))),
-        Card("Agent", null, h("div", null,
-          h("div", { className: "iris-field" }, h("label", null, t("cfgMaxTurns")),
-            h("input", {
-              className: "iris-input", value: ed.maxTurns !== undefined ? ed.maxTurns : ((data.agent && data.agent.max_turns) || ""),
-              onChange: function (e) { var n = {}; for (var x in ed) n[x] = ed[x]; n.maxTurns = e.target.value; setEd(n); }
-            }))))),
+        [savedMsg ? Badge(savedMsg, "good") : null,
+         Btn(t("cfgImport"), doImport, "", false, "upload"),
+         Btn(t("cfgExport"), doExport, "", false, "download"),
+         Btn(t("save"), save, "primary")]),
+      h("div", { className: "iris-tabs" }, TABS.map(function (tb) {
+        return h("button", {
+          key: tb[0], className: "iris-tab" + (activeTab === tb[0] ? " on" : ""),
+          onClick: function () { setActiveTab(tb[0]); }
+        }, t(tb[1]));
+      })),
+      Card(tabLabel, null, tabBody),
       Card(t("cfgRawView"), null,
         h("pre", { className: "iris-logbox", style: { maxHeight: "40vh" } }, JSON.stringify(data, null, 2).slice(0, 20000))));
   }
@@ -1080,31 +1639,42 @@
       var cat = v.category || "other";
       (byCat[cat] = byCat[cat] || []).push([k, v]);
     });
+    function catRank(c) {
+      if (/llm|provider|model/i.test(c)) return 0;
+      if (/tool/i.test(c)) return 1;
+      if (/messag|platform|chat/i.test(c)) return 2;
+      return 3;
+    }
+    var cats = Object.keys(byCat).sort(function (a, b) {
+      var ra = catRank(a), rb = catRank(b);
+      return ra !== rb ? ra - rb : a.localeCompare(b);
+    });
     function setKey(k) {
       var v = prompt(t("keyPrompt", k)); if (v == null || v === "") return;
       act(t, "/api/env", jinit("PUT", { key: k, value: v }), reload);
     }
+    function delKey(k) {
+      if (confirm(t("confirmDelete", k))) {
+        act(t, "/api/env", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ key: k }) }, reload);
+      }
+    }
     return h("div", { className: "iris-page" },
       PageHead(t("keysTitle"), t("keysDesc"),
         Btn(t("keyShowAdvanced"), function () { setAdv(!showAdv); }, showAdv ? "primary" : "")),
-      Object.keys(byCat).sort().map(function (cat) {
+      cats.map(function (cat) {
+        var catLabels = { provider: t("catProvider"), tool: t("catTool"), messaging: t("catMessaging"), setting: t("catSetting") };
         return h("div", { key: cat },
-          h("div", { className: "iris-nav-label", style: { padding: "6px 0" } }, cat),
-          Table([{ l: t("name") }, { l: "", m: 1 }, { l: t("status") }, { l: "", r: 1 }],
-            byCat[cat].sort().map(function (pair, i) {
-              var k = pair[0], v = pair[1];
-              return h("tr", { key: i },
-                h("td", null, h("b", { className: "iris-mono", style: { fontSize: "11.5px" } }, k),
-                  h("br"), h("small", { className: "iris-muted" }, (v.description || "").slice(0, 70))),
-                h("td", { className: "hide-m iris-mono", style: { color: "var(--color-muted-foreground)" } }, v.redacted_value || "—"),
-                h("td", null, Badge(v.is_set ? t("keySet") : t("keyUnset"), v.is_set ? "good" : "warn")),
-                h("td", { className: "r" },
-                  h("button", { className: "iris-link", onClick: function () { setKey(k); } }, v.is_set ? t("keyEdit") : t("keyDefine")),
-                  v.is_set ? h("button", {
-                    className: "iris-link", style: { color: "var(--color-destructive)", marginLeft: "8px" },
-                    onClick: function () { if (confirm(t("confirmDelete", k))) act(t, "/api/env", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ key: k }) }, reload); }
-                  }, t("keyDelete")) : null));
-            })));
+          Subhead(catLabels[cat] || cat),
+          Card(null, null, byCat[cat].sort(function (a, b) { return a[0].localeCompare(b[0]); }).map(function (pair, i) {
+            var k = pair[0], v = pair[1];
+            return h("div", { className: "iris-row", key: k },
+              h("span", { className: "iris-row-body" }, h("b", null, k)),
+              h("span", { className: "iris-key-val" }, v.redacted_value || (v.is_set ? "••••••" : "—")),
+              h("span", { className: "iris-row-meta", style: { display: "flex", gap: "7px", alignItems: "center" } },
+                Badge(v.is_set ? t("keySet") : t("keyUnset"), v.is_set ? "good" : "warn"),
+                v.is_set ? Btn(t("keyEdit"), function () { setKey(k); }, "sm") : Btn(t("keyDefine"), function () { setKey(k); }, "sm primary"),
+                v.is_set ? Btn(t("keyDelete"), function () { delKey(k); }, "sm danger") : null));
+          })));
       }));
   }
 
@@ -1117,22 +1687,58 @@
     var tl = useState(true); var tail = tl[0], setTail = tl[1];
     var data = useJSON("/api/logs?file=" + file + "&lines=" + lines, tail ? 5000 : 0);
     var raw = asList(data && data.lines, ["lines"]);
+    var LINE_RE = /^(\d{4}-\d{2}-\d{2}[ T][\d:.,]+)\s+(\w+)\s+([\w.-]+):\s?(.*)$/;
+    function parseLine(l) {
+      var m = LINE_RE.exec(String(l));
+      return m ? { ts: m[1], level: m[2], comp: m[3], msg: m[4] } : null;
+    }
+    function levelKey(lv2) {
+      if (/^(ERROR|CRITICAL)/i.test(lv2)) return "ERROR";
+      if (/^WARN/i.test(lv2)) return "WARN";
+      if (/^DEBUG/i.test(lv2)) return "DEBUG";
+      if (/^INFO/i.test(lv2)) return "INFO";
+      return null;
+    }
+    function levelCls(lv2) {
+      var k = levelKey(lv2);
+      return k === "ERROR" ? "iris-lg-e" : k === "WARN" ? "iris-lg-w" : k === "DEBUG" ? "iris-lg-d" : k === "INFO" ? "iris-lg-i" : "";
+    }
     var shown = raw.filter(function (l) {
       if (level === "ALL") return true;
-      return String(l).indexOf(" " + level) >= 0 || String(l).indexOf(level) >= 0;
+      var p = parseLine(l);
+      return !!p && levelKey(p.level) === level;
     });
     return h("div", { className: "iris-page" },
       PageHead(t("logsTitle"), t("logsDesc"), null),
       h("div", { className: "iris-filterbar" },
-        Chips([{ v: "agent", l: "agent" }, { v: "gateway", l: "gateway" }, { v: "errors", l: "errors" }], file, setFile),
-        Chips([{ v: "ALL", l: "ALL" }, { v: "INFO", l: "INFO" }, { v: "WARNING", l: "WARN" }, { v: "ERROR", l: "ERROR" }], level, setLevel),
-        Chips([{ v: 50, l: "50" }, { v: 200, l: "200" }, { v: 500, l: "500" }], lines, setLines),
+        h("select", {
+          className: "iris-input", value: file,
+          onChange: function (e) { setFile(e.target.value); }
+        },
+          h("option", { value: "agent" }, "agent.log"),
+          h("option", { value: "gateway" }, "gateway.log"),
+          h("option", { value: "errors" }, "errors.log")),
+        Chips([{ v: "ALL", l: t("logAll") }, { v: "INFO", l: t("logInfo") },
+          { v: "WARN", l: t("logWarn") }, { v: "ERROR", l: t("logError") }], level, setLevel),
+        h("select", {
+          className: "iris-input hide-m", value: String(lines),
+          onChange: function (e) { setLines(parseInt(e.target.value, 10) || 200); }
+        }, [50, 200, 500].map(function (n) { return h("option", { key: n, value: n }, n + " " + t("lines")); })),
         h("span", { className: "iris-spacer" }),
         h("span", { style: { display: "flex", gap: "8px", alignItems: "center", fontSize: "12px" } },
           t("liveTail"), Switch(tail, function () { setTail(!tail); }))),
       h("div", { className: "iris-logbox" }, shown.slice(-400).map(function (l, i) {
-        var cls = /ERROR|CRITICAL/.test(l) ? "iris-lg-e" : /WARN/.test(l) ? "iris-lg-w" : /DEBUG/.test(l) ? "iris-lg-d" : "";
-        return h("div", { key: i, className: cls }, l);
+        var p = parseLine(l);
+        if (!p) {
+          var cls = /ERROR|CRITICAL/.test(l) ? "iris-lg-e" : /WARN/.test(l) ? "iris-lg-w" : /DEBUG/.test(l) ? "iris-lg-d" : "";
+          return h("div", { key: i, className: cls }, l);
+        }
+        var lvlText = p.level.length < 5 ? (p.level + "     ").slice(0, 5) : p.level;
+        return h("div", { key: i },
+          h("span", { className: "iris-lg-t" }, p.ts), " ",
+          h("span", { className: levelCls(p.level) }, lvlText), " ",
+          h("span", { className: "iris-lg-c" }, "[" + p.comp + "]"), " ",
+          p.msg);
       })));
   }
 
@@ -1144,56 +1750,108 @@
     var status = useJSON("/api/status", 10000, bump);
     var memory = useJSON("/api/memory", 60000, bump);
     var cps = useJSON("/api/ops/checkpoints", 60000, bump);
+    var platforms = useJSON("/api/messaging/platforms", 30000, bump);
+    var curatorData = useJSON("/api/curator", 30000, bump);
     var reload = function () { setBump(bump + 1); };
     var s = stats || {};
+    var curator = curatorData || {};
     var gwOnline = !!(status && (status.gateway_running || status.gateway === "running"));
     var cpu = firstNum(s.cpu_percent, s.cpu && s.cpu.percent);
     var mem = firstNum(s.memory_percent, s.memory && s.memory.percent);
     var disk = firstNum(s.disk_percent, s.disk && s.disk.percent);
-    var memFiles = memory ? asList(memory, ["files", "sizes", "stores"]) : [];
+    var memFiles = memory ? asList(memory.builtin_files, ["builtin_files", "files", "sizes", "stores"]) : [];
     var providers = memory ? asList(memory.providers, ["providers"]) : [];
+    var activeProvider = memory && (memory.provider || memory.active);
     var cpSessions = asList(cps && cps.sessions, ["sessions"]);
-    function op(label, path) {
-      return Btn(label, function () { act(t, path, jinit("POST"), function (r) { if (r !== null) alert(t("launched", label)); }); });
+    var plats = asList(platforms, ["platforms", "items"]);
+    var connectedCount = plats.filter(function (p) {
+      return p.enabled === true && p.configured !== false && gwOnline;
+    }).length;
+    function op(label, path, icon, kind) {
+      return Btn(label, function () {
+        act(t, path, jinit("POST"), function (r) { if (r !== null) alert(t("launched", label)); });
+      }, kind || "", false, icon);
     }
+    function fmtUptime(sec) {
+      if (sec == null || !isFinite(sec)) return "—";
+      var totalMin = Math.floor(sec / 60);
+      var days = Math.floor(totalMin / 1440);
+      var hours = Math.floor((totalMin % 1440) / 60);
+      var mins = totalMin % 60;
+      if (days > 0) return days + " " + (locale === "fr" ? "j" : "d") + " " + hours + " h";
+      return hours + " h " + mins;
+    }
+    function shortTime(v) {
+      if (!v) return "";
+      var m = /(\d{2}:\d{2})/.exec(String(v));
+      return m ? m[1] : String(v).slice(11, 16);
+    }
+    var ramTotal = s.memory && (s.memory.total != null ? s.memory.total : s.memory.total_bytes);
+    var diskTotal = s.disk && (s.disk.total != null ? s.disk.total : s.disk.total_bytes);
+    var loadAvg = s.load_avg && s.load_avg.length ? s.load_avg[0] : null;
+    var line1 = [s.os, s.arch, s.python_version ? "Python " + s.python_version : null,
+      s.hermes_version ? "hermes " + s.hermes_version : null].filter(Boolean).join(" · ");
+    var line2Parts = [];
+    if (s.cpu_count != null) line2Parts.push(s.cpu_count + " vCPU");
+    if (loadAvg != null) line2Parts.push("charge " + dec(loadAvg, 2, locale));
+    if (ramTotal != null) line2Parts.push("RAM " + fmtBytes(ramTotal, locale) + (mem != null ? " (" + Math.round(mem) + " %)" : ""));
+    if (diskTotal != null) line2Parts.push("disque " + fmtBytes(diskTotal, locale) + (disk != null ? " (" + Math.round(disk) + " %)" : ""));
+    var line2 = line2Parts.join(" · ");
     return h("div", { className: "iris-page" },
-      PageHead(t("sysTitle"), t("sysDesc"), null),
+      PageHead(t("sysTitle"), t("sysDesc"),
+        [op(t("doctor"), "/api/ops/doctor", "term"), op(t("backup"), "/api/ops/backup", "download", "primary")]),
       h("div", { className: "iris-grid-2" },
-        Card(t("host"), h("span", { className: "iris-muted num" }, s.hostname || ""),
-          [h("div", { key: "i", className: "iris-note", style: { marginTop: 0, marginBottom: 8 } },
-            [s.os, s.arch, s.python_version ? "Python " + s.python_version : null, s.hermes_version ? "hermes " + s.hermes_version : null]
-              .filter(Boolean).join(" · ")),
+        Card(t("host"), h("span", { className: "iris-muted num" }, t("uptime", fmtUptime(s.uptime_seconds))),
+          [h("div", { key: "i1", className: "iris-note", style: { marginTop: 0, marginBottom: 2 } }, line1),
+           line2 ? h("div", { key: "i2", className: "iris-note", style: { marginTop: 0, marginBottom: 8 } }, line2) : null,
+           h("hr", { className: "iris-sep", key: "sep" }),
            Meter(t("cpu"), cpu, cpu != null ? Math.round(cpu) + " %" : "—"),
            Meter(t("ram"), mem, mem != null ? Math.round(mem) + " %" : "—"),
            Meter(t("disk"), disk, disk != null ? Math.round(disk) + " %" : "—")]),
-        Card(t("gateway"), Badge(gwOnline ? t("gatewayOnline") : t("gatewayDown"), gwOnline ? "good" : "crit"),
-          h("div", { className: "iris-actions" },
-            Btn(gwOnline ? t("chRestart") : t("chStart"), function () {
-              act(t, gwOnline ? "/api/gateway/restart" : "/api/gateway/start", jinit("POST"), reload);
-            }, "primary"),
-            gwOnline ? Btn(t("chStop"), function () { act(t, "/api/gateway/stop", jinit("POST"), reload); }, "danger") : null))),
+        Card(t("gateway"), Badge(gwOnline ? t("online") : t("offline"), gwOnline ? "good" : "crit"),
+          [h("div", { key: "btns", className: "iris-actions" },
+             Btn(gwOnline ? t("gwRestart") : t("gwStart"), function () {
+               act(t, gwOnline ? "/api/gateway/restart" : "/api/gateway/start", jinit("POST"), reload);
+             }, "primary"),
+             gwOnline ? Btn(t("gwStop"), function () { act(t, "/api/gateway/stop", jinit("POST"), reload); }, "danger") : null),
+           h("div", { key: "conn", className: "iris-note" }, t("gwConnStat", connectedCount)),
+           h("hr", { className: "iris-sep", key: "sep" }),
+           h("div", { key: "chead", className: "iris-card-head", style: { margin: 0 } },
+             h("h3", { style: { fontSize: "12px" } }, t("curator")),
+             Badge(curator.paused ? t("paused") : t("active"), curator.paused ? "neutral" : "good"),
+             h("span", { className: "iris-spacer" }),
+             Btn(t("curatorRunNow"), function () { act(t, "/api/curator/run", jinit("POST"), reload); }, "sm")),
+           h("div", { key: "cnote", className: "iris-note", style: { fontSize: "11.5px", marginTop: 5 } },
+             t("lastConsolidation", timeAgo(curator.last_run_at) || "—"))])),
       h("div", { className: "iris-grid-2" },
-        Card(t("memory"), h("span", { className: "iris-muted" }, memory && (memory.provider || memory.active) ? (memory.provider || memory.active) : "built-in"),
+        Card(t("memPersist"), h("span", { className: "iris-muted iris-mono" }, "provider : " + (activeProvider || "built-in")),
           [memFiles.slice(0, 4).map(function (f, i) {
             return Meter(f.name || f.file || "store", Math.min(100, (firstNum(f.size, f.bytes) || 0) / 2e9 * 100), fmtBytes(firstNum(f.size, f.bytes), locale));
           }),
            providers.length ? h("div", { className: "iris-note", key: "p" },
-             providers.map(function (p) { return p.name + (p.available ? " ✓" : ""); }).join(" · ")) : null,
+             t("providersAvail") + " " + providers.map(function (p) {
+               var nm = p.name || p.id || "?";
+               return nm + (nm === activeProvider ? " " + t("activeMark") : "");
+             }).join(", ")) : null,
            h("div", { className: "iris-actions", key: "a", style: { marginTop: 10 } },
              Btn(t("memReset"), function () {
                if (confirm(t("confirmReset"))) act(t, "/api/memory/reset", jinit("POST", { target: "memory" }), reload);
              }, "danger"))]),
-        Card(t("checkpoints"), h("span", { className: "iris-muted num" }, cps ? fmtBytes(cps.total_bytes, locale) : "—"),
+        Card(t("checkpoints"), h("span", { className: "iris-muted num" }, cpSessions.length + " · " + fmtBytes(cps && cps.total_bytes, locale)),
           [cpSessions.length ? cpSessions.slice(0, 5).map(function (c, i) {
-            return h(React.Fragment, { key: i },
-              Row("", c.session_id || c.id || "?", fmtBytes(firstNum(c.bytes, c.size), locale), null));
+            var sid = c.session_id || c.id || "?";
+            var st = shortTime(c.time || c.checkpoint_time || c.updated_at || c.created_at || c.timestamp);
+            return h("div", { className: "iris-row", key: i },
+              h("span", { className: "iris-row-body" },
+                h("span", { className: "iris-mono", style: { fontSize: "11.5px" } }, sid + (st ? " · " + st : ""))),
+              h("span", { className: "iris-row-meta" }, fmtBytes(firstNum(c.bytes, c.size), locale)));
           }) : Empty("—"),
            h("div", { className: "iris-actions", key: "a", style: { marginTop: 10 } },
              Btn(t("pruneCp"), function () { act(t, "/api/ops/checkpoints/prune", jinit("POST"), reload); }))])),
       Card(t("opsTitle"), null,
         h("div", { className: "iris-actions" },
-          op(t("doctor"), "/api/ops/doctor"), op(t("audit"), "/api/ops/security-audit"),
-          op(t("backup"), "/api/ops/backup"), op(t("dump"), "/api/ops/dump"))));
+          op(t("doctor"), "/api/ops/doctor", "term"), op(t("audit"), "/api/ops/security-audit", "shield"),
+          op(t("backup"), "/api/ops/backup", "download"), op(t("dump"), "/api/ops/dump", "file"))));
   }
 
   /* ================= PLUGINS ================= */
@@ -1290,8 +1948,8 @@
   }
 
   /* ================= NAVIGATION (overlay slot) ================= */
-  function NavItems(t, path, cls, onNav) {
-    var groups = [
+  function navGroups(t) {
+    return [
       [null, [["/", t("navHome"), "grid"], ["/chat", t("navChat"), "chat"], ["/sessions", t("navSessions"), "hist"], ["/analytics", t("navAnalytics"), "chart"]]],
       [t("grpAutomation"), [["/cron", t("navCron"), "clock"], ["/webhooks", t("navWebhooks"), "hook"]]],
       [t("grpCapabilities"), [["/skills", t("navSkills"), "spark"], ["/mcp", t("navMcp"), "plug"], ["/toolsets", t("navToolsets"), "tool"], ["/plugins", t("navPlugins"), "puzzle"], ["/models", t("navModels"), "brain"]]],
@@ -1299,38 +1957,72 @@
       [t("grpAdmin"), [["/config", t("navConfig"), "cog"], ["/env", t("navKeys"), "key"], ["/profiles", t("navProfiles"), "users"],
         ["/files", t("navFiles"), "file"], ["/logs", t("logs"), "file"], ["/system", t("navSystem"), "server"], ["/docs", t("navDocs"), "globe"]]]
     ];
-    return groups.map(function (g, gi) {
+  }
+  // badges: {path: [text, kind]} — mockup shows live counts next to Sessions / Pairing
+  function NavItems(t, path, cls, onNav, badges) {
+    return navGroups(t).map(function (g, gi) {
       return h("div", { key: gi, className: "iris-nav-group" },
         g[0] ? h("div", { className: "iris-nav-label" }, g[0]) : null,
         g[1].map(function (l, li) {
+          var b = badges && badges[l[0]];
           return h("a", {
             key: li, href: l[0],
             className: cls + (path === l[0] ? " active" : ""),
             onClick: function (e) { e.preventDefault(); onNav(l[0]); }
-          }, Icon(l[2]), l[1]);
+          }, Icon(l[2]), l[1],
+            b ? h("span", { className: "iris-nav-badge " + (b[1] || "") }, b[0]) : null);
         }));
     });
+  }
+  function useNavBadges() {
+    var stats = useJSON("/api/sessions/stats", 60000);
+    var pairing = useJSON("/api/pairing", 60000);
+    var badges = {};
+    var act = stats && firstNum(stats.active_store, stats.active);
+    if (act) badges["/sessions"] = [String(act), ""];
+    var pend = pairing ? asList(pairing.pending, ["pending"]).length : 0;
+    if (pend) badges["/pairing"] = [String(pend), "warn-b"];
+    return badges;
   }
   function SideNav() {
     var t = makeT(useLocale());
     var path = usePath();
+    var badges = useNavBadges();
     return h("nav", { className: "iris-sidenav" },
       h("div", { className: "iris-side-logo" },
         h("span", { className: "mark" }),
-        h("span", null, h("b", null, "Iris"), h("small", null, "Control Center"))),
+        h("span", null, h("b", null, "Iris"), h("small", null, "Hermes core"))),
       h("div", { className: "iris-nav-scroll" },
-        NavItems(t, path, "iris-nav-item", navTo)));
+        NavItems(t, path, "iris-nav-item", navTo, badges)));
   }
   function MobileNav() {
     var t = makeT(useLocale());
     var path = usePath();
-    var links = [["/", t("navHome"), "grid"], ["/chat", t("navChat"), "chat"], ["/sessions", t("navSessions"), "hist"], ["/cron", t("navCron"), "clock"], ["/system", t("navSystem"), "server"]];
-    return h("nav", { className: "iris-bottombar" }, links.map(function (l, i) {
-      return h("a", {
-        key: i, href: l[0], className: "iris-bb-item" + (path === l[0] ? " active" : ""),
-        onClick: function (e) { e.preventDefault(); navTo(l[0]); }
-      }, Icon(l[2], "bb"), h("span", null, l[1]));
-    }));
+    var ds = useState(false); var open = ds[0], setOpen = ds[1];
+    var links = [["/", t("navHome"), "grid"], ["/chat", t("navChat"), "chat"], ["/sessions", t("navSessions"), "hist"], ["/cron", t("navCron"), "clock"]];
+    var closeAnd = function (href) { setOpen(false); navTo(href); };
+    return h(React.Fragment, null,
+      h("nav", { className: "iris-bottombar" },
+        links.map(function (l, i) {
+          return h("a", {
+            key: i, href: l[0], className: "iris-bb-item" + (path === l[0] ? " active" : ""),
+            onClick: function (e) { e.preventDefault(); closeAnd(l[0]); }
+          }, Icon(l[2], "bb"), h("span", null, l[1]));
+        }),
+        h("button", {
+          className: "iris-bb-item" + (open ? " active" : ""),
+          onClick: function () { setOpen(!open); }
+        }, Icon("dots", "bb"), h("span", null, t("navMore")))),
+      h("div", { className: "iris-scrim" + (open ? " open" : ""), onClick: function () { setOpen(false); } }),
+      h("div", { className: "iris-drawer" + (open ? " open" : "") },
+        h("div", { className: "iris-grabber" }),
+        h("div", { className: "iris-drawer-grid" },
+          navGroups(t).reduce(function (acc, g) { return acc.concat(g[1]); }, []).map(function (l, i) {
+            return h("a", {
+              key: i, href: l[0], className: "iris-drawer-item" + (path === l[0] ? " active" : ""),
+              onClick: function (e) { e.preventDefault(); closeAnd(l[0]); }
+            }, Icon(l[2]), h("span", null, l[1]));
+          }))));
   }
   function pageTitleFor(path, t) {
     var map = {
