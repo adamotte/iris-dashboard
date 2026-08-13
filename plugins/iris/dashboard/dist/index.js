@@ -143,7 +143,8 @@
       providersAvail: "Available providers:", activeMark: "(active)",
       gwRestart: "Restart", gwStop: "Stop", gwStart: "Start",
       navMore: "More", online: "online", offline: "stopped",
-      catProvider: "LLM providers", catTool: "Tools", catMessaging: "Messaging", catSetting: "Settings"
+      catProvider: "LLM providers", catTool: "Tools", catMessaging: "Messaging", catSetting: "Settings",
+      cronGwDown: "The gateway is stopped — triggered and scheduled jobs will not run until it starts."
     },
     fr: {
       overview: "Vue d'ensemble", gatewayOnline: "Passerelle en ligne", gatewayDown: "Passerelle arrêtée",
@@ -246,7 +247,8 @@
       providersAvail: "Providers disponibles :", activeMark: "(actif)",
       gwRestart: "Redémarrer", gwStop: "Arrêter", gwStart: "Démarrer",
       navMore: "Plus", online: "en ligne", offline: "arrêtée",
-      catProvider: "Fournisseurs LLM", catTool: "Outils", catMessaging: "Messagerie", catSetting: "Réglages"
+      catProvider: "Fournisseurs LLM", catTool: "Outils", catMessaging: "Messagerie", catSetting: "Réglages",
+      cronGwDown: "La passerelle est arrêtée — les jobs déclenchés ou planifiés ne s'exécuteront pas tant qu'elle n'est pas démarrée."
     }
   };
 
@@ -1032,6 +1034,7 @@
     var bp = useState(0); var bump = bp[0], setBump = bp[1];
     var frm = useState(false); var showForm = frm[0], setShowForm = frm[1];
     var data = useJSON("/api/cron/jobs", 20000, bump);
+    var gwStatus = useJSON("/api/status", 30000);
     var jobs = asList(data, ["jobs", "items"]);
     var reload = function () { setBump(bump + 1); };
 
@@ -1078,6 +1081,11 @@
 
     return h("div", { className: "iris-page" },
       PageHead(t("cronTitle"), sub, Btn(t("newJob"), function () { setShowForm(!showForm); }, "primary", false, "plus")),
+      // a stopped gateway silently swallows triggered/scheduled runs: say it
+      gwStatus && !gwStatus.gateway_running ? h("div", {
+        className: "iris-note",
+        style: { marginTop: 0, color: "var(--color-warning,#fab219)", display: "flex", alignItems: "center", gap: "7px" }
+      }, Icon("alert", "sm"), t("cronGwDown"), " ", LinkTo("/system", t("navSystem"))) : null,
       showForm ? h(JobForm) : null,
       Table([{ l: t("job") }, { l: t("schedule"), m: 1 }, { l: t("target"), m: 1 }, { l: t("status") },
              { l: t("lastRun"), r: 1, m: 1 }, { l: t("nextRun"), r: 1 }, { l: t("actions"), r: 1 }],
