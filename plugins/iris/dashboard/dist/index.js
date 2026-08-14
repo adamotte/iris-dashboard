@@ -139,6 +139,7 @@
       share: "Share", cronSub: "{0} active jobs · {1} paused",
       whNone: "No webhook configured", copy: "Copy", copied: "Copied ✓",
       created: "Created ✓", updated: "Updated ✓", deleted: "Deleted ✓", triggered: "Triggered ✓",
+      timeJustNow: "just now", timeMinAgo: "{0} min ago", timeHourAgo: "{0} h ago", timeDayAgo: "{0} d ago",
       curatorNote: "Automatic consolidation of agent-created skills.",
       curatorRunNow: "Run now", searchSkill: "Search skills…",
       mcpError: "error", verifiedNous: "Nous verified",
@@ -253,6 +254,7 @@
       share: "Part", cronSub: "{0} jobs actifs · {1} en pause",
       whNone: "Aucun webhook configuré", copy: "Copier", copied: "Copié ✓",
       created: "Créé ✓", updated: "Mis à jour ✓", deleted: "Supprimé ✓", triggered: "Déclenché ✓",
+      timeJustNow: "à l'instant", timeMinAgo: "il y a {0} min", timeHourAgo: "il y a {0} h", timeDayAgo: "il y a {0} j",
       curatorNote: "Consolidation automatique des skills créées par l'agent.",
       curatorRunNow: "Exécuter maintenant", searchSkill: "Rechercher une skill…",
       mcpError: "erreur", verifiedNous: "vérifié Nous",
@@ -789,6 +791,24 @@
       if (reload) reload();
     });
   }
+  // localized relative time: the SDK's timeAgo wins when it exists, otherwise
+  // fall back to "just now / 5 min ago / 3 h ago / 2 d ago" (or a plain date)
+  function fmtRel(v, t, locale) {
+    try {
+      var s = timeAgo(v);
+      if (s) return s;
+    } catch (e) { /* noop */ }
+    if (v == null || v === "") return "";
+    var ms;
+    try { ms = new Date(v).getTime(); } catch (e) { return txt(v); }
+    if (!isFinite(ms)) return txt(v);
+    var mins = Math.round((Date.now() - ms) / 60000);
+    if (mins < 1) return t("timeJustNow");
+    if (mins < 60) return t("timeMinAgo", mins);
+    if (mins < 1440) return t("timeHourAgo", Math.floor(mins / 60));
+    if (mins < 10080) return t("timeDayAgo", Math.floor(mins / 1440));
+    return new Date(ms).toLocaleDateString(locale === "fr" ? "fr-FR" : "en-US");
+  }
 
   /* ================= chart ================= */
   function BarChart(props) {
@@ -1012,7 +1032,7 @@
         meta != null ? h("span", { className: "iris-row-meta", style: metaStyle || null }, meta) : null);
     }
     var chanRows = [ChanRow(gwOnline ? "ok" : "err", t("gateway"),
-      gwOnline ? (t("online") + (status && status.gateway_updated_at ? " · " + timeAgo(status.gateway_updated_at) : "")) : t("gatewayDown"))];
+      gwOnline ? (t("online") + (status && status.gateway_updated_at ? " · " + fmtRel(status.gateway_updated_at, t, locale) : "")) : t("gatewayDown"))];
     if (connectedPlats.length) {
       chanRows.push(ChanRow("ok", connectedPlats.map(function (p) { return txt(p.name || p.label || p.id); }).join(" · "), t("connected")));
     }
@@ -1101,7 +1121,7 @@
                 },
                   IconRow(sic, "",
                     h(React.Fragment, null, s.is_active ? LiveDot() : null, txt(s.title || s.display_name || s.preview || id) || "session"),
-                    txt(s.preview) || timeAgo(s.last_activity_at) || "",
+                    txt(s.preview) || fmtRel(s.last_activity_at, t, locale) || "",
                     h("span", { style: { display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "3px" } },
                       ModelBadge(txt(s.model)), h("b", { className: "num" }, fmtTokens(tok, locale)))));
               });
@@ -1117,7 +1137,7 @@
                t("provider") + " : ", h("b", { style: { color: "var(--color-secondary-foreground,#aaa8bb)" } }, providerName), " · ", t("curator") + " ",
                Badge(curatorPaused ? t("paused") : t("active"), curatorPaused ? "neutral" : "good"),
                h("br"),
-               enabledSkills + " " + t("skills") + " " + t("enabled") + " · " + t("lastConsolidation", timeAgo(curator && curator.last_run_at) || "—"))]),
+               enabledSkills + " " + t("skills") + " " + t("enabled") + " · " + t("lastConsolidation", fmtRel(curator && curator.last_run_at, t, locale) || "—"))]),
           Card(t("channelsSystem"), null,
             chanRows.concat([
               h("hr", { className: "iris-sep", key: "s2" }),
@@ -1244,7 +1264,7 @@
             h("td", { className: "hide-m" }, sx.model ? ModelBadge(modelShort(sx.model)) : "—"),
             h("td", { className: "r num" }, fmtTokens(firstNum(sx.tokens, sx.total_tokens))),
             h("td", { className: "r num hide-m" }, firstNum(sx.message_count, sx.messages) != null ? String(firstNum(sx.message_count, sx.messages)) : "—"),
-            h("td", { className: "r num" }, timeAgo(sx.updated_at || sx.last_activity || sx.created_at) || "—"),
+            h("td", { className: "r num" }, fmtRel(sx.updated_at || sx.last_activity || sx.created_at, t, locale) || "—"),
             h("td", { className: "r", onClick: function (e) { e.stopPropagation(); } },
               id ? h("a", { className: "iris-link", href: "/api/sessions/" + id + "/export" }, t("export")) : null, " ",
               id ? h("button", {
@@ -1413,7 +1433,7 @@
             h("td", { className: "hide-m" }, txt(j.deliver || j.target) || "local"),
             h("td", null, Badge(isPaused ? t("paused") : t("active"), isPaused ? "neutral" : "good")),
             h("td", { className: "r num hide-m" }, lr
-              ? h(React.Fragment, null, timeAgo(lr) || String(lr).slice(5, 16), lastBadge ? " " : null, lastBadge)
+              ? h(React.Fragment, null, fmtRel(lr, t, locale) || String(lr).slice(5, 16), lastBadge ? " " : null, lastBadge)
               : "—"),
             h("td", { className: "r num" }, (!isPaused && nr)
               ? h(React.Fragment, null, h("b", null, fmtNextRun(nr) || "—"),
@@ -1547,7 +1567,7 @@
         Badge(curator.paused ? t("paused") : t("active"), curator.paused ? "neutral" : "iris"),
         h("div", null,
           h("div", { style: { fontSize: "11.5px", color: "var(--color-muted-foreground)", lineHeight: "1.6" } },
-            t("curatorNote") + " " + t("lastConsolidation", timeAgo(curator.last_run_at) || "—") +
+            t("curatorNote") + " " + t("lastConsolidation", fmtRel(curator.last_run_at, t, locale) || "—") +
             (curator.interval_hours ? " · interval " + curator.interval_hours + " h" : "")),
           h("div", { style: { display: "flex", gap: "8px", marginTop: "8px" } },
             Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POST"), t("triggered"), reload); }, "sm"),
@@ -1764,7 +1784,7 @@
             var sub = h(React.Fragment, null,
               txt(p.platform), " · ", t("pairingCode") + " ",
               h("span", { className: "iris-mono" }, txt(p.code) || "?"),
-              " · ", timeAgo(p.created_at || p.requested_at || p.timestamp) || txt(p.age));
+              " · ", fmtRel(p.created_at || p.requested_at || p.timestamp, t, locale) || txt(p.age));
             return h(React.Fragment, { key: i },
               IconRow("link", "warn-i", txt(p.user || p.username || p.user_id) || "?", sub,
                 h("span", { style: { display: "flex", gap: "6px" } },
@@ -2207,7 +2227,7 @@
              h("span", { className: "iris-spacer" }),
 Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POST"), t("triggered"), reload); }, "sm")),
             h("div", { key: "cnote", className: "iris-note", style: { fontSize: "11.5px", marginTop: 5 } },
-             t("lastConsolidation", timeAgo(curator.last_run_at) || "—"))])),
+             t("lastConsolidation", fmtRel(curator.last_run_at, t, locale) || "—"))])),
       h("div", { className: "iris-grid-2" },
         Card(t("memPersist"), h("span", { className: "iris-muted iris-mono" }, "provider : " + (activeProvider || "built-in")),
           [memFiles.slice(0, 4).map(function (f, i) {
