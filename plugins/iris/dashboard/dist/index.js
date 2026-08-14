@@ -818,6 +818,15 @@
     if (mins < 10080) return t("timeDayAgo", Math.floor(mins / 1440));
     return new Date(ms).toLocaleDateString(locale === "fr" ? "fr-FR" : "en-US");
   }
+  // persisted state: useState seeded from localStorage, written back on change
+  function lsGet(k, d) { try { var v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* noop */ } }
+  function usePersist(key, init) {
+    var st = useState(function () { return lsGet(key, init); });
+    var v = st[0], setV = st[1];
+    useEffect(function () { lsSet(key, v); }, [key, v]);
+    return st;
+  }
 
   /* ================= chart ================= */
   function BarChart(props) {
@@ -1160,7 +1169,7 @@
     var locale = useLocale(); var t = makeT(locale);
     var bp = useState(0); var bump = bp[0], setBump = bp[1];
     var qs = useState(""); var q = qs[0], setQ = qs[1];
-    var tab = useState("all"); var flt = tab[0], setFlt = tab[1];
+    var tab = usePersist("iris:sessions:flt", "all"); var flt = tab[0], setFlt = tab[1];
     var mf = useState(""); var modelFlt = mf[0], setModelFlt = mf[1];
     var sf = useState(""); var sourceFlt = sf[0], setSourceFlt = sf[1];
     var rf = useState(false); var refreshing = rf[0], setRefreshing = rf[1];
@@ -1290,7 +1299,7 @@
   /* ================= ANALYTICS ================= */
   function AnalyticsPage() {
     var locale = useLocale(); var t = makeT(locale);
-    var pd = useState(7); var days = pd[0], setDays = pd[1];
+    var pd = usePersist("iris:analytics:days", 7); var days = pd[0], setDays = pd[1];
     // one fetch spans both the current period and the equal-length one before it
     var usage = useJSON("/api/analytics/usage?days=" + (days * 2), 60000);
     var daily = useMemo(function () { return normDaily(usage); }, [usage]);
@@ -2097,10 +2106,10 @@
   /* ================= LOGS ================= */
   function LogsPage() {
     var locale = useLocale(); var t = makeT(locale);
-    var fs2 = useState("agent"); var file = fs2[0], setFile = fs2[1];
-    var ls = useState(200); var lines = ls[0], setLines = ls[1];
-    var lv = useState("ALL"); var level = lv[0], setLevel = lv[1];
-    var tl = useState(true); var tail = tl[0], setTail = tl[1];
+    var fs2 = usePersist("iris:logs:file", "agent"); var file = fs2[0], setFile = fs2[1];
+    var ls = usePersist("iris:logs:lines", 200); var lines = ls[0], setLines = ls[1];
+    var lv = usePersist("iris:logs:level", "ALL"); var level = lv[0], setLevel = lv[1];
+    var tl = usePersist("iris:logs:tail", true); var tail = tl[0], setTail = tl[1];
     var data = useJSON("/api/logs?file=" + file + "&lines=" + lines, tail ? 5000 : 0);
     var raw = asList(data && data.lines, ["lines"]);
     var LINE_RE = /^(\d{4}-\d{2}-\d{2}[ T][\d:.,]+)\s+(\w+)\s+([\w.-]+):\s?(.*)$/;
