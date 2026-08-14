@@ -141,7 +141,7 @@
       created: "Created ✓", updated: "Updated ✓", deleted: "Deleted ✓", triggered: "Triggered ✓",
       timeJustNow: "just now", timeMinAgo: "{0} min ago", timeHourAgo: "{0} h ago", timeDayAgo: "{0} d ago",
       curatorNote: "Automatic consolidation of agent-created skills.",
-      curatorRunNow: "Run now", searchSkill: "Search skills…",
+      curatorRunNow: "Run now", searchSkill: "Search skills…", editJob: "Edit job",
       mcpError: "error", verifiedNous: "Nous verified",
       owner: "owner", admin: "admin", since: "since {0}",
       cfgImport: "Import", cfgExport: "Export",
@@ -257,7 +257,7 @@
       created: "Créé ✓", updated: "Mis à jour ✓", deleted: "Supprimé ✓", triggered: "Déclenché ✓",
       timeJustNow: "à l'instant", timeMinAgo: "il y a {0} min", timeHourAgo: "il y a {0} h", timeDayAgo: "il y a {0} j",
       curatorNote: "Consolidation automatique des skills créées par l'agent.",
-      curatorRunNow: "Exécuter maintenant", searchSkill: "Rechercher une skill…",
+      curatorRunNow: "Exécuter maintenant", searchSkill: "Rechercher une skill…", editJob: "Modifier le job",
       mcpError: "erreur", verifiedNous: "vérifié Nous",
       owner: "propriétaire", admin: "admin", since: "depuis le {0}",
       cfgImport: "Importer", cfgExport: "Exporter",
@@ -510,6 +510,8 @@
     eye: [P("M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12Z"), C(12, 12, 2.8)],
     play: [P("M7 4.5v15l12-7.5L7 4.5Z")],
     pause: [P("M8 5v14M16 5v14")],
+    zap: [P("M13 2 3 14h7l-1 8 11-12h-7l1-8Z")],
+    pencil: [P("M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"), P("m15 5 4 4")],
     dots: [C(5, 12, 1.6), C(12, 12, 1.6), C(19, 12, 1.6)],
     copy: [RC(9, 9, 12, 12, 2), P("M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1")],
     mic: [RC(9, 3, 6, 11, 3), P("M5 11a7 7 0 0 0 14 0"), P("M12 18v3")],
@@ -1371,6 +1373,7 @@
     var locale = useLocale(); var t = makeT(locale);
     var bp = useState(0); var bump = bp[0], setBump = bp[1];
     var frm = useState(false); var showForm = frm[0], setShowForm = frm[1];
+    var edt = useState(null); var editing = edt[0], setEditing = edt[1];
     var data = useJSON("/api/cron/jobs", 20000, bump);
     var gwStatus = useJSON("/api/status", 30000);
     var jobs = asList(data, ["jobs", "items"]);
@@ -1389,9 +1392,18 @@
       } catch (e) { return null; }
     }
 
-    function JobForm() {
-      var n = useState(""); var p = useState(""); var s = useState("0 7 * * *"); var d = useState("local");
-      return Card(t("newJob"), null, h("div", null,
+    function JobForm(props) {
+      var job = props.job;
+      var isEdit = !!(job && (job.id || job.job_id || job.name));
+      var id = isEdit ? (job.id || job.job_id || job.name) : "";
+      var n = useState(isEdit ? txt(job.name) || "" : "");
+      var p = useState(isEdit ? txt(job.prompt) || "" : "");
+      var s = useState(isEdit
+        ? txt(job.schedule && job.schedule.expr) || txt(job.schedule) || ""
+        : "0 7 * * *");
+      var d = useState(isEdit ? txt(job.deliver || job.target) || "local" : "local");
+      function closeForm() { setShowForm(false); setEditing(null); }
+      return Card(isEdit ? t("editJob") : t("newJob"), null, h("div", null,
         h("div", { className: "iris-field" }, h("label", null, t("nameLbl")),
           h("input", { className: "iris-input", value: n[0], onChange: function (e) { n[1](e.target.value); } })),
         h("div", { className: "iris-field" }, h("label", null, t("promptLbl")),
@@ -1401,11 +1413,16 @@
         h("div", { className: "iris-field" }, h("label", null, t("deliverLbl")),
           h("input", { className: "iris-input", value: d[0], onChange: function (e) { d[1](e.target.value); } })),
         h("div", { className: "iris-actions" },
-          Btn(t("create"), function () {
-            actToast(t, "/api/cron/jobs", jinit("POST", { name: n[0], prompt: p[0], schedule: s[0], deliver: d[0] }), t("created"),
-              function () { setShowForm(false); reload(); });
-          }, "primary", false, "plus"),
-          Btn(t("cancel"), function () { setShowForm(false); }))));
+          isEdit
+            ? Btn(t("save"), function () {
+                actToast(t, "/api/cron/jobs/" + id, jinit("PUT", { updates: { name: n[0], prompt: p[0], schedule: s[0], deliver: d[0] } }), t("updated"),
+                  function () { closeForm(); reload(); });
+              }, "primary", false, "check")
+            : Btn(t("create"), function () {
+                actToast(t, "/api/cron/jobs", jinit("POST", { name: n[0], prompt: p[0], schedule: s[0], deliver: d[0] }), t("created"),
+                  function () { closeForm(); reload(); });
+              }, "primary", false, "plus"),
+          Btn(t("cancel"), closeForm))));
     }
 
     var activeCount = jobs.filter(function (j) { return !isPausedJob(j); }).length;
@@ -1418,13 +1435,13 @@
     var sub = t("cronSub", activeCount, pausedCount) + (untilNext ? " · " + t("nextRun").toLowerCase() + " " + t("inTime", untilNext) : "");
 
     return h("div", { className: "iris-page" },
-      PageHead(t("cronTitle"), sub, Btn(t("newJob"), function () { setShowForm(!showForm); }, "primary", false, "plus")),
+      PageHead(t("cronTitle"), sub, Btn(t("newJob"), function () { setEditing(null); setShowForm(!showForm); }, "primary", false, "plus")),
       // a stopped gateway silently swallows triggered/scheduled runs: say it
       gwStatus && !gwStatus.gateway_running ? h("div", {
         className: "iris-note",
         style: { marginTop: 0, color: "var(--color-warning,#fab219)", display: "flex", alignItems: "center", gap: "7px" }
       }, Icon("alert", "sm"), t("cronGwDown"), " ", LinkTo("/system", t("navSystem"))) : null,
-      showForm ? h(JobForm) : null,
+      showForm ? h(JobForm, { job: editing }) : null,
       Table([{ l: t("job") }, { l: t("schedule"), m: 1 }, { l: t("target"), m: 1 }, { l: t("status") },
              { l: t("lastRun"), r: 1, m: 1 }, { l: t("nextRun"), r: 1 }, { l: t("actions"), r: 1 }],
         jobs.length ? jobs.map(function (j, i) {
@@ -1432,7 +1449,6 @@
           var isPaused = isPausedJob(j);
           var lr = lastRunOf(j), nr = nextRunOf(j);
           var promptTxt = txt(j.prompt);
-          var promptShown = promptTxt.length > 60 ? promptTxt.slice(0, 60) + "…" : promptTxt;
           var exprStr = txt(j.schedule && j.schedule.expr) || txt(j.schedule);
           var dispStr = txt(j.schedule_display);
           var lastStatus = j.last_status;
@@ -1446,7 +1462,7 @@
           var jUntil = nr ? timeUntil(nr, locale) : "";
           return h("tr", { key: i, style: isPaused ? { opacity: .55 } : undefined },
             h("td", null, h("b", null, txt(j.name) || id), h("br"),
-              h("small", { className: "iris-muted" }, promptShown)),
+              h("small", { className: "iris-muted" }, promptTxt || "")),
             h("td", { className: "hide-m" }, dispStr && dispStr !== exprStr
               ? h(React.Fragment, null, h("span", { className: "iris-mono" }, exprStr), h("br"), h("small", { className: "iris-muted" }, dispStr))
               : h("span", { className: "iris-mono" }, exprStr || dispStr)),
@@ -1460,18 +1476,20 @@
                   jUntil ? h("br") : null, jUntil ? h("small", null, t("inTime", jUntil)) : null)
               : "—"),
             h("td", { className: "r" },
-              h("button", { className: "iris-icon-btn sm", title: t("runNow"), "aria-label": t("runNow"), onClick: function () { actToast(t, "/api/cron/jobs/" + id + "/trigger", jinit("POST"), t("triggered"), reload); } }, Icon("play", "sm")), " ",
-              h("button", {
-                className: "iris-icon-btn sm", title: isPaused ? t("resume") : t("pause"),
-                "aria-label": isPaused ? t("resume") : t("pause"),
-                onClick: function () { actToast(t, "/api/cron/jobs/" + id + (isPaused ? "/resume" : "/pause"), jinit("POST"), t("updated"), reload); }
-              }, Icon(isPaused ? "play" : "pause", "sm")),
-              isPaused ? " " : null,
-              isPaused ? h("button", {
-                className: "iris-icon-btn sm", title: t("deleteS"), "aria-label": t("deleteS"),
-                style: { color: "var(--color-destructive)" },
-                onClick: function () { askDelete(t, txt(j.name) || id, function () { actToast(t, "/api/cron/jobs/" + id, jinit("DELETE"), t("deleted"), reload); }); }
-              }, Icon("trash", "sm")) : null));
+              h("div", { className: "iris-actions-cell" },
+                h("button", { className: "iris-icon-btn sm", title: t("runNow"), "aria-label": t("runNow"),
+                  onClick: function () { actToast(t, "/api/cron/jobs/" + id + "/trigger", jinit("POST"), t("triggered"), reload); } }, Icon("zap", "sm")),
+                h("button", { className: "iris-icon-btn sm", title: isPaused ? t("resume") : t("pause"),
+                  "aria-label": isPaused ? t("resume") : t("pause"),
+                  onClick: function () { actToast(t, "/api/cron/jobs/" + id + (isPaused ? "/resume" : "/pause"), jinit("POST"), t("updated"), reload); }
+                }, Icon(isPaused ? "play" : "pause", "sm")),
+                h("button", { className: "iris-icon-btn sm", title: t("editJob"), "aria-label": t("editJob"),
+                  onClick: function () { setEditing(j); setShowForm(true); } }, Icon("pencil", "sm")),
+                isPaused ? h("button", {
+                  className: "iris-icon-btn sm", title: t("deleteS"), "aria-label": t("deleteS"),
+                  style: { color: "var(--color-destructive)" },
+                  onClick: function () { askDelete(t, txt(j.name) || id, function () { actToast(t, "/api/cron/jobs/" + id, jinit("DELETE"), t("deleted"), reload); }); }
+                }, Icon("trash", "sm")) : null)));
         }) : h("tr", null, h("td", { colSpan: 7 }, Empty(t("noCronJob"))))));
   }
 

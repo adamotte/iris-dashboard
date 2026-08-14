@@ -73,6 +73,7 @@
 .iris-tile-link{text-decoration:none;color:inherit;display:flex;flex-direction:column;cursor:pointer}
 .iris-tile-link:hover{border-color:color-mix(in srgb,var(--color-primary,#7a6cff) 50%,transparent);transform:translateY(-1px)}
 .iris-tile-link:focus-visible{outline:2px solid var(--color-primary,#7a6cff);outline-offset:2px}
+.iris-actions-cell{display:flex;align-items:center;justify-content:flex-end;gap:6px;white-space:nowrap}
 .iris-delta{font-weight:650}
 .iris-delta.up{color:var(--color-success,#22b573)}
 .iris-delta.down{color:var(--color-destructive,#e05a6b)}
