@@ -138,6 +138,7 @@
       vsPrev: "vs previous period", perDayAvg: "{0} / day on average", avgPerDay: "avg {0} / day",
       share: "Share", cronSub: "{0} active jobs · {1} paused",
       whNone: "No webhook configured", copy: "Copy", copied: "Copied ✓",
+      created: "Created ✓", updated: "Updated ✓", deleted: "Deleted ✓", triggered: "Triggered ✓",
       curatorNote: "Automatic consolidation of agent-created skills.",
       curatorRunNow: "Run now", searchSkill: "Search skills…",
       mcpError: "error", verifiedNous: "Nous verified",
@@ -251,6 +252,7 @@
       vsPrev: "vs période préc.", perDayAvg: "{0} / jour en moyenne", avgPerDay: "moy. {0} / jour",
       share: "Part", cronSub: "{0} jobs actifs · {1} en pause",
       whNone: "Aucun webhook configuré", copy: "Copier", copied: "Copié ✓",
+      created: "Créé ✓", updated: "Mis à jour ✓", deleted: "Supprimé ✓", triggered: "Déclenché ✓",
       curatorNote: "Consolidation automatique des skills créées par l'agent.",
       curatorRunNow: "Exécuter maintenant", searchSkill: "Rechercher une skill…",
       mcpError: "erreur", verifiedNous: "vérifié Nous",
@@ -761,6 +763,33 @@
     return cur ? h(DialogBox, { key: cur.id, d: cur }) : null;
   }
 
+  /* ================= toasts =================
+     Transient success feedback — the mirror of the error modal: errors alert,
+     every completed action says so with a self-dismissing toast. Same pattern
+     as DLG: a tiny store, the Toaster in the overlay slot owns the markup. */
+  var TOAST = { items: [], seq: 0, subs: [] };
+  function toastEmit() { TOAST.subs.slice().forEach(function (fn) { fn(TOAST.items.slice()); }); }
+  function toastPush(msg, kind) {
+    var id = ++TOAST.seq;
+    TOAST.items.push({ id: id, msg: msg, kind: kind || "good" });
+    if (TOAST.items.length > 4) TOAST.items.shift();
+    toastEmit();
+    setTimeout(function () { toastDismiss(id); }, 3200);
+    return id;
+  }
+  function toastDismiss(id) {
+    var i = -1;
+    TOAST.items.forEach(function (x, n) { if (x.id === id) i = n; });
+    if (i >= 0) { TOAST.items.splice(i, 1); toastEmit(); }
+  }
+  // act() + a success toast (only when the request didn't fail) + optional reload
+  function actToast(t, path, init, msg, reload) {
+    act(t, path, init, function (r) {
+      if (r !== null) toastPush(msg);
+      if (reload) reload();
+    });
+  }
+
   /* ================= chart ================= */
   function BarChart(props) {
     var days = props.days || [], t = props.t;
@@ -933,10 +962,10 @@
           h("small", null, (txt(p.user || p.username || p.code) || "") + " · " + t("pairingCode") + " " + (txt(p.code) || "?")),
           h("span", { style: { display: "flex", gap: "6px", marginTop: "7px" } },
             Btn(t("approve"), function () {
-              act(t, "/api/pairing/approve", jinit("POST", { platform: p.platform, code: p.code }), reload);
+              actToast(t, "/api/pairing/approve", jinit("POST", { platform: p.platform, code: p.code }), t("updated"), reload);
             }, "sm primary"),
             Btn(t("reject"), function () {
-              act(t, "/api/pairing/revoke", jinit("POST", { platform: p.platform, user_id: p.user_id || p.user }), reload);
+              actToast(t, "/api/pairing/revoke", jinit("POST", { platform: p.platform, user_id: p.user_id || p.user }), t("updated"), reload);
             }, "sm")))));
     });
     if (env) {
@@ -1156,7 +1185,7 @@
         Btn(t("pruneOld"), function () {
           irisConfirm(t, { title: t("pruneOld"), message: t("confirmPrune"), tone: "danger", icon: "trash", ok: t("deleteS") })
             .then(function (ok) {
-              if (ok) act(t, "/api/sessions/prune", jinit("POST", { days: 90 }), function () { setBump(bump + 1); });
+              if (ok) actToast(t, "/api/sessions/prune", jinit("POST", { days: 90 }), t("deleted"), function () { setBump(bump + 1); });
             });
         })),
       h("div", { className: "iris-tabs" },
@@ -1222,7 +1251,7 @@
                 className: "iris-link", style: { color: "var(--color-destructive)" },
                 onClick: function () {
                   askDelete(t, txt(sx.name) || id, function () {
-                    act(t, "/api/sessions/" + id, jinit("DELETE"), function () { setBump(bump + 1); });
+                    actToast(t, "/api/sessions/" + id, jinit("DELETE"), t("deleted"), function () { setBump(bump + 1); });
                   });
                 }
               }, t("deleteS")) : null));
@@ -1333,7 +1362,7 @@
           h("input", { className: "iris-input", value: d[0], onChange: function (e) { d[1](e.target.value); } })),
         h("div", { className: "iris-actions" },
           Btn(t("create"), function () {
-            act(t, "/api/cron/jobs", jinit("POST", { name: n[0], prompt: p[0], schedule: s[0], deliver: d[0] }),
+            actToast(t, "/api/cron/jobs", jinit("POST", { name: n[0], prompt: p[0], schedule: s[0], deliver: d[0] }), t("created"),
               function () { setShowForm(false); reload(); });
           }, "primary", false, "plus"),
           Btn(t("cancel"), function () { setShowForm(false); }))));
@@ -1391,17 +1420,17 @@
                   jUntil ? h("br") : null, jUntil ? h("small", null, t("inTime", jUntil)) : null)
               : "—"),
             h("td", { className: "r" },
-              h("button", { className: "iris-icon-btn sm", title: t("runNow"), "aria-label": t("runNow"), onClick: function () { act(t, "/api/cron/jobs/" + id + "/trigger", jinit("POST"), reload); } }, Icon("play", "sm")), " ",
+              h("button", { className: "iris-icon-btn sm", title: t("runNow"), "aria-label": t("runNow"), onClick: function () { actToast(t, "/api/cron/jobs/" + id + "/trigger", jinit("POST"), t("triggered"), reload); } }, Icon("play", "sm")), " ",
               h("button", {
                 className: "iris-icon-btn sm", title: isPaused ? t("resume") : t("pause"),
                 "aria-label": isPaused ? t("resume") : t("pause"),
-                onClick: function () { act(t, "/api/cron/jobs/" + id + (isPaused ? "/resume" : "/pause"), jinit("POST"), reload); }
+                onClick: function () { actToast(t, "/api/cron/jobs/" + id + (isPaused ? "/resume" : "/pause"), jinit("POST"), t("updated"), reload); }
               }, Icon(isPaused ? "play" : "pause", "sm")),
               isPaused ? " " : null,
               isPaused ? h("button", {
                 className: "iris-icon-btn sm", title: t("deleteS"), "aria-label": t("deleteS"),
                 style: { color: "var(--color-destructive)" },
-                onClick: function () { askDelete(t, txt(j.name) || id, function () { act(t, "/api/cron/jobs/" + id, jinit("DELETE"), reload); }); }
+                onClick: function () { askDelete(t, txt(j.name) || id, function () { actToast(t, "/api/cron/jobs/" + id, jinit("DELETE"), t("deleted"), reload); }); }
               }, Icon("trash", "sm")) : null));
         }) : h("tr", null, h("td", { colSpan: 7 }, Empty(t("noCronJob"))))));
   }
@@ -1431,6 +1460,8 @@
                   title: t("whNew"), subtitle: n[0], message: t("whSecretNote"),
                   mono: String(r.secret || r.signing_secret), icon: "shield", tone: "warn"
                 });
+              } else if (r !== null) {
+                toastPush(t("created"));
               }
               setShowForm(false); reload();
             });
@@ -1448,10 +1479,10 @@
           h("h3", null, w.name || "webhook"),
           Badge(enabled ? t("active") : t("disabled"), enabled ? "good" : "neutral"),
           h("span", { className: "iris-spacer" }),
-          Switch(enabled, function () { act(t, "/api/webhooks/" + (w.name) + "/enabled", jinit("PUT", { enabled: !enabled }), reload); }, w.name || "webhook"),
+          Switch(enabled, function () { actToast(t, "/api/webhooks/" + (w.name) + "/enabled", jinit("PUT", { enabled: !enabled }), t("updated"), reload); }, w.name || "webhook"),
           h("button", {
             className: "iris-link", style: { color: "var(--color-destructive)" },
-            onClick: function () { askDelete(t, txt(w.name), function () { act(t, "/api/webhooks/" + w.name, jinit("DELETE"), reload); }); }
+            onClick: function () { askDelete(t, txt(w.name), function () { actToast(t, "/api/webhooks/" + w.name, jinit("DELETE"), t("deleted"), reload); }); }
           }, t("deleteS"))),
         h("div", null,
           h("div", { style: { fontSize: "12px", color: "var(--color-muted-foreground,#8c8a9c)", marginBottom: "9px" } }, txt(w.description)),
@@ -1475,7 +1506,7 @@
       PageHead(t("whTitle"), t("whDesc"), Btn(t("whNew"), function () { setShowForm(!showForm); }, "primary", false, "plus")),
       showForm ? h(WebhookForm) : null,
       data ? Card(t("whEnableSys"), Switch(data.enabled === true, function () {
-        act(t, "/api/webhooks/enable", jinit("POST", { enabled: !data.enabled }), reload);
+        actToast(t, "/api/webhooks/enable", jinit("POST", { enabled: !data.enabled }), t("updated"), reload);
       }, t("whEnableSys")), h("div", { className: "iris-note" }, t("whUrl") + " : " + (data.base_url || "—"))) : null,
       subs.length ? subs.map(function (w, i) { return h(WebhookCard, { w: w, key: i }); }) : Card(null, null, Empty(t("whNone"))));
   }
@@ -1519,9 +1550,9 @@
             t("curatorNote") + " " + t("lastConsolidation", timeAgo(curator.last_run_at) || "—") +
             (curator.interval_hours ? " · interval " + curator.interval_hours + " h" : "")),
           h("div", { style: { display: "flex", gap: "8px", marginTop: "8px" } },
-            Btn(t("curatorRunNow"), function () { act(t, "/api/curator/run", jinit("POST"), reload); }, "sm"),
+            Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POST"), t("triggered"), reload); }, "sm"),
             Btn(curator.paused ? t("curatorResume") : t("curatorPause"), function () {
-              act(t, "/api/curator/paused", jinit("PUT", { paused: !curator.paused }), reload);
+              actToast(t, "/api/curator/paused", jinit("PUT", { paused: !curator.paused }), t("updated"), reload);
             }, "sm"))),
         "tinted") : null,
       h("div", { className: "iris-filterbar" },
@@ -1531,7 +1562,7 @@
         var on = s.enabled !== false;
         return h("div", { className: "iris-mini", key: i, style: on ? null : { opacity: 0.6 } },
           h("div", { className: "mc-head" }, Icon(skillIcon(s), "dim"), h("b", null, s.name),
-            Switch(on, function () { act(t, "/api/skills/toggle", jinit("PUT", { name: s.name, enabled: !on }), reload); }, s.name)),
+            Switch(on, function () { actToast(t, "/api/skills/toggle", jinit("PUT", { name: s.name, enabled: !on }), t("updated"), reload); }, s.name)),
           h("p", null, s.description || ""),
           h("div", { className: "mc-foot" },
             Badge(s.category || s.provenance || "", "neutral"),
@@ -1580,10 +1611,10 @@
                 });
               });
             }, "sm"),
-            Switch(enabled, function () { act(t, "/api/mcp/servers/" + s2.name + "/enabled", jinit("PUT", { enabled: !enabled }), reload); }, s2.name),
+            Switch(enabled, function () { actToast(t, "/api/mcp/servers/" + s2.name + "/enabled", jinit("PUT", { enabled: !enabled }), t("updated"), reload); }, s2.name),
             h("button", {
               className: "iris-link", style: { color: "var(--color-destructive)" },
-              onClick: function () { askDelete(t, txt(s2.name), function () { act(t, "/api/mcp/servers/" + s2.name, jinit("DELETE"), reload); }); }
+              onClick: function () { askDelete(t, txt(s2.name), function () { actToast(t, "/api/mcp/servers/" + s2.name, jinit("DELETE"), t("deleted"), reload); }); }
             }, t("deleteS"))),
           h("div", null,
             h("div", { className: "iris-key-val" }, s2.url || s2.command || ""),
@@ -1598,7 +1629,7 @@
             h("p", null, c.description || ""),
             h("div", { className: "mc-foot" },
               Btn(t("mcpInstall"), function () {
-                act(t, "/api/mcp/catalog/install", jinit("POST", { name: c.name || c.id }), reload);
+                actToast(t, "/api/mcp/catalog/install", jinit("POST", { name: c.name || c.id }), t("created"), reload);
               }, "sm primary"),
               h("span", null, t("verifiedNous"))));
         }))) : null);
@@ -1618,7 +1649,7 @@
         var tsIcons = { web: "globe", browser: "globe", files: "file", shell: "term", memory: "brain", scheduler: "clock", voice: "mic" };
         return h("div", { className: "iris-mini", key: i, style: on ? null : { opacity: 0.6 } },
           h("div", { className: "mc-head" }, Icon(tsIcons[s2.name] || "tool", "dim"), h("b", null, s2.label || s2.name),
-            Switch(on, function () { act(t, "/api/tools/toolsets/" + s2.name, jinit("PUT", { enabled: !on }), reload); }, s2.label || s2.name)),
+            Switch(on, function () { actToast(t, "/api/tools/toolsets/" + s2.name, jinit("PUT", { enabled: !on }), t("updated"), reload); }, s2.label || s2.name)),
           h("p", null, s2.description || ""),
           h("div", { className: "mc-foot" },
             h("span", null, t("toolsN", (s2.tools || []).length)),
@@ -1647,14 +1678,14 @@
         secret: true, hint: t("keySecretHint")
       }).then(function (v) {
         if (v == null || v === "") return;
-        act(t, "/api/env", jinit("PUT", { key: k, value: v }), reload);
+        actToast(t, "/api/env", jinit("PUT", { key: k, value: v }), t("saved"), reload);
       });
     }
     return h("div", { className: "iris-page" },
       PageHead(t("chTitle"), t("chDesc"),
         gwOnline
-          ? Btn(t("chRestart"), function () { act(t, "/api/gateway/restart", jinit("POST"), reload); }, "", false, "refresh")
-          : Btn(t("chStart"), function () { act(t, "/api/gateway/start", jinit("POST"), reload); }, "primary", false, "refresh")),
+          ? Btn(t("chRestart"), function () { actToast(t, "/api/gateway/restart", jinit("POST"), t("triggered"), reload); }, "", false, "refresh")
+          : Btn(t("chStart"), function () { actToast(t, "/api/gateway/start", jinit("POST"), t("triggered"), reload); }, "primary", false, "refresh")),
       shown.slice(0, 24).map(function (p, i) {
         var errMsg = txt(p.error_message);
         var errCode = txt(p.error_code);
@@ -1689,7 +1720,7 @@
                   });
                 }, "sm"),
             Switch(p.enabled === true, function () {
-              act(t, "/api/messaging/platforms/" + p.id, jinit("PUT", { enabled: !p.enabled }), reload);
+              actToast(t, "/api/messaging/platforms/" + p.id, jinit("PUT", { enabled: !p.enabled }), t("updated"), reload);
             }, p.name || p.id)),
           h("div", { className: "iris-muted" }, p.description || ""),
           envVars.map(function (v, vi) {
@@ -1726,7 +1757,7 @@
     }
     return h("div", { className: "iris-page" },
       PageHead(t("prTitle"), t("prDesc"),
-        Btn(t("clearPending"), function () { act(t, "/api/pairing/clear-pending", jinit("POST"), reload); }, "", pending.length === 0, "trash")),
+        Btn(t("clearPending"), function () { actToast(t, "/api/pairing/clear-pending", jinit("POST"), t("updated"), reload); }, "", pending.length === 0, "trash")),
       h("div", { className: "iris-grid-2" },
         Card(t("prPending"), Badge(String(pending.length), pending.length ? "warn" : "neutral"),
           pending.length ? pending.map(function (p, i) {
@@ -1737,8 +1768,8 @@
             return h(React.Fragment, { key: i },
               IconRow("link", "warn-i", txt(p.user || p.username || p.user_id) || "?", sub,
                 h("span", { style: { display: "flex", gap: "6px" } },
-                  Btn(t("approve"), function () { act(t, "/api/pairing/approve", jinit("POST", { platform: p.platform, code: p.code }), reload); }, "sm primary"),
-                  Btn(t("reject"), function () { act(t, "/api/pairing/revoke", jinit("POST", { platform: p.platform, user_id: p.user_id || p.user }), reload); }, "sm"))));
+                  Btn(t("approve"), function () { actToast(t, "/api/pairing/approve", jinit("POST", { platform: p.platform, code: p.code }), t("updated"), reload); }, "sm primary"),
+                  Btn(t("reject"), function () { actToast(t, "/api/pairing/revoke", jinit("POST", { platform: p.platform, user_id: p.user_id || p.user }), t("updated"), reload); }, "sm"))));
           }) : Empty(t("noPending"))),
         Card(t("prApproved"), h("span", { className: "iris-muted" }, String(approved.length)),
           approved.length ? approved.map(function (p, i) {
@@ -1756,7 +1787,7 @@
                       title: t("revoke"), subtitle: txt(p.platform), message: t("confirmDelete", name),
                       tone: "danger", icon: "link", ok: t("revoke")
                     }).then(function (ok) {
-                      if (ok) act(t, "/api/pairing/revoke", jinit("POST", { platform: p.platform, user_id: p.user_id || p.user }), reload);
+                      if (ok) actToast(t, "/api/pairing/revoke", jinit("POST", { platform: p.platform, user_id: p.user_id || p.user }), t("updated"), reload);
                     });
                   }, "sm danger")));
           }) : Empty("—"))));
@@ -1983,12 +2014,12 @@
         secret: true, hint: t("keySecretHint")
       }).then(function (v) {
         if (v == null || v === "") return;
-        act(t, "/api/env", jinit("PUT", { key: k, value: v }), reload);
+        actToast(t, "/api/env", jinit("PUT", { key: k, value: v }), t("saved"), reload);
       });
     }
     function delKey(k) {
       askDelete(t, k, function () {
-        act(t, "/api/env", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ key: k }) }, reload);
+        actToast(t, "/api/env", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ key: k }) }, t("deleted"), reload);
       });
     }
     function keyRow(pair) {
@@ -2165,17 +2196,17 @@
         Card(t("gateway"), Badge(gwOnline ? t("online") : t("offline"), gwOnline ? "good" : "crit"),
           [h("div", { key: "btns", className: "iris-actions" },
              Btn(gwOnline ? t("gwRestart") : t("gwStart"), function () {
-               act(t, gwOnline ? "/api/gateway/restart" : "/api/gateway/start", jinit("POST"), reload);
+               actToast(t, gwOnline ? "/api/gateway/restart" : "/api/gateway/start", jinit("POST"), t("triggered"), reload);
              }, "primary"),
-             gwOnline ? Btn(t("gwStop"), function () { act(t, "/api/gateway/stop", jinit("POST"), reload); }, "danger") : null),
+             gwOnline ? Btn(t("gwStop"), function () { actToast(t, "/api/gateway/stop", jinit("POST"), t("triggered"), reload); }, "danger") : null),
            h("div", { key: "conn", className: "iris-note" }, t("gwConnStat", connectedCount)),
            h("hr", { className: "iris-sep", key: "sep" }),
            h("div", { key: "chead", className: "iris-card-head", style: { margin: 0 } },
              h("h3", { style: { fontSize: "12px" } }, t("curator")),
              Badge(curator.paused ? t("paused") : t("active"), curator.paused ? "neutral" : "good"),
              h("span", { className: "iris-spacer" }),
-             Btn(t("curatorRunNow"), function () { act(t, "/api/curator/run", jinit("POST"), reload); }, "sm")),
-           h("div", { key: "cnote", className: "iris-note", style: { fontSize: "11.5px", marginTop: 5 } },
+Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POST"), t("triggered"), reload); }, "sm")),
+            h("div", { key: "cnote", className: "iris-note", style: { fontSize: "11.5px", marginTop: 5 } },
              t("lastConsolidation", timeAgo(curator.last_run_at) || "—"))])),
       h("div", { className: "iris-grid-2" },
         Card(t("memPersist"), h("span", { className: "iris-muted iris-mono" }, "provider : " + (activeProvider || "built-in")),
@@ -2193,7 +2224,7 @@
                  title: t("memReset"), subtitle: t("memPersist"), message: t("confirmReset"),
                  tone: "danger", icon: "brain", ok: t("memReset")
                }).then(function (ok) {
-                 if (ok) act(t, "/api/memory/reset", jinit("POST", { target: "memory" }), reload);
+                 if (ok) actToast(t, "/api/memory/reset", jinit("POST", { target: "memory" }), t("updated"), reload);
                });
              }, "danger"))]),
         Card(t("checkpoints"), h("span", { className: "iris-muted num" }, cpSessions.length + " · " + fmtBytes(cps && cps.total_bytes, locale)),
@@ -2206,7 +2237,7 @@
               h("span", { className: "iris-row-meta" }, fmtBytes(firstNum(c.bytes, c.size), locale)));
           }) : Empty("—"),
            h("div", { className: "iris-actions", key: "a", style: { marginTop: 10 } },
-             Btn(t("pruneCp"), function () { act(t, "/api/ops/checkpoints/prune", jinit("POST"), reload); }))])),
+             Btn(t("pruneCp"), function () { actToast(t, "/api/ops/checkpoints/prune", jinit("POST"), t("deleted"), reload); }))])),
       Card(t("opsTitle"), null,
         h("div", { className: "iris-actions" },
           op(t("doctor"), "/api/ops/doctor", "term"), op(t("audit"), "/api/ops/security-audit", "shield"),
@@ -2240,8 +2271,8 @@
     var hiddenCount = hub ? dash.filter(function (p) { return !loadedSet[p.name]; }).length : 0;
     var activeAgents = agents.filter(function (p) { return p.runtime_status === "active"; });
     function setHidden(name, hidden) {
-      act(t, "/api/dashboard/plugins/" + encodeURIComponent(name) + "/visibility",
-        jinit("POST", { hidden: hidden }), reload);
+      actToast(t, "/api/dashboard/plugins/" + encodeURIComponent(name) + "/visibility",
+        jinit("POST", { hidden: hidden }), t("updated"), reload);
     }
     function dashCard(p) {
       var hidden = hub ? !loadedSet[p.name] : false;
@@ -2462,8 +2493,28 @@
         Btn(t("retry"), function () { location.reload(); }, "sm", false, "refresh"),
         IconBtn("x", function () { setDismissed(seq); }, t("cancel"))));
   }
+  function Toaster() {
+    var st = useState([]); var items = st[0], setItems = st[1];
+    useEffect(function () {
+      function on(list) { setItems(list); }
+      TOAST.subs.push(on);
+      on(TOAST.items.slice());
+      return function () {
+        var i = TOAST.subs.indexOf(on);
+        if (i >= 0) TOAST.subs.splice(i, 1);
+      };
+    }, []);
+    if (!items.length) return null;
+    return h("div", { className: "iris-toastcnt", "aria-live": "polite" },
+      items.map(function (x) {
+        return h("div", { className: "iris-toast" + (x.kind === "err" ? " err" : ""), key: x.id },
+          Icon(x.kind === "err" ? "alert" : "check", "sm"),
+          h("span", { className: "iris-toast-txt" }, x.msg),
+          IconBtn("x", function () { toastDismiss(x.id); }, "close"));
+      }));
+  }
   function Overlay() {
-    return h(React.Fragment, null, h(SideNav), h(MobileNav), h(NativeTitleSync), h(ModalHost), h(NetBanner));
+    return h(React.Fragment, null, h(SideNav), h(MobileNav), h(NativeTitleSync), h(ModalHost), h(NetBanner), h(Toaster));
   }
   // gateway pill in the native header (mockup topbar), via the header-right slot
   function HeaderPill() {
