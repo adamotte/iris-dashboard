@@ -1472,17 +1472,20 @@
       var n = useState(isEdit ? txt(job.name) || "" : "");
       var p = useState(isEdit ? txt(job.prompt) || "" : "");
       var s = useState(isEdit
-        ? txt(job.schedule && job.schedule.expr) || txt(job.schedule) || ""
+        ? txt(job.schedule && (job.schedule.expr || job.schedule.display || job.schedule.value))
+          || txt(job.schedule_display) || txt(job.schedule) || ""
         : "0 7 * * *");
       var d = useState(isEdit ? txt(job.deliver || job.target) || "local" : "local");
       function closeForm() { setShowForm(false); setEditing(null); }
+      var schedPreview = humanCron(s[0], locale);
       return Card(isEdit ? t("editJob") : t("newJob"), null, h("div", null,
         h("div", { className: "iris-field" }, h("label", null, t("nameLbl")),
           h("input", { className: "iris-input", value: n[0], onChange: function (e) { n[1](e.target.value); } })),
         h("div", { className: "iris-field" }, h("label", null, t("promptLbl")),
           h(AutoTextArea, { value: p[0], onChange: function (e) { p[1](e.target.value); } })),
         h("div", { className: "iris-field" }, h("label", null, t("cronExpr")),
-          h("input", { className: "iris-input iris-mono", value: s[0], onChange: function (e) { s[1](e.target.value); } })),
+          h("input", { className: "iris-input iris-mono", value: s[0], onChange: function (e) { s[1](e.target.value); } }),
+          schedPreview ? h("small", { className: "iris-muted", style: { display: "block", marginTop: "4px" } }, schedPreview) : null),
         h("div", { className: "iris-field" }, h("label", null, t("deliverLbl")),
           h("input", { className: "iris-input", value: d[0], onChange: function (e) { d[1](e.target.value); } })),
         h("div", { className: "iris-actions" },
