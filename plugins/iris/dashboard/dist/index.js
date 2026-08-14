@@ -22,6 +22,35 @@
   var useEffect = hooks.useEffect;
   var useMemo = hooks.useMemo;
 
+  /* ================= cronstrue (cron → human) ================= */
+  // Vendored UMD (MIT) at dist/cronstrue-i18n.min.js, served next to this
+  // bundle at /api/dashboard-plugins/iris/dist/. Lazy-injected on the cron
+  // page so the rest of the dashboard never pays the 186 KB download.
+  var CS_BASE = "";
+  try {
+    var csScript = document.currentScript || document.querySelector('script[data-hermes-plugin="iris"]');
+    if (csScript && csScript.src) CS_BASE = csScript.src.slice(0, csScript.src.lastIndexOf("/") + 1);
+  } catch (e) { /* noop */ }
+  var csInjected = false;
+  function loadCronstrue(done) {
+    if (window.cronstrue) { if (done) done(); return; }
+    if (csInjected) return;
+    csInjected = true;
+    var s = document.createElement("script");
+    s.src = CS_BASE + "cronstrue-i18n.min.js";
+    s.async = true;
+    if (done) s.onload = done;
+    document.head.appendChild(s);
+  }
+  function humanCron(expr, locale) {
+    if (!window.cronstrue || !expr) return "";
+    try {
+      return window.cronstrue.toString(String(expr), {
+        locale: locale === "fr" ? "fr" : "en", use24HourTimeFormat: true
+      });
+    } catch (e) { return ""; }
+  }
+
   /* ================= i18n ================= */
   var CATALOG = {
     en: {
@@ -1414,6 +1443,10 @@
     var bp = useState(0); var bump = bp[0], setBump = bp[1];
     var frm = useState(false); var showForm = frm[0], setShowForm = frm[1];
     var edt = useState(null); var editing = edt[0], setEditing = edt[1];
+    // lazy-load cronstrue (cron → human) once; re-render when it arrives
+    useEffect(function () {
+      loadCronstrue(function () { setBump(function (v) { return v + 1; }); });
+    }, []);
     var data = useJSON("/api/cron/jobs", 20000, bump);
     var gwStatus = useJSON("/api/status", 30000);
     var jobs = asList(data, ["jobs", "items"]);
@@ -1491,6 +1524,10 @@
           var promptTxt = txt(j.prompt);
           var exprStr = txt(j.schedule && j.schedule.expr) || txt(j.schedule);
           var dispStr = txt(j.schedule_display);
+          // human-friendly line under the raw expression (cronstrue) or the
+          // backend's own display for interval/one-shot schedules
+          var human = humanCron(exprStr, locale);
+          var schedSub = human || (dispStr && dispStr !== exprStr ? dispStr : "");
           var lastStatus = j.last_status;
           var lastBadge = null;
           if (lastStatus) {
@@ -1503,9 +1540,9 @@
           return h("tr", { key: i, style: isPaused ? { opacity: .55 } : undefined },
             h("td", null, h("b", null, txt(j.name) || id), h("br"),
               h("small", { className: "iris-muted iris-cron-prompt", title: promptTxt || "" }, promptTxt || "")),
-            h("td", { className: "hide-m" }, dispStr && dispStr !== exprStr
-              ? h(React.Fragment, null, h("span", { className: "iris-mono" }, exprStr), h("br"), h("small", { className: "iris-muted" }, dispStr))
-              : h("span", { className: "iris-mono" }, exprStr || dispStr)),
+            h("td", { className: "hide-m" },
+              h("span", { className: "iris-mono" }, exprStr || dispStr),
+              schedSub ? h(React.Fragment, null, h("br"), h("small", { className: "iris-muted" }, schedSub)) : null),
             h("td", { className: "hide-m" }, txt(j.deliver || j.target) || "local"),
             h("td", null, Badge(isPaused ? t("paused") : t("active"), isPaused ? "neutral" : "good")),
             h("td", { className: "r num hide-m", style: { whiteSpace: "nowrap" } }, lr
