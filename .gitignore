@@ -3,3 +3,6 @@ mockup/
 
 # local tooling config
 .claude/
+
+# graphify analysis output
+graphify-out/

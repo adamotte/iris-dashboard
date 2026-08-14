@@ -51,6 +51,7 @@
       search: "Search…", refresh: "Refresh", enabled: "enabled", disabled: "disabled",
       actions: "Actions", name: "Name", description: "Description", status: "Status",
       confirmDelete: "Delete “{0}”?", error: "Error: {0}", save: "Save", saved: "Saved ✓",
+      netDown: "{0} data source(s) unreachable — the gateway may be down", retry: "Reload",
       /* dialogs */
       dlgOk: "Confirm", dlgClose: "Close", errTitle: "Something went wrong",
       resultTitle: "Result", confirmTitle: "Confirmation",
@@ -180,6 +181,7 @@
       search: "Rechercher…", refresh: "Actualiser", enabled: "activé", disabled: "désactivé",
       actions: "Actions", name: "Nom", description: "Description", status: "État",
       confirmDelete: "Supprimer « {0} » ?", error: "Erreur : {0}", save: "Enregistrer", saved: "Enregistré ✓",
+      netDown: "{0} source(s) de données injoignable(s) — la passerelle est peut-être arrêtée", retry: "Recharger",
       dlgOk: "Confirmer", dlgClose: "Fermer", errTitle: "Une erreur est survenue",
       resultTitle: "Résultat", confirmTitle: "Confirmation",
       sessionsTitle: "Sessions", sessionsDesc: "Recherche plein-texte dans tout l'historique",
@@ -367,13 +369,46 @@
     return n + " " + u[0];
   }
 
+  /* ================= connectivity (error states) =================
+     useJSON reports fetch failures to this tiny store; the always-mounted
+     NetBanner (overlay slot) turns them into one dismissible banner, so a
+     dead gateway or a failing endpoint is never a page of silent "—".
+     Entries carry a timestamp and are pruned on a timer: a stale failure
+     left behind by an unmounted page cannot pin the banner forever. */
+  var NET = { fails: {}, seq: 0, subs: [] };
+  function netEmit() { NET.subs.slice().forEach(function (fn) { fn(NET.fails, NET.seq); }); }
+  function netNote(path, failed) {
+    var k = String(path).split("?")[0];
+    var now = Date.now();
+    var changed = false;
+    if (failed) {
+      if (!NET.fails[k]) changed = true;
+      NET.fails[k] = now;
+    } else if (NET.fails[k]) {
+      delete NET.fails[k];
+      changed = true;
+    }
+    if (changed) { NET.seq += 1; netEmit(); }
+  }
+  function netPrune() {
+    var now = Date.now(), changed = false;
+    Object.keys(NET.fails).forEach(function (k) {
+      if (now - NET.fails[k] > 150000) { delete NET.fails[k]; changed = true; }
+    });
+    if (changed) { NET.seq += 1; netEmit(); }
+  }
+
   function useJSON(path, refreshMs, bump) {
     var st = useState(null); var data = st[0], setData = st[1];
     useEffect(function () {
       var alive = true;
       function load() {
-        SDK.fetchJSON(path).then(function (d) { if (alive) setData(d); })
-          .catch(function () { /* silent */ });
+        SDK.fetchJSON(path).then(function (d) {
+          netNote(path, false);
+          if (alive) setData(d);
+        }).catch(function () {
+          netNote(path, true);
+        });
       }
       load();
       var t = refreshMs ? setInterval(load, refreshMs) : null;
@@ -529,8 +564,11 @@
       onClick: function (e) { e.preventDefault(); navTo(href); }
     }, label + " →");
   }
-  function Switch(on, onToggle) {
-    return h("button", { className: "iris-switch" + (on ? " on" : ""), onClick: onToggle });
+  function Switch(on, onToggle, label) {
+    return h("button", {
+      className: "iris-switch" + (on ? " on" : ""), onClick: onToggle,
+      role: "switch", "aria-checked": !!on, "aria-label": label || undefined, type: "button"
+    });
   }
   function PageHead(title, desc, actions) {
     return h("div", { className: "iris-page-head" },
@@ -552,7 +590,10 @@
   function ModelBadge(text, cls) { return h("span", { className: "iris-model-badge " + (cls || "") }, text); }
   function Subhead(text) { return h("div", { className: "iris-subhead" }, text); }
   function IconBtn(icon, onClick, title) {
-    return h("button", { className: "iris-icon-btn", onClick: onClick, title: title || undefined }, Icon(icon, "sm"));
+    return h("button", {
+      className: "iris-icon-btn", onClick: onClick,
+      title: title || undefined, "aria-label": title || undefined, type: "button"
+    }, Icon(icon, "sm"));
   }
   function Table(cols, rows) {
     return h("div", { className: "iris-card iris-table-card", style: { overflowX: "auto" } },
@@ -634,6 +675,7 @@
     var vs = useState(spec.value || ""); var val = vs[0], setVal = vs[1];
     var rv = useState(false); var reveal = rv[0], setReveal = rv[1];
     var isPrompt = spec.kind === "prompt";
+    var mref = { current: null };
     function cancel() { closeDialog(d.id, spec.kind === "confirm" ? false : (isPrompt ? null : true)); }
     function submit() {
       if (!isPrompt) return closeDialog(d.id, true);
@@ -643,7 +685,22 @@
     useEffect(function () {
       var prev = document.activeElement;
       function onKey(e) {
-        if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); cancel(); }
+        if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); cancel(); return; }
+        // focus trap: Tab / Shift+Tab cycle inside the dialog, never beyond it
+        if (e.key === "Tab" && mref.current) {
+          var nodes = mref.current.querySelectorAll(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+          var list = Array.prototype.filter.call(nodes, function (n) {
+            return !n.disabled && n.offsetParent !== null;
+          });
+          if (!list.length) return;
+          var first = list[0], last = list[list.length - 1], cur = document.activeElement;
+          if (e.shiftKey) {
+            if (cur === first || !mref.current.contains(cur)) { e.preventDefault(); last.focus(); }
+          } else if (cur === last || !mref.current.contains(cur)) {
+            e.preventDefault(); first.focus();
+          }
+        }
       }
       document.addEventListener("keydown", onKey, true);
       return function () {
@@ -673,7 +730,7 @@
       className: "iris-modal-scrim",
       onMouseDown: function (e) { if (e.target === e.currentTarget) cancel(); }
     },
-      h("div", { className: "iris-modal", role: "dialog", "aria-modal": "true", "aria-label": spec.title },
+      h("div", { className: "iris-modal", ref: mref, role: "dialog", "aria-modal": "true", "aria-label": spec.title },
         h("div", { className: "iris-modal-head" },
           h("span", { className: "iris-icbox " + (DLG_TONE[spec.tone] || "iris-i") }, Icon(spec.icon || "cog")),
           h("div", { className: "iris-modal-title" },
@@ -773,6 +830,23 @@
   }
 
   /* ================= HOME ================= */
+  // pulsing placeholder shown until the first Home fetches land (or ~3s elapse)
+  function HomeSkeleton() {
+    return h("div", { className: "iris-home iris-skel", "aria-busy": "true" },
+      h("div", { className: "iris-page-head" },
+        h("div", { className: "iris-skel-bar", style: { width: 190, height: 22 } })),
+      h("div", { className: "iris-tiles" }, [0, 1, 2, 3].map(function (i) {
+        return h("div", { className: "iris-skel-card", key: i, style: { padding: 14 } },
+          h("div", { className: "iris-skel-bar", style: { width: "45%", height: 11 } }),
+          h("div", { className: "iris-skel-bar", style: { width: "70%", height: 26, marginTop: 10 } }));
+      })),
+      h("div", { className: "iris-cols" },
+        h("div", { className: "iris-col-main" }, [0, 1].map(function (i) {
+          return h("div", { className: "iris-skel-card", key: i, style: { minHeight: 150 } });
+        })),
+        h("div", { className: "iris-col-side" },
+          h("div", { className: "iris-skel-card", style: { minHeight: 190 } }))));
+  }
   function HomePage() {
     var locale = useLocale(); var t = makeT(locale);
     var bp = useState(0); var bump = bp[0], setBump = bp[1];
@@ -790,6 +864,16 @@
     var platforms = useJSON("/api/messaging/platforms", 30000);
     var env = useJSON("/api/env", 60000);
 
+    // P0 loading gate: skeleton while the primary fetches are still in flight,
+    // with a ~3s failsafe so a slow gateway can't hold the page hostage.
+    // NOTE: this return sits after every hook (rules of hooks — HomeSkeleton
+    // must never be returned mid-hook-chain).
+    var sk = useState(false); var skElapsed = sk[0], setSkElapsed = sk[1];
+    useEffect(function () {
+      var t = setTimeout(function () { setSkElapsed(true); }, 3000);
+      return function () { clearTimeout(t); };
+    }, []);
+
     // tiles always read a fixed 14-day window; the usage card below has its
     // own period-driven fetch (7 / 14 / 30 j chips) so switching periods
     // there doesn't perturb the "cost/tokens today" tiles.
@@ -801,6 +885,7 @@
       if (w.length) avg7 = w.reduce(function (s, d) { return s + d.cost; }, 0) / w.length;
     }
     var daysPeriod = useMemo(function () { return normDaily(usagePeriod); }, [usagePeriod]);
+    if (!skElapsed && status == null && sessions == null) return HomeSkeleton();
 
     var sessList = asList(sessions, ["sessions", "items", "recent"]);
     var active = firstNum(status && status.active_sessions, status && status.activeSessions);
@@ -974,7 +1059,15 @@
                 var inTok = firstNum(s.input_tokens), outTok = firstNum(s.output_tokens);
                 var tok = (inTok != null || outTok != null) ? (inTok || 0) + (outTok || 0) : null;
                 return h("div", {
-                  key: i, onClick: id ? function () { navTo("/chat?resume=" + encodeURIComponent(id)); } : null,
+                  key: i,
+                  onClick: id ? function () { navTo("/chat?resume=" + encodeURIComponent(id)); } : null,
+                  tabIndex: id ? 0 : null, role: id ? "link" : null,
+                  onKeyDown: id ? function (e) {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      navTo("/chat?resume=" + encodeURIComponent(id));
+                    }
+                  } : null,
                   style: { cursor: id ? "pointer" : "default" }
                 },
                   IconRow(sic, "",
@@ -1107,7 +1200,14 @@
           return h("tr", {
             key: i, className: id ? "iris-rowlink" : null,
             title: id ? t("resumeChat") : null,
-            onClick: id ? function () { navTo("/chat?resume=" + encodeURIComponent(id)); } : null
+            tabIndex: id ? 0 : null, role: id ? "link" : null,
+            onClick: id ? function () { navTo("/chat?resume=" + encodeURIComponent(id)); } : null,
+            onKeyDown: id ? function (e) {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                navTo("/chat?resume=" + encodeURIComponent(id));
+              }
+            } : null
           },
             h("td", null, h("b", null, sx.is_active ? LiveDot() : null, txt(sx.name || sx.title) || id || "session"),
               h("br"), h("small", { className: "iris-muted" }, txt(sx.preview).slice(0, 80))),
@@ -1291,14 +1391,16 @@
                   jUntil ? h("br") : null, jUntil ? h("small", null, t("inTime", jUntil)) : null)
               : "—"),
             h("td", { className: "r" },
-              h("button", { className: "iris-icon-btn sm", title: t("runNow"), onClick: function () { act(t, "/api/cron/jobs/" + id + "/trigger", jinit("POST"), reload); } }, Icon("play", "sm")), " ",
+              h("button", { className: "iris-icon-btn sm", title: t("runNow"), "aria-label": t("runNow"), onClick: function () { act(t, "/api/cron/jobs/" + id + "/trigger", jinit("POST"), reload); } }, Icon("play", "sm")), " ",
               h("button", {
                 className: "iris-icon-btn sm", title: isPaused ? t("resume") : t("pause"),
+                "aria-label": isPaused ? t("resume") : t("pause"),
                 onClick: function () { act(t, "/api/cron/jobs/" + id + (isPaused ? "/resume" : "/pause"), jinit("POST"), reload); }
               }, Icon(isPaused ? "play" : "pause", "sm")),
               isPaused ? " " : null,
               isPaused ? h("button", {
-                className: "iris-icon-btn sm", title: t("deleteS"), style: { color: "var(--color-destructive)" },
+                className: "iris-icon-btn sm", title: t("deleteS"), "aria-label": t("deleteS"),
+                style: { color: "var(--color-destructive)" },
                 onClick: function () { askDelete(t, txt(j.name) || id, function () { act(t, "/api/cron/jobs/" + id, jinit("DELETE"), reload); }); }
               }, Icon("trash", "sm")) : null));
         }) : h("tr", null, h("td", { colSpan: 7 }, Empty(t("noCronJob"))))));
@@ -1346,7 +1448,7 @@
           h("h3", null, w.name || "webhook"),
           Badge(enabled ? t("active") : t("disabled"), enabled ? "good" : "neutral"),
           h("span", { className: "iris-spacer" }),
-          Switch(enabled, function () { act(t, "/api/webhooks/" + (w.name) + "/enabled", jinit("PUT", { enabled: !enabled }), reload); }),
+          Switch(enabled, function () { act(t, "/api/webhooks/" + (w.name) + "/enabled", jinit("PUT", { enabled: !enabled }), reload); }, w.name || "webhook"),
           h("button", {
             className: "iris-link", style: { color: "var(--color-destructive)" },
             onClick: function () { askDelete(t, txt(w.name), function () { act(t, "/api/webhooks/" + w.name, jinit("DELETE"), reload); }); }
@@ -1374,7 +1476,7 @@
       showForm ? h(WebhookForm) : null,
       data ? Card(t("whEnableSys"), Switch(data.enabled === true, function () {
         act(t, "/api/webhooks/enable", jinit("POST", { enabled: !data.enabled }), reload);
-      }), h("div", { className: "iris-note" }, t("whUrl") + " : " + (data.base_url || "—"))) : null,
+      }, t("whEnableSys")), h("div", { className: "iris-note" }, t("whUrl") + " : " + (data.base_url || "—"))) : null,
       subs.length ? subs.map(function (w, i) { return h(WebhookCard, { w: w, key: i }); }) : Card(null, null, Empty(t("whNone"))));
   }
 
@@ -1429,7 +1531,7 @@
         var on = s.enabled !== false;
         return h("div", { className: "iris-mini", key: i, style: on ? null : { opacity: 0.6 } },
           h("div", { className: "mc-head" }, Icon(skillIcon(s), "dim"), h("b", null, s.name),
-            Switch(on, function () { act(t, "/api/skills/toggle", jinit("PUT", { name: s.name, enabled: !on }), reload); })),
+            Switch(on, function () { act(t, "/api/skills/toggle", jinit("PUT", { name: s.name, enabled: !on }), reload); }, s.name)),
           h("p", null, s.description || ""),
           h("div", { className: "mc-foot" },
             Badge(s.category || s.provenance || "", "neutral"),
@@ -1478,7 +1580,7 @@
                 });
               });
             }, "sm"),
-            Switch(enabled, function () { act(t, "/api/mcp/servers/" + s2.name + "/enabled", jinit("PUT", { enabled: !enabled }), reload); }),
+            Switch(enabled, function () { act(t, "/api/mcp/servers/" + s2.name + "/enabled", jinit("PUT", { enabled: !enabled }), reload); }, s2.name),
             h("button", {
               className: "iris-link", style: { color: "var(--color-destructive)" },
               onClick: function () { askDelete(t, txt(s2.name), function () { act(t, "/api/mcp/servers/" + s2.name, jinit("DELETE"), reload); }); }
@@ -1516,7 +1618,7 @@
         var tsIcons = { web: "globe", browser: "globe", files: "file", shell: "term", memory: "brain", scheduler: "clock", voice: "mic" };
         return h("div", { className: "iris-mini", key: i, style: on ? null : { opacity: 0.6 } },
           h("div", { className: "mc-head" }, Icon(tsIcons[s2.name] || "tool", "dim"), h("b", null, s2.label || s2.name),
-            Switch(on, function () { act(t, "/api/tools/toolsets/" + s2.name, jinit("PUT", { enabled: !on }), reload); })),
+            Switch(on, function () { act(t, "/api/tools/toolsets/" + s2.name, jinit("PUT", { enabled: !on }), reload); }, s2.label || s2.name)),
           h("p", null, s2.description || ""),
           h("div", { className: "mc-foot" },
             h("span", null, t("toolsN", (s2.tools || []).length)),
@@ -1588,7 +1690,7 @@
                 }, "sm"),
             Switch(p.enabled === true, function () {
               act(t, "/api/messaging/platforms/" + p.id, jinit("PUT", { enabled: !p.enabled }), reload);
-            })),
+            }, p.name || p.id)),
           h("div", { className: "iris-muted" }, p.description || ""),
           envVars.map(function (v, vi) {
             return h("div", { className: "iris-input-row iris-env-row", style: { marginTop: 6 }, key: vi },
@@ -1728,7 +1830,7 @@
       return h("div", { className: "iris-field", key: path },
         h("div", { className: "iris-input-row", style: { justifyContent: "space-between" } },
           h("label", { style: { margin: 0 } }, label),
-          Switch(cur, function () { setEdit(path, !cur); })));
+          Switch(cur, function () { setEdit(path, !cur); }, label)));
     }
     function genericSection(sectionKey) {
       var obj = (data && data[sectionKey]) || {};
@@ -1976,7 +2078,7 @@
         }, [50, 200, 500].map(function (n) { return h("option", { key: n, value: n }, n + " " + t("lines")); })),
         h("span", { className: "iris-spacer" }),
         h("span", { style: { display: "flex", gap: "8px", alignItems: "center", fontSize: "12px" } },
-          t("liveTail"), Switch(tail, function () { setTail(!tail); }))),
+          t("liveTail"), Switch(tail, function () { setTail(!tail); }, t("liveTail")))),
       h("div", { className: "iris-logbox" }, shown.slice(-400).map(function (l, i) {
         var p = parseLine(l);
         if (!p) {
@@ -2146,7 +2248,7 @@
       var tab = p.tab || {};
       return h("div", { className: "iris-mini", key: p.name, style: hidden ? { opacity: 0.55 } : null },
         h("div", { className: "mc-head" }, Icon("puzzle", "dim"), h("b", null, p.label || p.name),
-          Switch(!hidden, function () { setHidden(p.name, !hidden); })),
+          Switch(!hidden, function () { setHidden(p.name, !hidden); }, p.label || p.name)),
         h("p", null, p.description || ""),
         h("div", { className: "mc-foot" },
           h("span", { className: "num" }, p.name + (p.version ? " · v" + p.version : "")),
@@ -2333,8 +2435,35 @@
     }, [path, t("navHome")]);
     return null;
   }
+  // one banner for every failing endpoint; a dismissed banner re-appears
+  // only when a *new* failure set arrives (seq bumps on any change).
+  function NetBanner() {
+    var t = makeT(useLocale());
+    var st = useState(NET.fails); var fails = st[0], setFails = st[1];
+    var sq = useState(NET.seq); var seq = sq[0], setSeq = sq[1];
+    var ds = useState(-1); var dismissed = ds[0], setDismissed = ds[1];
+    useEffect(function () {
+      function on(f, s) { setFails(f); setSeq(s); }
+      NET.subs.push(on);
+      on(NET.fails, NET.seq);
+      var pr = setInterval(netPrune, 30000);
+      return function () {
+        var i = NET.subs.indexOf(on);
+        if (i >= 0) NET.subs.splice(i, 1);
+        clearInterval(pr);
+      };
+    }, []);
+    var keys = Object.keys(fails);
+    if (!keys.length || seq <= dismissed) return null;
+    return h("div", { className: "iris-netcnt", role: "status" },
+      h("div", { className: "iris-netbanner" },
+        Icon("alert", "sm"),
+        h("span", { className: "iris-net-txt" }, t("netDown", keys.length)),
+        Btn(t("retry"), function () { location.reload(); }, "sm", false, "refresh"),
+        IconBtn("x", function () { setDismissed(seq); }, t("cancel"))));
+  }
   function Overlay() {
-    return h(React.Fragment, null, h(SideNav), h(MobileNav), h(NativeTitleSync), h(ModalHost));
+    return h(React.Fragment, null, h(SideNav), h(MobileNav), h(NativeTitleSync), h(ModalHost), h(NetBanner));
   }
   // gateway pill in the native header (mockup topbar), via the header-right slot
   function HeaderPill() {

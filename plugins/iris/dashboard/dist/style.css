@@ -410,3 +410,33 @@ tr.iris-rowlink:hover td{background:color-mix(in srgb,var(--color-foreground,#88
   .iris-filterbar{overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px}
   .iris-filterbar .iris-input{min-width:150px}
 }
+
+/* ---- connectivity banner (overlay slot): visible fetch failures ----
+   Below the modal (z-120), above the mobile bottom bar (z-60) and the
+   native aside (z-50). */
+.iris-netcnt{position:fixed;top:60px;left:50%;transform:translateX(-50%);z-index:110;
+  width:min(600px,calc(100vw - 24px))}
+.iris-netbanner{display:flex;align-items:center;gap:9px;padding:8px 8px 8px 14px;border-radius:11px;
+  background:var(--color-popover,#1d1c26);border:1px solid var(--color-warning,#fab219);
+  color:var(--color-foreground,inherit);box-shadow:0 10px 30px rgba(0,0,0,.35);
+  font-size:12.5px;animation:iris-pop .16s cubic-bezier(.3,.8,.4,1)}
+.iris-net-txt{flex:1;font-weight:550;min-width:0}
+@media (max-width:860px){.iris-netcnt{top:calc(10px + env(safe-area-inset-top,0px))}}
+
+/* ---- loading skeleton (home page) ---- */
+.iris-skel{pointer-events:none}
+.iris-skel-card{border-radius:13px;border:1px solid var(--color-border,rgba(128,128,128,.2));
+  padding:16px 18px;background:var(--color-card,rgba(128,128,128,.06))}
+.iris-skel-bar{height:14px;border-radius:6px;
+  background:color-mix(in srgb,var(--color-foreground,#888) 9%,transparent);
+  animation:iris-pulse 1.6s ease-in-out infinite}
+
+/* ---- keyboard focus ----
+   inputs/selects already get a primary border on :focus; every other
+   interactive element gets a visible ring. */
+.iris-btn:focus-visible,.iris-icon-btn:focus-visible,.iris-chip:focus-visible,
+.iris-tab:focus-visible,.iris-switch:focus-visible,.iris-link:focus-visible,
+.iris-nav-item:focus-visible,.iris-bb-item:focus-visible,.iris-drawer-item:focus-visible{
+  outline:2px solid var(--color-ring,#8b80f9);outline-offset:2px}
+tr.iris-rowlink:focus-visible td{background:color-mix(in srgb,var(--color-foreground,#888) 4%,transparent);
+  box-shadow:inset 0 0 0 2px var(--color-ring,#8b80f9)}
