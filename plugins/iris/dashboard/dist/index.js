@@ -501,6 +501,33 @@
     return st[0];
   }
 
+  // The native shell redirects the root route "/" → "/sessions" on the first
+  // render, before the plugin manifests finish loading in a fresh tab, so the
+  // iris "/" override never wins on first paint. Once the shell has rebuilt the
+  // routes (the home nav link proves the override is active), take the user
+  // home if we are still sitting on a bare root/sessions landing.
+  (function () {
+    try {
+      var bare = function () {
+        var p = location.pathname;
+        return (p === "/" || p === "/sessions") && !location.search && !location.hash;
+      };
+      if (!bare()) return;
+      var tries = 0;
+      var timer = setInterval(function () {
+        tries++;
+        var homeLink = false;
+        try { homeLink = !!document.querySelector('a[href="/"]'); } catch (e) { /* noop */ }
+        if (homeLink) {
+          clearInterval(timer);
+          if (bare() && location.pathname !== "/") navTo("/");
+          return;
+        }
+        if (tries > 40) clearInterval(timer);
+      }, 150);
+    } catch (e) { /* noop */ }
+  })();
+
   /* ================= icons (ported from the mockup) ================= */
   function P(d) { return h("path", { key: d.slice(0, 8), d: d }); }
   function C(cx, cy, r) { return h("circle", { key: "c" + cx + cy, cx: cx, cy: cy, r: r }); }
@@ -2431,8 +2458,15 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
     var hiddenCount = hub ? dash.filter(function (p) { return !loadedSet[p.name]; }).length : 0;
     var activeAgents = agents.filter(function (p) { return p.runtime_status === "active"; });
     function setHidden(name, hidden) {
-      actToast(t, "/api/dashboard/plugins/" + encodeURIComponent(name) + "/visibility",
-        jinit("POST", { hidden: hidden }), t("updated"), reload);
+      // the shell reads plugin visibility only at boot, so a reload is the
+      // only way to hand the route back to the native page (or restore it)
+      act(t, "/api/dashboard/plugins/" + encodeURIComponent(name) + "/visibility",
+        jinit("POST", { hidden: hidden }), function (r) {
+          if (r) {
+            try { sessionStorage.removeItem("hermes:plugin-manifests"); } catch (e) { /* noop */ }
+            location.reload();
+          }
+        });
     }
     function dashCard(p) {
       var hidden = hub ? !loadedSet[p.name] : false;
