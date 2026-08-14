@@ -151,7 +151,7 @@
       gwConnStat: "{0} platform(s) connected", memPersist: "Persistent memory",
       providersAvail: "Available providers:", activeMark: "(active)",
       gwRestart: "Restart", gwStop: "Stop", gwStart: "Start",
-      navMore: "More", online: "online", offline: "stopped",
+      navMore: "More", menuTitle: "Navigation", online: "online", offline: "stopped",
       catProvider: "LLM providers", catTool: "Tools", catMessaging: "Messaging", catSetting: "Settings",
       cronGwDown: "The gateway is stopped — triggered and scheduled jobs will not run until it starts."
     },
@@ -263,7 +263,7 @@
       gwConnStat: "{0} plateforme(s) connectée(s)", memPersist: "Mémoire persistante",
       providersAvail: "Providers disponibles :", activeMark: "(actif)",
       gwRestart: "Redémarrer", gwStop: "Arrêter", gwStart: "Démarrer",
-      navMore: "Plus", online: "en ligne", offline: "arrêtée",
+      navMore: "Plus", menuTitle: "Navigation", online: "en ligne", offline: "arrêtée",
       catProvider: "Fournisseurs LLM", catTool: "Outils", catMessaging: "Messagerie", catSetting: "Réglages",
       cronGwDown: "La passerelle est arrêtée — les jobs déclenchés ou planifiés ne s'exécuteront pas tant qu'elle n'est pas démarrée."
     }
@@ -1591,8 +1591,8 @@
             })),
           h("div", { className: "iris-muted" }, p.description || ""),
           envVars.map(function (v, vi) {
-            return h("div", { className: "iris-input-row", style: { marginTop: 6 }, key: vi },
-              h("span", { className: "iris-muted", style: { width: 180, flex: "none" } }, txt(v.prompt || v.key)),
+            return h("div", { className: "iris-input-row iris-env-row", style: { marginTop: 6 }, key: vi },
+              h("span", { className: "iris-muted iris-env-label" }, txt(v.prompt || v.key)),
               h("span", { className: "iris-key-val", style: { flex: 1 } }, v.is_set ? (v.redacted_value || "••••••") : "—"),
               Btn(v.is_set ? t("keyEdit") : t("keyDefine"), function () { setEnvVar(v.key, v.is_set); }, "sm" + (v.is_set ? "" : " primary")));
           }),
@@ -1891,7 +1891,7 @@
     }
     function keyRow(pair) {
       var k = pair[0], v = pair[1];
-      return h("div", { className: "iris-row", key: k },
+      return h("div", { className: "iris-row iris-key-row", key: k },
         h("span", { className: "iris-row-body" },
           h("b", null, k),
           v.prompt || v.description ? h("small", null, txt(v.prompt || v.description)) : null),
@@ -2258,6 +2258,15 @@
     var ds = useState(false); var open = ds[0], setOpen = ds[1];
     var links = [["/", t("navHome"), "grid"], ["/chat", t("navChat"), "chat"], ["/sessions", t("navSessions"), "hist"], ["/cron", t("navCron"), "clock"]];
     var closeAnd = function (href) { setOpen(false); navTo(href); };
+    // Escape and a route change both dismiss the drawer: it now sits above the
+    // bottom bar, so the "More" button is no longer there to toggle it back.
+    useEffect(function () {
+      if (!open) return undefined;
+      function onKey(e) { if (e.key === "Escape") setOpen(false); }
+      document.addEventListener("keydown", onKey, true);
+      return function () { document.removeEventListener("keydown", onKey, true); };
+    }, [open]);
+    useEffect(function () { setOpen(false); }, [path]);
     return h(React.Fragment, null,
       h("nav", { className: "iris-bottombar" },
         links.map(function (l, i) {
@@ -2271,15 +2280,24 @@
           onClick: function () { setOpen(!open); }
         }, Icon("dots", "bb"), h("span", null, t("navMore")))),
       h("div", { className: "iris-scrim" + (open ? " open" : ""), onClick: function () { setOpen(false); } }),
-      h("div", { className: "iris-drawer" + (open ? " open" : "") },
+      h("div", { className: "iris-drawer" + (open ? " open" : ""), "aria-hidden": open ? null : "true" },
         h("div", { className: "iris-grabber" }),
-        h("div", { className: "iris-drawer-grid" },
-          navGroups(t).reduce(function (acc, g) { return acc.concat(g[1]); }, []).map(function (l, i) {
-            return h("a", {
-              key: i, href: l[0], className: "iris-drawer-item" + (path === l[0] ? " active" : ""),
-              onClick: function (e) { e.preventDefault(); closeAnd(l[0]); }
-            }, Icon(l[2]), h("span", null, l[1]));
-          }))));
+        h("div", { className: "iris-drawer-head" },
+          h("b", null, t("menuTitle")),
+          IconBtn("x", function () { setOpen(false); }, t("cancel"))),
+        // same grouping as the desktop sidebar — a flat 20-tile grid read as a
+        // different menu altogether
+        navGroups(t).map(function (g, gi) {
+          return h("div", { className: "iris-drawer-group", key: gi },
+            g[0] ? h("div", { className: "iris-nav-label" }, g[0]) : null,
+            h("div", { className: "iris-drawer-grid" },
+              g[1].map(function (l, i) {
+                return h("a", {
+                  key: i, href: l[0], className: "iris-drawer-item" + (path === l[0] ? " active" : ""),
+                  onClick: function (e) { e.preventDefault(); closeAnd(l[0]); }
+                }, Icon(l[2]), h("span", null, l[1]));
+              })));
+        })));
   }
   function pageTitleFor(path, t) {
     var map = {

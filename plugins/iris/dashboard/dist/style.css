@@ -316,6 +316,19 @@ tr.iris-rowlink:hover td{background:color-mix(in srgb,var(--color-foreground,#88
 }
 @media (prefers-reduced-motion:reduce){.iris-modal-scrim,.iris-modal{animation:none}}
 
+/* ---- env-var rows (keys page, channel cards) ---- */
+.iris-env-label{width:180px;flex:none}
+/* narrow screens: the key name must never be the thing that gets ellipsed —
+   let the row wrap and push value + actions onto a second line */
+@media (max-width:640px){
+  .iris-key-row{flex-wrap:wrap;gap:4px 10px;padding:11px 0}
+  .iris-key-row .iris-row-body{flex:1 0 100%}
+  .iris-key-row .iris-key-val{flex:1;min-width:0}
+  .iris-key-row .iris-row-meta{margin-left:auto;flex-wrap:wrap;justify-content:flex-end}
+  .iris-env-row{flex-wrap:wrap;gap:4px 8px}
+  .iris-env-label{width:auto;flex:1 0 100%}
+}
+
 /* ---- collapsible section header (keys page: missing keys) ---- */
 .iris-section-head{display:flex;align-items:center;gap:9px;margin:20px 0 2px;padding-top:14px;
   border-top:1px solid var(--color-border,rgba(128,128,128,.2))}
@@ -329,41 +342,61 @@ tr.iris-rowlink:hover td{background:color-mix(in srgb,var(--color-foreground,#88
 .iris-drawer{display:none}
 @media (max-width:860px){
   .iris-cols,.iris-grid-2{grid-template-columns:1fr}
+  /* the bar is fixed: give every page enough room to scroll clear of it */
+  .iris-home,.iris-page{padding-bottom:calc(72px + env(safe-area-inset-bottom))}
+  body{padding-bottom:calc(56px + env(safe-area-inset-bottom))}
   .iris-bottombar{
     display:flex;position:fixed;left:0;right:0;bottom:0;z-index:60;
     background:var(--color-card,#16151d);border-top:1px solid var(--color-border,rgba(128,128,128,.2));
     padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
-  .iris-bb-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+  .iris-bb-item{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px;
     font-size:10px;font-weight:600;text-decoration:none;
     color:var(--color-muted-foreground,#8c8a9c);padding:5px 0;border-radius:8px;background:none;border:none;font-family:inherit;cursor:pointer}
+  .iris-bb-item span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .iris-bb-item .iris-ic.bb{margin:0}
   .iris-bb-item.active{color:var(--color-primary,#5b4bd4)}
   .iris-table .hide-m{display:none}
-  .iris-scrim{display:block;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:49;
+  /* scrim and drawer both sit ABOVE the bottom bar (z-60): below it the bar
+     stayed lit over the dimmed page and clipped the drawer's last row */
+  .iris-scrim{display:block;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:70;
     opacity:0;pointer-events:none;transition:opacity .2s}
   .iris-scrim.open{opacity:1;pointer-events:auto}
-  .iris-drawer{display:block;position:fixed;left:0;right:0;bottom:0;z-index:50;
+  .iris-drawer{display:block;position:fixed;left:0;right:0;bottom:0;z-index:71;
     background:var(--color-card,#16151d);border-radius:18px 18px 0 0;
     border:1px solid var(--color-border,rgba(128,128,128,.2));
-    padding:14px 14px calc(18px + env(safe-area-inset-bottom));
+    padding:12px 14px calc(20px + env(safe-area-inset-bottom));
     transform:translateY(105%);transition:transform .25s cubic-bezier(.3,.7,.3,1);
-    max-height:78vh;overflow-y:auto}
-  .iris-drawer.open{transform:translateY(0)}
-  .iris-grabber{width:38px;height:4px;border-radius:2px;margin:0 auto 14px;
+    max-height:min(86vh,640px);overflow-y:auto;overscroll-behavior:contain;visibility:hidden}
+  .iris-drawer.open{transform:translateY(0);visibility:visible}
+  .iris-grabber{width:38px;height:4px;border-radius:2px;margin:0 auto 10px;
     background:color-mix(in srgb,var(--color-foreground,#888) 15%,transparent)}
-  .iris-drawer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .iris-drawer-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .iris-drawer-head b{flex:1;font-size:14px;font-weight:650;letter-spacing:-.01em}
+  .iris-drawer-group{margin-bottom:14px}
+  .iris-drawer-group:last-child{margin-bottom:0}
+  .iris-drawer-group .iris-nav-label{padding:0 2px;margin-bottom:7px}
+  .iris-drawer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
   .iris-drawer-item{display:flex;flex-direction:column;align-items:center;gap:7px;
-    padding:13px 6px;border-radius:12px;border:1px solid var(--color-border,rgba(128,128,128,.2));
+    padding:12px 6px;border-radius:12px;border:1px solid var(--color-border,rgba(128,128,128,.2));
     font-size:11px;font-weight:600;color:var(--color-secondary-foreground,#aaa8bb);
-    text-align:center;text-decoration:none}
+    text-align:center;text-decoration:none;min-width:0}
+  .iris-drawer-item span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .iris-drawer-item:active{background:var(--iris-hover,color-mix(in srgb,var(--color-foreground,#888) 5%,transparent))}
   .iris-drawer-item.active{background:color-mix(in srgb,var(--color-primary,#5b4bd4) 11%,transparent);
     color:var(--color-primary,#5b4bd4);border-color:transparent}
+  /* swipeable strips: keep the scroll, drop the scrollbar drawn across the UI */
+  .iris-tabs,.iris-filterbar,.iris-chips{scrollbar-width:none;-ms-overflow-style:none}
+  .iris-tabs::-webkit-scrollbar,.iris-filterbar::-webkit-scrollbar,.iris-chips::-webkit-scrollbar{display:none}
 }
 @media (max-width:480px){
   .iris-tiles{grid-template-columns:1fr 1fr;gap:10px}
   .iris-cards{grid-template-columns:1fr}
-  .iris-actions .iris-btn .iris-btn-txt{display:none}
+  .iris-card{padding:14px 15px}
+  .iris-tile .iris-t-value{font-size:22px}
+  /* actions wrap under the title instead of collapsing to bare icons — a
+     button with no icon rendered as an empty box */
+  .iris-page-head{align-items:flex-start}
+  .iris-actions{width:100%}
   .iris-filterbar{overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px}
   .iris-filterbar .iris-input{min-width:150px}
 }
