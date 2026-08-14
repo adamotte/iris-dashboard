@@ -243,7 +243,17 @@ tr.iris-rowlink:hover td{background:color-mix(in srgb,var(--color-foreground,#88
   .iris-nav-label{margin-bottom:3px}
   .iris-side-logo{padding:8px 10px 6px}
 }
-@media (max-width:860px){.iris-sidenav{display:none}}
+@media (max-width:860px){
+  .iris-sidenav{display:none}
+  /* Below 860px the Iris sidebar steps aside for the bottom bar — which
+     uncovers the shell's own aside (it is only *covered* on desktop, never
+     removed). Two menus would then coexist, the native one listing the native
+     page names (Status, no Home). Hide it and its trigger so the mobile
+     navigation has a single source of truth; the Iris drawer already lists
+     every page, native ones included. */
+  aside#app-sidebar,
+  [aria-controls="app-sidebar"]{display:none !important}
+}
 
 /* ---- gateway pill (header-right slot, mockup .pill) ---- */
 .iris-gwpill{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:550;
