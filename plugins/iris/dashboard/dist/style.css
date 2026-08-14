@@ -75,6 +75,9 @@
 .iris-tile-link{text-decoration:none;color:inherit;display:flex;flex-direction:column;cursor:pointer}
 .iris-tile-link:hover{border-color:color-mix(in srgb,var(--color-primary,#7a6cff) 50%,transparent);transform:translateY(-1px)}
 .iris-tile-link:focus-visible{outline:2px solid var(--color-primary,#7a6cff);outline-offset:2px}
+.iris-row-link{display:block;text-decoration:none;color:inherit;border-radius:8px;margin:0 -8px;padding:0 8px}
+.iris-row-link:hover{background:color-mix(in srgb,var(--color-primary,#7a6cff) 7%,transparent)}
+.iris-row-link:focus-visible{outline:2px solid var(--color-primary,#7a6cff);outline-offset:2px}
 .iris-actions-cell{display:flex;align-items:center;justify-content:flex-end;gap:6px;white-space:nowrap}
 .iris-cron-prompt{display:block;max-width:min(60ch,40vw);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .iris-textarea{min-height:44px;resize:vertical;font:inherit;line-height:1.5}

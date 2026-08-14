@@ -1132,17 +1132,20 @@
               }
               // a paused job is not "ok"; a job that never ran has no verdict
               if (isPausedJob(j)) {
-                return h(React.Fragment, { key: i },
+                return h("a", { key: i, className: "iris-row-link", href: "/cron",
+                    onClick: function (e) { e.preventDefault(); navTo("/cron"); } },
                   IconRow("pause", "warn-i", txt(j.name) || "job", t("paused") + (j.deliver ? " · " + txt(j.deliver) : ""),
                     h(React.Fragment, null, hhmm, " ", Badge(t("paused"), "warn"))));
               }
               if (!lastRun) {
-                return h(React.Fragment, { key: i },
+                return h("a", { key: i, className: "iris-row-link", href: "/cron",
+                    onClick: function (e) { e.preventDefault(); navTo("/cron"); } },
                   IconRow("clock", "iris-i", txt(j.name) || "job", t("neverRun") + (j.deliver ? " · " + txt(j.deliver) : ""),
                     h(React.Fragment, null, "—", " ", Badge(t("neverRun"), "neutral"))));
               }
               var fail = !!(j.last_status === "error" || j.last_status === "failed" || j.last_error);
-              return h(React.Fragment, { key: i },
+              return h("a", { key: i, className: "iris-row-link", href: "/cron",
+                  onClick: function (e) { e.preventDefault(); navTo("/cron"); } },
                 IconRow(fail ? "x" : "check", fail ? "crit-i" : "good-i", txt(j.name) || "job",
                   (fail ? txt(j.last_error || j.last_status) : t("executed")) + (j.deliver ? " · " + txt(j.deliver) : ""),
                   h(React.Fragment, null, hhmm, " ", Badge(fail ? "err" : "ok", fail ? "crit" : "good"))));
