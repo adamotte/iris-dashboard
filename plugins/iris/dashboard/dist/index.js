@@ -1084,6 +1084,14 @@
     var providerName = txt(memory && (memory.provider || memory.active)) || "—";
     var curatorPaused = !!(curator && curator.paused);
 
+    // cron tile icon mirrors the jobs state: green check while running and
+    // healthy, red cross while running but failing, amber pause when on hold
+    var cronRunning = activeJobs > 0;
+    var cronFailing = jobs.some(function (j) { return !isPausedJob(j) && (j.last_status === "error" || j.last_status === "failed" || j.last_error); });
+    var cronPaused = jobs.length > 0 && !cronRunning;
+    var cronIcon = cronPaused ? "pause" : cronFailing ? "x" : cronRunning ? "check" : "clock";
+    var cronKind = cronPaused ? "warn-i" : cronFailing ? "crit-i" : cronRunning ? "good-i" : "iris-i";
+
     return h("div", { className: "iris-home" },
       PageHead(t("hello"),
         (gwOnline ? t("gatewayOnline") : t("gatewayDown")) +
@@ -1103,7 +1111,8 @@
           last && last.cache != null ? t("cacheRate", Math.round(last.cache)) : " ", "/analytics"),
         Tile(TL("hist", t("activeSessions")), active != null ? String(active) : "—",
           t("sessionsToday", sessionsToday), "/sessions"),
-        Tile(TL("clock", t("nextAutomation")), nextJob ? txt(nextJob.name) || "job" : (jobs.length ? txt(jobs[0].name) || jobs.length + " " + t("jobs") : "—"),
+        Tile(h(React.Fragment, null, h("span", { className: "iris-icbox " + cronKind }, Icon(cronIcon)), t("nextAutomation")),
+          nextJob ? txt(nextJob.name) || "job" : (jobs.length ? txt(jobs[0].name) || jobs.length + " " + t("jobs") : "—"),
           nextJob && nextRunOf(nextJob) ? t("inTime", timeUntil(nextRunOf(nextJob), locale)) + " · " + t("jobsActive", activeJobs)
             : (jobs.length ? schedStr(jobs[0]) : t("noScheduledJob")), "/cron")),
 

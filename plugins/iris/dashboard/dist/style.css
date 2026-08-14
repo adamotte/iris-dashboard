@@ -65,6 +65,8 @@
 .iris-tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
 .iris-tile .iris-t-label{font-size:12px;color:var(--color-muted-foreground,#8c8a9c);font-weight:550;
   display:flex;align-items:center;gap:7px}
+.iris-tile .iris-icbox{width:22px;height:22px;border-radius:7px}
+.iris-tile .iris-icbox .iris-ic{width:13px;height:13px}
 .iris-tile .iris-t-value{font-size:25px;font-weight:700;letter-spacing:-.02em;margin:6px 0 2px;
   font-variant-numeric:tabular-nums;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .iris-tile .iris-t-value small{font-size:14px;color:var(--color-muted-foreground,#8c8a9c);font-weight:500}
