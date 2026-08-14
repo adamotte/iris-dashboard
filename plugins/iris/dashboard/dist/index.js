@@ -145,6 +145,7 @@
       mcpError: "error", verifiedNous: "Nous verified",
       owner: "owner", admin: "admin", since: "since {0}",
       cfgImport: "Import", cfgExport: "Export",
+      cfgSearch: "Search settings…", cfgNoMatch: "No match for “{0}”",
       tabModel: "Model", tabAgent: "Agent", tabMemory: "Memory",
       tabApprovals: "Approvals", tabGateway: "Gateway", tabDisplay: "Display",
       cfgProvider: "Provider", cfgCtx: "Context window",
@@ -260,6 +261,7 @@
       mcpError: "erreur", verifiedNous: "vérifié Nous",
       owner: "propriétaire", admin: "admin", since: "depuis le {0}",
       cfgImport: "Importer", cfgExport: "Exporter",
+      cfgSearch: "Rechercher un réglage…", cfgNoMatch: "Aucun résultat pour « {0} »",
       tabModel: "Modèle", tabAgent: "Agent", tabMemory: "Mémoire",
       tabApprovals: "Approbations", tabGateway: "Passerelle", tabDisplay: "Affichage",
       cfgProvider: "Fournisseur", cfgCtx: "Fenêtre de contexte",
@@ -1867,6 +1869,7 @@
     var edit = useState({}); var ed = edit[0], setEd = edit[1];
     var sv = useState(""); var savedMsg = sv[0], setSaved = sv[1];
     var tabSt = useState("model"); var activeTab = tabSt[0], setActiveTab = tabSt[1];
+    var cq = useState(""); var q = cq[0], setQ = cq[1];
     if (!data) return h("div", { className: "iris-page" }, PageHead(t("cfgTitle"), t("cfgDesc"), null), Empty("…"));
     function getPath(obj, path) {
       var parts = path.split("."), cur = obj;
@@ -1887,21 +1890,25 @@
       return v != null ? v : dflt;
     }
     function setEdit(path, value) { var n = {}; for (var x in ed) n[x] = ed[x]; n[path] = value; setEd(n); }
+    // each setting is a { path, label, el } descriptor so the search box can
+    // filter on the dot-path or the label before anything is rendered
     function field(path, label, hint) {
       var raw = val(path, "");
-      return h("div", { className: "iris-field", key: path }, h("label", null, label),
-        h("input", {
-          className: "iris-input", value: raw == null ? "" : String(raw),
-          onChange: function (e) { setEdit(path, e.target.value); }
-        }),
-        hint ? h("div", { className: "iris-hint" }, hint) : null);
+      return { path: path, label: label,
+        el: h("div", { className: "iris-field", key: path }, h("label", null, label),
+          h("input", {
+            className: "iris-input", value: raw == null ? "" : String(raw),
+            onChange: function (e) { setEdit(path, e.target.value); }
+          }),
+          hint ? h("div", { className: "iris-hint" }, hint) : null) };
     }
     function switchField(path, label) {
       var cur = !!val(path, false);
-      return h("div", { className: "iris-field", key: path },
-        h("div", { className: "iris-input-row", style: { justifyContent: "space-between" } },
-          h("label", { style: { margin: 0 } }, label),
-          Switch(cur, function () { setEdit(path, !cur); }, label)));
+      return { path: path, label: label,
+        el: h("div", { className: "iris-field", key: path },
+          h("div", { className: "iris-input-row", style: { justifyContent: "space-between" } },
+            h("label", { style: { margin: 0 } }, label),
+            Switch(cur, function () { setEdit(path, !cur); }, label))) };
     }
     function genericSection(sectionKey) {
       var obj = (data && data[sectionKey]) || {};
@@ -1909,7 +1916,6 @@
         var v = obj[k];
         return typeof v === "string" || typeof v === "number" || typeof v === "boolean";
       }).slice(0, 8);
-      if (!keys.length) return Empty("—");
       return keys.map(function (k) {
         var path = sectionKey + "." + k;
         return typeof obj[k] === "boolean" ? switchField(path, k) : field(path, k, null);
@@ -1966,23 +1972,31 @@
     var TABS = [["model", "tabModel"], ["agent", "tabAgent"], ["memory", "tabMemory"],
       ["approvals", "tabApprovals"], ["gateway", "tabGateway"], ["display", "tabDisplay"]];
     var tabLabel = t(TABS.filter(function (tb) { return tb[0] === activeTab; })[0][1]);
-    var tabBody;
+    var tabFields;
     if (activeTab === "model") {
-      tabBody = h("div", null,
+      tabFields = [
         field("model", t("cfgModel"), t("cfgModelHint")),
         field("model_context_length", t("cfgCtx"), null),
-        (data.cron && typeof data.cron.model === "string") ? field("cron.model", t("cfgCronModel"), null) : null);
+        (data.cron && typeof data.cron.model === "string") ? field("cron.model", t("cfgCronModel"), null) : null];
     } else if (activeTab === "agent") {
-      tabBody = h("div", null,
+      tabFields = [
         field("agent.max_turns", t("cfgMaxTurns"), null),
-        field("max_live_sessions", t("cfgMaxLive"), null));
+        field("max_live_sessions", t("cfgMaxLive"), null)];
     } else if (activeTab === "approvals") {
-      tabBody = h("div", null,
+      tabFields = [
         field("approvals.mode", t("cfgApprovalMode"), null),
-        field("approvals.cron_mode", "cron_mode", null));
+        field("approvals.cron_mode", "cron_mode", null)];
     } else {
-      tabBody = h("div", null, genericSection(activeTab));
+      tabFields = genericSection(activeTab);
     }
+    var qLow = String(q).toLowerCase().trim();
+    var shown = tabFields.filter(function (f) {
+      if (!f) return false;
+      if (!qLow) return true;
+      return f.label.toLowerCase().indexOf(qLow) >= 0 || f.path.toLowerCase().indexOf(qLow) >= 0;
+    });
+    var tabBody = h("div", null,
+      qLow && !shown.length ? Empty(t("cfgNoMatch", q)) : shown.map(function (f) { return f.el; }));
     return h("div", { className: "iris-page" },
       PageHead(t("cfgTitle"), t("cfgDesc"),
         [savedMsg ? Badge(savedMsg, "good") : null,
@@ -1996,6 +2010,11 @@
           onClick: function () { setActiveTab(tb[0]); }
         }, t(tb[1]));
       })),
+      h("div", { className: "iris-filterbar" },
+        h("input", {
+          className: "iris-input", type: "search", placeholder: t("cfgSearch"), value: q,
+          onChange: function (e) { setQ(e.target.value); }
+        })),
       Card(tabLabel, null, tabBody),
       Card(t("cfgRawView"), null,
         h("pre", { className: "iris-logbox", style: { maxHeight: "40vh" } }, JSON.stringify(data, null, 2).slice(0, 20000))));
