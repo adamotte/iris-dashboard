@@ -281,6 +281,48 @@ tr.iris-rowlink:hover td{background:color-mix(in srgb,var(--color-foreground,#88
   color:var(--color-muted-foreground,#8c8a9c);flex-wrap:wrap}
 .iris-chart-foot b{color:var(--color-secondary-foreground,#aaa8bb);font-weight:600}
 
+/* ---- modal dialogs (replaces window.prompt / confirm / alert) ----
+   Above the mobile bottom bar (z-60) and the native aside (z-50). */
+.iris-modal-scrim{position:fixed;inset:0;z-index:120;display:flex;align-items:center;justify-content:center;
+  padding:20px;background:color-mix(in srgb,#000 55%,transparent);
+  -webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);animation:iris-fade .14s ease-out}
+.iris-modal{width:min(460px,100%);max-height:calc(100vh - 40px);overflow:auto;
+  display:flex;flex-direction:column;gap:14px;font-size:13.5px;
+  background:var(--color-popover,var(--color-card,#16151d));
+  border:1px solid var(--color-border,rgba(128,128,128,.25));border-radius:16px;
+  padding:18px 20px 16px;box-shadow:0 18px 50px rgba(0,0,0,.45);
+  animation:iris-pop .16s cubic-bezier(.3,.8,.4,1)}
+@keyframes iris-fade{from{opacity:0}}
+@keyframes iris-pop{from{opacity:0;transform:translateY(8px) scale(.985)}}
+.iris-modal-head{display:flex;align-items:flex-start;gap:11px}
+.iris-modal-title{flex:1;min-width:0;padding-top:1px}
+.iris-modal-title b{display:block;font-size:14.5px;font-weight:650;letter-spacing:-.01em}
+.iris-modal-title small{display:block;margin-top:2px;font-size:11.5px;word-break:break-all;
+  color:var(--color-muted-foreground,#8c8a9c);font-family:var(--theme-font-mono,ui-monospace,monospace)}
+.iris-modal-body{font-size:13px;line-height:1.55;color:var(--color-secondary-foreground,inherit)}
+.iris-modal-body p{margin:0}
+.iris-modal-pre{margin:10px 0 0;padding:10px 12px;max-height:220px;overflow:auto;
+  background:var(--color-background,color-mix(in srgb,var(--color-foreground,#000) 5%,transparent));
+  border:1px solid var(--color-border,rgba(128,128,128,.2));border-radius:9px;
+  font-family:var(--theme-font-mono,ui-monospace,monospace);font-size:11.5px;line-height:1.7;
+  white-space:pre-wrap;word-break:break-all}
+.iris-modal-foot{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.iris-secret-wrap{display:flex;gap:8px;align-items:center}
+.iris-secret-wrap .iris-input{flex:1;font-family:var(--theme-font-mono,ui-monospace,monospace);font-size:12.5px}
+@media (max-width:480px){
+  .iris-modal-scrim{padding:12px;align-items:flex-end}
+  .iris-modal{width:100%;border-radius:16px}
+  .iris-modal-foot .iris-btn{flex:1;justify-content:center}
+}
+@media (prefers-reduced-motion:reduce){.iris-modal-scrim,.iris-modal{animation:none}}
+
+/* ---- collapsible section header (keys page: missing keys) ---- */
+.iris-section-head{display:flex;align-items:center;gap:9px;margin:20px 0 2px;padding-top:14px;
+  border-top:1px solid var(--color-border,rgba(128,128,128,.2))}
+.iris-section-head b{font-size:12.5px;font-weight:650}
+.iris-keys-missing .iris-card{background:none}
+.iris-keys-missing .iris-row-body b{font-weight:550;color:var(--color-secondary-foreground,inherit)}
+
 /* ---- mobile bar + overflow drawer (overlay slot) ---- */
 .iris-bottombar{display:none}
 .iris-scrim{display:none}

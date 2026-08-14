@@ -51,6 +51,9 @@
       search: "Search…", refresh: "Refresh", enabled: "enabled", disabled: "disabled",
       actions: "Actions", name: "Name", description: "Description", status: "Status",
       confirmDelete: "Delete “{0}”?", error: "Error: {0}", save: "Save", saved: "Saved ✓",
+      /* dialogs */
+      dlgOk: "Confirm", dlgClose: "Close", errTitle: "Something went wrong",
+      resultTitle: "Result", confirmTitle: "Confirmation",
       /* sessions */
       sessionsTitle: "Sessions", sessionsDesc: "Full-text search across every conversation",
       chats: "Chats", automation: "Automation", archived: "Archived", messages: "Messages",
@@ -99,7 +102,13 @@
       /* keys */
       keysTitle: "API Keys", keysDesc: "Manage the .env file — values never leave your server",
       keySet: "set", keyUnset: "missing", keyEdit: "Edit", keyDefine: "Set", keyDelete: "Delete",
-      keyShowAdvanced: "Show advanced keys", keyPrompt: "Value for {0}:",
+      keyEditTitle: "Edit a key", keyDefineTitle: "Set a key", keyValueLbl: "Value",
+      keySecretHint: "Written to the .env file on your server — it never leaves it.",
+      keyReveal: "Show the value", keyHide: "Hide the value", keyAdvanced: "advanced",
+      keysSetN: "{0} set", keysMissingN: "{0} missing", keysMissingTitle: "Missing keys",
+      keyShowMissing: "Show the missing keys ({0})", keyHideMissing: "Hide the missing keys",
+      keySearch: "Search a key…", keysNoneSet: "No key set yet",
+      keysAllSet: "Every key is set ✓", keysNoMatch: "No key matches this search",
       /* logs */
       logsTitle: "Logs", logsDesc: "Agent, gateway and errors consolidated — live tail",
       liveTail: "Live tail", lines: "lines",
@@ -171,6 +180,8 @@
       search: "Rechercher…", refresh: "Actualiser", enabled: "activé", disabled: "désactivé",
       actions: "Actions", name: "Nom", description: "Description", status: "État",
       confirmDelete: "Supprimer « {0} » ?", error: "Erreur : {0}", save: "Enregistrer", saved: "Enregistré ✓",
+      dlgOk: "Confirmer", dlgClose: "Fermer", errTitle: "Une erreur est survenue",
+      resultTitle: "Résultat", confirmTitle: "Confirmation",
       sessionsTitle: "Sessions", sessionsDesc: "Recherche plein-texte dans tout l'historique",
       chats: "Chats", automation: "Automations", archived: "Archivées", messages: "Messages",
       model: "Modèle", lastActivity: "Dernière activité", source: "Source", export: "Exporter",
@@ -207,7 +218,13 @@
       cfgRawView: "Vue brute (lecture seule)", cfgSaveNote: "Enregistre via PUT /api/config",
       keysTitle: "Clés API", keysDesc: "Gérez le fichier .env — les valeurs ne quittent jamais votre serveur",
       keySet: "définie", keyUnset: "manquante", keyEdit: "Modifier", keyDefine: "Définir", keyDelete: "Supprimer",
-      keyShowAdvanced: "Afficher les clés avancées", keyPrompt: "Valeur pour {0} :",
+      keyEditTitle: "Modifier une clé", keyDefineTitle: "Définir une clé", keyValueLbl: "Valeur",
+      keySecretHint: "Écrite dans le fichier .env de votre serveur — elle n'en sort jamais.",
+      keyReveal: "Afficher la valeur", keyHide: "Masquer la valeur", keyAdvanced: "avancée",
+      keysSetN: "{0} définies", keysMissingN: "{0} manquantes", keysMissingTitle: "Clés manquantes",
+      keyShowMissing: "Afficher les clés manquantes ({0})", keyHideMissing: "Masquer les clés manquantes",
+      keySearch: "Rechercher une clé…", keysNoneSet: "Aucune clé définie pour l'instant",
+      keysAllSet: "Toutes les clés sont définies ✓", keysNoMatch: "Aucune clé ne correspond à cette recherche",
       logsTitle: "Logs", logsDesc: "Agent, passerelle et erreurs consolidés — suivi en direct",
       liveTail: "Suivi live", lines: "lignes",
       sysTitle: "Système", sysDesc: "Administration de l'installation — hôte, passerelle, mémoire, opérations",
@@ -368,7 +385,9 @@
   function act(t, path, init, done) {
     SDK.fetchJSON(path, init).then(function (r) { if (done) done(r); })
       .catch(function (e) {
-        try { alert(t("error", (e && e.message) || e)); } catch (x) { /* noop */ }
+        try {
+          irisAlert(t, { title: t("errTitle"), message: String((e && e.message) || e), tone: "danger", icon: "alert" });
+        } catch (x) { /* noop */ }
         if (done) done(null);
       });
   }
@@ -542,6 +561,147 @@
           return h("th", { key: i, className: (c.r ? "r " : "") + (c.m ? "hide-m" : "") }, c.l);
         }))),
         h("tbody", null, rows)));
+  }
+
+  /* ================= dialogs =================
+     Replaces window.prompt/confirm/alert everywhere: the native popups are
+     chrome-styled and break the visual language. A single dialog lives in the
+     overlay slot (always mounted) and is driven by this tiny store, so any page
+     can await a modal without owning the markup. */
+  var DLG = { cur: null, seq: 0, hosts: 0, subs: [] };
+  function dlgEmit() { DLG.subs.slice().forEach(function (fn) { fn(DLG.cur); }); }
+  // Fallback when no Iris overlay is mounted: without a host the promise would
+  // stay pending forever and the action would silently never happen.
+  function dlgNative(spec) {
+    if (spec.kind === "prompt") return prompt(spec.title, spec.value || "");
+    if (spec.kind === "confirm") return confirm(spec.message || spec.title);
+    alert([spec.title, spec.message, spec.mono].filter(Boolean).join("\n"));
+    return true;
+  }
+  function closeDialog(id, value) {
+    var c = DLG.cur;
+    if (!c || c.id !== id) return;
+    DLG.cur = null;
+    dlgEmit();
+    c.resolve(value);
+  }
+  function openDialog(spec) {
+    if (!DLG.hosts) return Promise.resolve(dlgNative(spec));
+    if (DLG.cur) closeDialog(DLG.cur.id, DLG.cur.spec.kind === "confirm" ? false : null);
+    DLG.seq += 1;
+    var id = DLG.seq;
+    return new Promise(function (resolve) {
+      DLG.cur = { id: id, spec: spec, resolve: resolve };
+      dlgEmit();
+    });
+  }
+  // resolves the typed value, or null when cancelled
+  function irisPrompt(t, opts) {
+    return openDialog({
+      kind: "prompt", icon: opts.icon || "key", tone: opts.tone || "iris",
+      title: opts.title, subtitle: opts.subtitle, label: opts.label || t("keyValueLbl"),
+      value: opts.value || "", placeholder: opts.placeholder || "", secret: !!opts.secret,
+      hint: opts.hint || "", ok: opts.ok || t("save"), cancel: t("cancel")
+    });
+  }
+  // resolves true / false
+  function irisConfirm(t, opts) {
+    return openDialog({
+      kind: "confirm", icon: opts.icon || "alert", tone: opts.tone || "warn",
+      title: opts.title || t("confirmTitle"), subtitle: opts.subtitle,
+      message: opts.message, mono: opts.mono,
+      ok: opts.ok || t("dlgOk"), cancel: t("cancel")
+    });
+  }
+  function irisAlert(t, opts) {
+    return openDialog({
+      kind: "alert", icon: opts.icon || "check", tone: opts.tone || "iris",
+      title: opts.title, subtitle: opts.subtitle, message: opts.message, mono: opts.mono,
+      ok: opts.ok || t("dlgClose")
+    });
+  }
+  // the "delete X?" flow, identical on every page
+  function askDelete(t, name, done) {
+    irisConfirm(t, {
+      title: t("deleteS"), subtitle: name, message: t("confirmDelete", name),
+      tone: "danger", icon: "trash", ok: t("deleteS")
+    }).then(function (ok) { if (ok) done(); });
+  }
+  var DLG_TONE = { iris: "iris-i", warn: "warn-i", danger: "crit-i", good: "good-i" };
+  function DialogBox(props) {
+    var d = props.d, spec = d.spec;
+    var t = makeT(useLocale());
+    var vs = useState(spec.value || ""); var val = vs[0], setVal = vs[1];
+    var rv = useState(false); var reveal = rv[0], setReveal = rv[1];
+    var isPrompt = spec.kind === "prompt";
+    function cancel() { closeDialog(d.id, spec.kind === "confirm" ? false : (isPrompt ? null : true)); }
+    function submit() {
+      if (!isPrompt) return closeDialog(d.id, true);
+      if (!val) return;
+      closeDialog(d.id, val);
+    }
+    useEffect(function () {
+      var prev = document.activeElement;
+      function onKey(e) {
+        if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); cancel(); }
+      }
+      document.addEventListener("keydown", onKey, true);
+      return function () {
+        document.removeEventListener("keydown", onKey, true);
+        try { if (prev && prev.focus) prev.focus(); } catch (e) { /* noop */ }
+      };
+    }, [d.id]);
+    var body = isPrompt
+      ? h("div", { className: "iris-modal-body" },
+          h("div", { className: "iris-field", style: { marginBottom: 0 } },
+            spec.label ? h("label", null, spec.label) : null,
+            h("div", { className: "iris-secret-wrap" },
+              h("input", {
+                className: "iris-input", type: (spec.secret && !reveal) ? "password" : "text",
+                value: val, placeholder: spec.placeholder || "", autoFocus: true,
+                spellCheck: false, autoComplete: "off",
+                onChange: function (e) { setVal(e.target.value); },
+                onKeyDown: function (e) { if (e.key === "Enter") { e.preventDefault(); submit(); } }
+              }),
+              spec.secret ? IconBtn(reveal ? "x" : "eye", function () { setReveal(!reveal); },
+                reveal ? t("keyHide") : t("keyReveal")) : null),
+            spec.hint ? h("div", { className: "iris-hint" }, spec.hint) : null))
+      : h("div", { className: "iris-modal-body" },
+          spec.message ? h("p", null, spec.message) : null,
+          spec.mono ? h("pre", { className: "iris-modal-pre" }, spec.mono) : null);
+    return h("div", {
+      className: "iris-modal-scrim",
+      onMouseDown: function (e) { if (e.target === e.currentTarget) cancel(); }
+    },
+      h("div", { className: "iris-modal", role: "dialog", "aria-modal": "true", "aria-label": spec.title },
+        h("div", { className: "iris-modal-head" },
+          h("span", { className: "iris-icbox " + (DLG_TONE[spec.tone] || "iris-i") }, Icon(spec.icon || "cog")),
+          h("div", { className: "iris-modal-title" },
+            h("b", null, spec.title),
+            spec.subtitle ? h("small", null, spec.subtitle) : null),
+          IconBtn("x", cancel, t("cancel"))),
+        body,
+        h("div", { className: "iris-modal-foot" },
+          spec.kind === "alert" ? null : Btn(spec.cancel || t("cancel"), cancel),
+          h("button", {
+            className: "iris-btn " + (spec.tone === "danger" ? "danger" : "primary"),
+            onClick: submit, autoFocus: !isPrompt, disabled: isPrompt && !val
+          }, h("span", { className: "iris-btn-txt" }, spec.ok)))));
+  }
+  function ModalHost() {
+    var st = useState(DLG.cur); var cur = st[0], setCur = st[1];
+    useEffect(function () {
+      function on(c) { setCur(c); }
+      DLG.hosts += 1;
+      DLG.subs.push(on);
+      setCur(DLG.cur);
+      return function () {
+        DLG.hosts -= 1;
+        var i = DLG.subs.indexOf(on);
+        if (i >= 0) DLG.subs.splice(i, 1);
+      };
+    }, []);
+    return cur ? h(DialogBox, { key: cur.id, d: cur }) : null;
   }
 
   /* ================= chart ================= */
@@ -761,7 +921,9 @@
         (active != null ? " · " + active + " " + t("activeSessionsSuffix") : "") +
         (status && status.version ? " · v" + status.version : ""),
         [Btn(t("doctor"), function () {
-          act(t, "/api/ops/doctor", jinit("POST"), function (r) { if (r !== null) alert(t("launched", t("doctor"))); });
+          act(t, "/api/ops/doctor", jinit("POST"), function (r) {
+            if (r !== null) irisAlert(t, { title: t("doctor"), message: t("launched", t("doctor")), icon: "term" });
+          });
         }, "", false, "term"),
          Btn(t("newSession"), function () { navTo("/chat"); }, "primary", false, "plus")]),
 
@@ -899,7 +1061,10 @@
         (s.active_store != null ? t("sessActive", s.active_store) + " · " : "") +
         (s.archived != null ? s.archived + " " + t("archived").toLowerCase() + " · " : "") + t("sessionsDesc"),
         Btn(t("pruneOld"), function () {
-          if (confirm(t("confirmPrune"))) act(t, "/api/sessions/prune", jinit("POST", { days: 90 }), function () { setBump(bump + 1); });
+          irisConfirm(t, { title: t("pruneOld"), message: t("confirmPrune"), tone: "danger", icon: "trash", ok: t("deleteS") })
+            .then(function (ok) {
+              if (ok) act(t, "/api/sessions/prune", jinit("POST", { days: 90 }), function () { setBump(bump + 1); });
+            });
         })),
       h("div", { className: "iris-tabs" },
         [{ v: "all", l: t("all") }, { v: "chats", l: t("chats") }, { v: "auto", l: t("automation") }, { v: "archived", l: t("archived") }]
@@ -955,7 +1120,11 @@
               id ? h("a", { className: "iris-link", href: "/api/sessions/" + id + "/export" }, t("export")) : null, " ",
               id ? h("button", {
                 className: "iris-link", style: { color: "var(--color-destructive)" },
-                onClick: function () { if (confirm(t("confirmDelete", sx.name || id))) act(t, "/api/sessions/" + id, jinit("DELETE"), function () { setBump(bump + 1); }); }
+                onClick: function () {
+                  askDelete(t, txt(sx.name) || id, function () {
+                    act(t, "/api/sessions/" + id, jinit("DELETE"), function () { setBump(bump + 1); });
+                  });
+                }
               }, t("deleteS")) : null));
         }) : h("tr", null, h("td", { colSpan: 7 }, Empty(t("noSessions"))))));
   }
@@ -1130,7 +1299,7 @@
               isPaused ? " " : null,
               isPaused ? h("button", {
                 className: "iris-icon-btn sm", title: t("deleteS"), style: { color: "var(--color-destructive)" },
-                onClick: function () { if (confirm(t("confirmDelete", j.name || id))) act(t, "/api/cron/jobs/" + id, jinit("DELETE"), reload); }
+                onClick: function () { askDelete(t, txt(j.name) || id, function () { act(t, "/api/cron/jobs/" + id, jinit("DELETE"), reload); }); }
               }, Icon("trash", "sm")) : null));
         }) : h("tr", null, h("td", { colSpan: 7 }, Empty(t("noCronJob"))))));
   }
@@ -1155,7 +1324,12 @@
           Btn(t("create"), function () {
             if (!n[0]) return;
             act(t, "/api/webhooks", jinit("POST", { name: n[0], event: f[0] }), function (r) {
-              if (r && (r.secret || r.signing_secret)) alert("Secret: " + (r.secret || r.signing_secret) + "\n" + t("whSecretNote"));
+              if (r && (r.secret || r.signing_secret)) {
+                irisAlert(t, {
+                  title: t("whNew"), subtitle: n[0], message: t("whSecretNote"),
+                  mono: String(r.secret || r.signing_secret), icon: "shield", tone: "warn"
+                });
+              }
               setShowForm(false); reload();
             });
           }, "primary", false, "plus"),
@@ -1175,7 +1349,7 @@
           Switch(enabled, function () { act(t, "/api/webhooks/" + (w.name) + "/enabled", jinit("PUT", { enabled: !enabled }), reload); }),
           h("button", {
             className: "iris-link", style: { color: "var(--color-destructive)" },
-            onClick: function () { if (confirm(t("confirmDelete", w.name))) act(t, "/api/webhooks/" + w.name, jinit("DELETE"), reload); }
+            onClick: function () { askDelete(t, txt(w.name), function () { act(t, "/api/webhooks/" + w.name, jinit("DELETE"), reload); }); }
           }, t("deleteS"))),
         h("div", null,
           h("div", { style: { fontSize: "12px", color: "var(--color-muted-foreground,#8c8a9c)", marginBottom: "9px" } }, txt(w.description)),
@@ -1297,13 +1471,17 @@
             h("span", { className: "iris-spacer" }),
             Btn(t("mcpTest"), function () {
               act(t, "/api/mcp/servers/" + s2.name + "/test", jinit("POST"), function (r) {
-                alert(r ? JSON.stringify(r).slice(0, 300) : "?");
+                if (r === null) return;
+                irisAlert(t, {
+                  title: t("mcpTest"), subtitle: s2.name, icon: "plug",
+                  mono: JSON.stringify(r, null, 2).slice(0, 1200)
+                });
               });
             }, "sm"),
             Switch(enabled, function () { act(t, "/api/mcp/servers/" + s2.name + "/enabled", jinit("PUT", { enabled: !enabled }), reload); }),
             h("button", {
               className: "iris-link", style: { color: "var(--color-destructive)" },
-              onClick: function () { if (confirm(t("confirmDelete", s2.name))) act(t, "/api/mcp/servers/" + s2.name, jinit("DELETE"), reload); }
+              onClick: function () { askDelete(t, txt(s2.name), function () { act(t, "/api/mcp/servers/" + s2.name, jinit("DELETE"), reload); }); }
             }, t("deleteS"))),
           h("div", null,
             h("div", { className: "iris-key-val" }, s2.url || s2.command || ""),
@@ -1359,11 +1537,16 @@
     // offer a restart (or a start, if it's down) scoped to the messaging channels.
     var shown = plats.filter(function (p) { return p.enabled || p.configured; });
     var rest = plats.filter(function (p) { return !(p.enabled || p.configured); });
-    function setEnvVar(k) {
+    function setEnvVar(k, isSet) {
       // mirrors KeysPage's setKey() exactly, so editing a platform's env var behaves
       // identically to editing it from the Keys page.
-      var v = prompt(t("keyPrompt", k)); if (v == null || v === "") return;
-      act(t, "/api/env", jinit("PUT", { key: k, value: v }), reload);
+      irisPrompt(t, {
+        title: isSet ? t("keyEditTitle") : t("keyDefineTitle"), subtitle: k,
+        secret: true, hint: t("keySecretHint")
+      }).then(function (v) {
+        if (v == null || v === "") return;
+        act(t, "/api/env", jinit("PUT", { key: k, value: v }), reload);
+      });
     }
     return h("div", { className: "iris-page" },
       PageHead(t("chTitle"), t("chDesc"),
@@ -1396,7 +1579,11 @@
               ? Btn(t("configure"), function () { navTo("/env"); }, "sm")
               : Btn(t("chTest"), function () {
                   act(t, "/api/messaging/platforms/" + p.id + "/test", jinit("POST"), function (r) {
-                    alert(r ? JSON.stringify(r).slice(0, 250) : "?");
+                    if (r === null) return;
+                    irisAlert(t, {
+                      title: t("chTest"), subtitle: txt(p.name) || p.id, icon: "radio",
+                      mono: JSON.stringify(r, null, 2).slice(0, 1200)
+                    });
                   });
                 }, "sm"),
             Switch(p.enabled === true, function () {
@@ -1407,7 +1594,7 @@
             return h("div", { className: "iris-input-row", style: { marginTop: 6 }, key: vi },
               h("span", { className: "iris-muted", style: { width: 180, flex: "none" } }, txt(v.prompt || v.key)),
               h("span", { className: "iris-key-val", style: { flex: 1 } }, v.is_set ? (v.redacted_value || "••••••") : "—"),
-              Btn(v.is_set ? t("keyEdit") : t("keyDefine"), function () { setEnvVar(v.key); }, "sm" + (v.is_set ? "" : " primary")));
+              Btn(v.is_set ? t("keyEdit") : t("keyDefine"), function () { setEnvVar(v.key, v.is_set); }, "sm" + (v.is_set ? "" : " primary")));
           }),
           errMsg ? h("div", { style: { color: "var(--color-warning)" }, key: "err" }, errMsg) : null);
       }),
@@ -1463,7 +1650,12 @@
               h("span", { className: "iris-row-meta" },
                 isOwner ? Badge(t("admin"), "iris") :
                   Btn(t("revoke"), function () {
-                    if (confirm(t("confirmDelete", name))) act(t, "/api/pairing/revoke", jinit("POST", { platform: p.platform, user_id: p.user_id || p.user }), reload);
+                    irisConfirm(t, {
+                      title: t("revoke"), subtitle: txt(p.platform), message: t("confirmDelete", name),
+                      tone: "danger", icon: "link", ok: t("revoke")
+                    }).then(function (ok) {
+                      if (ok) act(t, "/api/pairing/revoke", jinit("POST", { platform: p.platform, user_id: p.user_id || p.user }), reload);
+                    });
                   }, "sm danger")));
           }) : Empty("—"))));
   }
@@ -1578,7 +1770,10 @@
         reader.onload = function () {
           var cfg;
           try { cfg = JSON.parse(String(reader.result)); }
-          catch (err) { alert(t("error", (err && err.message) || String(err))); return; }
+          catch (err) {
+            irisAlert(t, { title: t("errTitle"), message: String((err && err.message) || err), tone: "danger", icon: "alert" });
+            return;
+          }
           act(t, "/api/config", jinit("PUT", { config: cfg }), function (r) {
             if (r !== null) { setSaved(t("saved")); setEd({}); setBump(bump + 1); setTimeout(function () { setSaved(""); }, 3000); }
           });
@@ -1636,54 +1831,101 @@
   function KeysPage() {
     var locale = useLocale(); var t = makeT(locale);
     var bp = useState(0); var bump = bp[0], setBump = bp[1];
-    var adv = useState(false); var showAdv = adv[0], setAdv = adv[1];
+    // A real instance exposes far more optional keys than configured ones: the
+    // page opens on what is actually set, the rest sits behind one button.
+    var ms = useState(false); var showMissing = ms[0], setShowMissing = ms[1];
+    var qs = useState(""); var q = qs[0], setQ = qs[1];
     var data = useJSON("/api/env", 30000, bump);
     var reload = function () { setBump(bump + 1); };
     if (!data) return h("div", { className: "iris-page" }, PageHead(t("keysTitle"), t("keysDesc"), null), Empty("…"));
-    var byCat = {};
-    Object.keys(data).forEach(function (k) {
-      var v = data[k] || {};
-      if (v.advanced && !showAdv && !v.is_set) return;
-      var cat = v.category || "other";
-      (byCat[cat] = byCat[cat] || []).push([k, v]);
-    });
+
+    var all = Object.keys(data).map(function (k) { return [k, data[k] || {}]; });
+    var setCount = all.filter(function (e) { return !!e[1].is_set; }).length;
+    var missCount = all.length - setCount;
+    var needle = q.trim().toLowerCase();
+    function matches(e) {
+      if (!needle) return true;
+      return (e[0] + " " + txt(e[1].prompt || e[1].description || "")).toLowerCase().indexOf(needle) >= 0;
+    }
+    var shownSet = all.filter(function (e) { return e[1].is_set && matches(e); });
+    var shownMissing = all.filter(function (e) { return !e[1].is_set && matches(e); });
+    // nothing configured yet (or a search that only hits unset keys): unfolding
+    // the missing list by hand would just be a required extra click
+    var missingOpen = showMissing || (!shownSet.length && shownMissing.length > 0);
+
     function catRank(c) {
       if (/llm|provider|model/i.test(c)) return 0;
       if (/tool/i.test(c)) return 1;
       if (/messag|platform|chat/i.test(c)) return 2;
       return 3;
     }
-    var cats = Object.keys(byCat).sort(function (a, b) {
-      var ra = catRank(a), rb = catRank(b);
-      return ra !== rb ? ra - rb : a.localeCompare(b);
-    });
-    function setKey(k) {
-      var v = prompt(t("keyPrompt", k)); if (v == null || v === "") return;
-      act(t, "/api/env", jinit("PUT", { key: k, value: v }), reload);
+    var catLabels = { provider: t("catProvider"), tool: t("catTool"), messaging: t("catMessaging"), setting: t("catSetting") };
+    // [[catLabel, entries], …] — categories ordered provider → tool → messaging → rest
+    function byCategory(list) {
+      var byCat = {};
+      list.forEach(function (e) {
+        var cat = e[1].category || "other";
+        (byCat[cat] = byCat[cat] || []).push(e);
+      });
+      return Object.keys(byCat).sort(function (a, b) {
+        var ra = catRank(a), rb = catRank(b);
+        return ra !== rb ? ra - rb : a.localeCompare(b);
+      }).map(function (cat) {
+        return [catLabels[cat] || cat, byCat[cat].sort(function (a, b) { return a[0].localeCompare(b[0]); })];
+      });
+    }
+
+    function setKey(k, isSet) {
+      irisPrompt(t, {
+        title: isSet ? t("keyEditTitle") : t("keyDefineTitle"), subtitle: k,
+        secret: true, hint: t("keySecretHint")
+      }).then(function (v) {
+        if (v == null || v === "") return;
+        act(t, "/api/env", jinit("PUT", { key: k, value: v }), reload);
+      });
     }
     function delKey(k) {
-      if (confirm(t("confirmDelete", k))) {
+      askDelete(t, k, function () {
         act(t, "/api/env", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ key: k }) }, reload);
-      }
+      });
     }
+    function keyRow(pair) {
+      var k = pair[0], v = pair[1];
+      return h("div", { className: "iris-row", key: k },
+        h("span", { className: "iris-row-body" },
+          h("b", null, k),
+          v.prompt || v.description ? h("small", null, txt(v.prompt || v.description)) : null),
+        v.is_set ? h("span", { className: "iris-key-val" }, v.redacted_value || "••••••") : null,
+        h("span", { className: "iris-row-meta", style: { display: "flex", gap: "7px", alignItems: "center" } },
+          v.advanced && !v.is_set ? Badge(t("keyAdvanced"), "neutral") : null,
+          Badge(v.is_set ? t("keySet") : t("keyUnset"), v.is_set ? "good" : "warn"),
+          Btn(v.is_set ? t("keyEdit") : t("keyDefine"), function () { setKey(k, v.is_set); }, "sm" + (v.is_set ? "" : " primary")),
+          v.is_set ? Btn(t("keyDelete"), function () { delKey(k); }, "sm danger") : null));
+    }
+    function section(list) {
+      return byCategory(list).map(function (g) {
+        return h("div", { key: g[0] }, Subhead(g[0]), Card(null, null, g[1].map(keyRow)));
+      });
+    }
+
     return h("div", { className: "iris-page" },
-      PageHead(t("keysTitle"), t("keysDesc"),
-        Btn(t("keyShowAdvanced"), function () { setAdv(!showAdv); }, showAdv ? "primary" : "")),
-      cats.map(function (cat) {
-        var catLabels = { provider: t("catProvider"), tool: t("catTool"), messaging: t("catMessaging"), setting: t("catSetting") };
-        return h("div", { key: cat },
-          Subhead(catLabels[cat] || cat),
-          Card(null, null, byCat[cat].sort(function (a, b) { return a[0].localeCompare(b[0]); }).map(function (pair, i) {
-            var k = pair[0], v = pair[1];
-            return h("div", { className: "iris-row", key: k },
-              h("span", { className: "iris-row-body" }, h("b", null, k)),
-              h("span", { className: "iris-key-val" }, v.redacted_value || (v.is_set ? "••••••" : "—")),
-              h("span", { className: "iris-row-meta", style: { display: "flex", gap: "7px", alignItems: "center" } },
-                Badge(v.is_set ? t("keySet") : t("keyUnset"), v.is_set ? "good" : "warn"),
-                v.is_set ? Btn(t("keyEdit"), function () { setKey(k); }, "sm") : Btn(t("keyDefine"), function () { setKey(k); }, "sm primary"),
-                v.is_set ? Btn(t("keyDelete"), function () { delKey(k); }, "sm danger") : null));
-          })));
-      }));
+      PageHead(t("keysTitle"),
+        t("keysSetN", setCount) + " · " + t("keysMissingN", missCount) + " · " + t("keysDesc"),
+        missCount ? Btn(missingOpen ? t("keyHideMissing") : t("keyShowMissing", missCount),
+          function () { setShowMissing(!missingOpen); }, missingOpen ? "primary" : "", false, "eye") : null),
+      all.length > 8 ? h("div", { className: "iris-filterbar" },
+        h("input", {
+          className: "iris-input", type: "search", placeholder: t("keySearch"), value: q,
+          onChange: function (e) { setQ(e.target.value); }
+        })) : null,
+      shownSet.length ? section(shownSet)
+        : Card(null, null, Empty(needle ? t("keysNoMatch") : t("keysNoneSet"))),
+      missingOpen ? h("div", { className: "iris-keys-missing" },
+        h("div", { className: "iris-section-head" },
+          Icon("key", "dim"), h("b", null, t("keysMissingTitle")),
+          Badge(String(shownMissing.length), "warn")),
+        shownMissing.length ? section(shownMissing)
+          : Card(null, null, Empty(needle ? t("keysNoMatch") : t("keysAllSet")))) : null);
   }
 
   /* ================= LOGS ================= */
@@ -1777,7 +2019,9 @@
     }).length;
     function op(label, path, icon, kind) {
       return Btn(label, function () {
-        act(t, path, jinit("POST"), function (r) { if (r !== null) alert(t("launched", label)); });
+        act(t, path, jinit("POST"), function (r) {
+          if (r !== null) irisAlert(t, { title: label, message: t("launched", label), icon: icon || "term" });
+        });
       }, kind || "", false, icon);
     }
     function fmtUptime(sec) {
@@ -1843,7 +2087,12 @@
              }).join(", ")) : null,
            h("div", { className: "iris-actions", key: "a", style: { marginTop: 10 } },
              Btn(t("memReset"), function () {
-               if (confirm(t("confirmReset"))) act(t, "/api/memory/reset", jinit("POST", { target: "memory" }), reload);
+               irisConfirm(t, {
+                 title: t("memReset"), subtitle: t("memPersist"), message: t("confirmReset"),
+                 tone: "danger", icon: "brain", ok: t("memReset")
+               }).then(function (ok) {
+                 if (ok) act(t, "/api/memory/reset", jinit("POST", { target: "memory" }), reload);
+               });
              }, "danger"))]),
         Card(t("checkpoints"), h("span", { className: "iris-muted num" }, cpSessions.length + " · " + fmtBytes(cps && cps.total_bytes, locale)),
           [cpSessions.length ? cpSessions.slice(0, 5).map(function (c, i) {
@@ -2067,7 +2316,7 @@
     return null;
   }
   function Overlay() {
-    return h(React.Fragment, null, h(SideNav), h(MobileNav), h(NativeTitleSync));
+    return h(React.Fragment, null, h(SideNav), h(MobileNav), h(NativeTitleSync), h(ModalHost));
   }
   // gateway pill in the native header (mockup topbar), via the header-right slot
   function HeaderPill() {
