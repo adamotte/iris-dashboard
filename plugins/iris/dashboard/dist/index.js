@@ -1122,7 +1122,7 @@
 
       h("div", { className: "iris-cols" },
         h("div", { className: "iris-col-main" },
-          Card(t("automationsLastRuns"), LinkTo("/cron", t("cron")),
+          Card(t("automationsLastRuns"), null,
             jobs.length ? jobs.slice(0, 5).map(function (j, i) {
               var lastRun = lastRunOf(j);
               var hhmm = "";
