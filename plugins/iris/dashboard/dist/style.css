@@ -70,6 +70,9 @@
 .iris-tile .iris-t-value small{font-size:14px;color:var(--color-muted-foreground,#8c8a9c);font-weight:500}
 .iris-tile .iris-t-sub{font-size:11.5px;color:var(--color-muted-foreground,#8c8a9c);font-variant-numeric:tabular-nums}
 .iris-tile .iris-t-sub b{color:var(--color-secondary-foreground,#aaa8bb)}
+.iris-tile-link{text-decoration:none;color:inherit;display:flex;flex-direction:column;cursor:pointer}
+.iris-tile-link:hover{border-color:color-mix(in srgb,var(--color-primary,#7a6cff) 50%,transparent);transform:translateY(-1px)}
+.iris-tile-link:focus-visible{outline:2px solid var(--color-primary,#7a6cff);outline-offset:2px}
 .iris-delta{font-weight:650}
 .iris-delta.up{color:var(--color-success,#22b573)}
 .iris-delta.down{color:var(--color-destructive,#e05a6b)}

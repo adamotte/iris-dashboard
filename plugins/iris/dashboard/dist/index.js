@@ -536,7 +536,16 @@
         h("h3", null, title), h("span", { className: "iris-spacer" }), extraHead || null) : null,
       body);
   }
-  function Tile(label, value, sub) {
+  function Tile(label, value, sub, href) {
+    if (href) {
+      return h("a", {
+        className: "iris-card iris-tile iris-tile-link", href: href,
+        onClick: function (e) { e.preventDefault(); navTo(href); }
+      },
+        h("div", { className: "iris-t-label" }, label),
+        h("div", { className: "iris-t-value" }, value),
+        h("div", { className: "iris-t-sub" }, sub || " "));
+    }
     return h("div", { className: "iris-card iris-tile" },
       h("div", { className: "iris-t-label" }, label),
       h("div", { className: "iris-t-value" }, value),
@@ -1063,14 +1072,14 @@
 
       h("div", { className: "iris-tiles" },
         Tile(TL("coin", t("costToday")), last ? splitUnit(fmtCost(last.cost, locale)) : "—",
-          avg7 != null ? t("avg7d", fmtCost(avg7, locale)) : t("viaAnalytics")),
+          avg7 != null ? t("avg7d", fmtCost(avg7, locale)) : t("viaAnalytics"), "/analytics"),
         Tile(TL("chart", t("tokensLastDay")), last ? splitUnit(fmtTokens(last.tokens, locale)) : "—",
-          last && last.cache != null ? t("cacheRate", Math.round(last.cache)) : " "),
+          last && last.cache != null ? t("cacheRate", Math.round(last.cache)) : " ", "/analytics"),
         Tile(TL("hist", t("activeSessions")), active != null ? String(active) : "—",
-          t("sessionsToday", sessionsToday)),
+          t("sessionsToday", sessionsToday), "/sessions"),
         Tile(TL("clock", t("nextAutomation")), nextJob ? txt(nextJob.name) || "job" : (jobs.length ? txt(jobs[0].name) || jobs.length + " " + t("jobs") : "—"),
           nextJob && nextRunOf(nextJob) ? t("inTime", timeUntil(nextRunOf(nextJob), locale)) + " · " + t("jobsActive", activeJobs)
-            : (jobs.length ? schedStr(jobs[0]) : t("noScheduledJob")))),
+            : (jobs.length ? schedStr(jobs[0]) : t("noScheduledJob")), "/cron")),
 
       h("div", { className: "iris-cols" },
         h("div", { className: "iris-col-main" },
@@ -1138,7 +1147,7 @@
                Badge(curatorPaused ? t("paused") : t("active"), curatorPaused ? "neutral" : "good"),
                h("br"),
                enabledSkills + " " + t("skills") + " " + t("enabled") + " · " + t("lastConsolidation", fmtRel(curator && curator.last_run_at, t, locale) || "—"))]),
-          Card(t("channelsSystem"), null,
+          Card(t("channelsSystem"), LinkTo("/system", t("manage")),
             chanRows.concat([
               h("hr", { className: "iris-sep", key: "s2" }),
               Meter(t("cpu"), cpu, cpu != null ? Math.round(cpu) + " %" : "—"),
@@ -1523,7 +1532,9 @@
     }
 
     return h("div", { className: "iris-page" },
-      PageHead(t("whTitle"), t("whDesc"), Btn(t("whNew"), function () { setShowForm(!showForm); }, "primary", false, "plus")),
+      PageHead(t("whTitle"), t("whDesc"),
+        [Btn(t("refresh"), reload, "", false, "refresh"),
+         Btn(t("whNew"), function () { setShowForm(!showForm); }, "primary", false, "plus")]),
       showForm ? h(WebhookForm) : null,
       data ? Card(t("whEnableSys"), Switch(data.enabled === true, function () {
         actToast(t, "/api/webhooks/enable", jinit("POST", { enabled: !data.enabled }), t("updated"), reload);
@@ -1966,6 +1977,7 @@
     return h("div", { className: "iris-page" },
       PageHead(t("cfgTitle"), t("cfgDesc"),
         [savedMsg ? Badge(savedMsg, "good") : null,
+         Btn(t("refresh"), function () { setBump(bump + 1); }, "", false, "refresh"),
          Btn(t("cfgImport"), doImport, "", false, "upload"),
          Btn(t("cfgExport"), doExport, "", false, "download"),
          Btn(t("save"), save, "primary")]),
@@ -2064,8 +2076,9 @@
     return h("div", { className: "iris-page" },
       PageHead(t("keysTitle"),
         t("keysSetN", setCount) + " · " + t("keysMissingN", missCount) + " · " + t("keysDesc"),
-        missCount ? Btn(missingOpen ? t("keyHideMissing") : t("keyShowMissing", missCount),
-          function () { setShowMissing(!missingOpen); }, missingOpen ? "primary" : "", false, "eye") : null),
+        [Btn(t("refresh"), reload, "", false, "refresh"),
+         missCount ? Btn(missingOpen ? t("keyHideMissing") : t("keyShowMissing", missCount),
+           function () { setShowMissing(!missingOpen); }, missingOpen ? "primary" : "", false, "eye") : null]),
       all.length > 8 ? h("div", { className: "iris-filterbar" },
         h("input", {
           className: "iris-input", type: "search", placeholder: t("keySearch"), value: q,
