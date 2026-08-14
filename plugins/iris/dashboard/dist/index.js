@@ -636,6 +636,99 @@
       h("div", null, h("h2", null, title), desc ? h("p", null, desc) : null),
       actions ? h("div", { className: "iris-actions" }, actions) : null);
   }
+  function CronJobForm(props) {
+    var locale = useLocale(); var t = makeT(locale);
+    var job = props.job;
+    var isEdit = !!(job && (job.id || job.job_id || job.name));
+    var id = isEdit ? (job.id || job.job_id || job.name) : "";
+    var n = useState(isEdit ? txt(job.name) || "" : "");
+    var p = useState(isEdit ? txt(job.prompt) || "" : "");
+    var s = useState(isEdit
+      ? txt(job.schedule && (job.schedule.expr || job.schedule.display || job.schedule.value))
+        || txt(job.schedule_display) || txt(job.schedule) || ""
+      : "0 7 * * *");
+    var d = useState(isEdit ? txt(job.deliver || job.target) || "local" : "local");
+    var schedPreview = humanCron(s[0], locale);
+    return Card(isEdit ? t("editJob") : t("newJob"), null, h("div", null,
+      h("div", { className: "iris-field" }, h("label", null, t("nameLbl")),
+        h("input", { className: "iris-input", value: n[0], onChange: function (e) { n[1](e.target.value); } })),
+      h("div", { className: "iris-field" }, h("label", null, t("promptLbl")),
+        h(AutoTextArea, { value: p[0], onChange: function (e) { p[1](e.target.value); } })),
+      h("div", { className: "iris-field" }, h("label", null, t("cronExpr")),
+        h("input", { className: "iris-input iris-mono", value: s[0], onChange: function (e) { s[1](e.target.value); } }),
+        schedPreview ? h("small", { className: "iris-muted", style: { display: "block", marginTop: "4px" } }, schedPreview) : null),
+      h("div", { className: "iris-field" }, h("label", null, t("deliverLbl")),
+        h("input", { className: "iris-input", value: d[0], onChange: function (e) { d[1](e.target.value); } })),
+      h("div", { className: "iris-actions" },
+        isEdit
+          ? Btn(t("save"), function () {
+              actToast(t, "/api/cron/jobs/" + id, jinit("PUT", { updates: { name: n[0], prompt: p[0], schedule: s[0], deliver: d[0] } }), t("updated"),
+                function () { props.onClose(); props.onDone(); });
+            }, "primary", false, "check")
+          : Btn(t("create"), function () {
+              actToast(t, "/api/cron/jobs", jinit("POST", { name: n[0], prompt: p[0], schedule: s[0], deliver: d[0] }), t("created"),
+                function () { props.onClose(); props.onDone(); });
+            }, "primary", false, "plus"),
+        Btn(t("cancel"), props.onClose))));
+  }
+  function WebhookForm(props) {
+    var t = props.t;
+    var n = useState(""); var f = useState("");
+    return Card(t("whNew"), null, h("div", null,
+      h("div", { className: "iris-field" }, h("label", null, t("nameLbl")),
+        h("input", { className: "iris-input", value: n[0], onChange: function (e) { n[1](e.target.value); } })),
+      h("div", { className: "iris-field" }, h("label", null, t("whEvents")),
+        h("input", { className: "iris-input", value: f[0], onChange: function (e) { f[1](e.target.value); } })),
+      h("div", { className: "iris-actions" },
+        Btn(t("create"), function () {
+          if (!n[0]) return;
+          act(t, "/api/webhooks", jinit("POST", { name: n[0], event: f[0] }), function (r) {
+            if (r && (r.secret || r.signing_secret)) {
+              irisAlert(t, {
+                title: t("whNew"), subtitle: n[0], message: t("whSecretNote"),
+                mono: String(r.secret || r.signing_secret), icon: "shield", tone: "warn"
+              });
+            } else if (r !== null) {
+              toastPush(t("created"));
+            }
+            props.onClose(); props.onDone();
+          });
+        }, "primary", false, "plus"),
+        Btn(t("cancel"), props.onClose))));
+  }
+  function WebhookCard(props) {
+    var t = props.t;
+    var w = props.w;
+    var enabled = w.enabled !== false;
+    var cp = useState(false); var copied = cp[0], setCopied = cp[1];
+    var url = txt(props.baseUrl) + txt(w.path || ("/hooks/" + (w.name || "")));
+    return h("section", { className: "iris-card", style: enabled ? undefined : { opacity: .6 } },
+      h("div", { className: "iris-card-head" },
+        h("h3", null, w.name || "webhook"),
+        Badge(enabled ? t("active") : t("disabled"), enabled ? "good" : "neutral"),
+        h("span", { className: "iris-spacer" }),
+        Switch(enabled, function () { actToast(t, "/api/webhooks/" + (w.name) + "/enabled", jinit("PUT", { enabled: !enabled }), t("updated"), props.onDone); }, w.name || "webhook"),
+        h("button", {
+          className: "iris-link", style: { color: "var(--color-destructive)" },
+          onClick: function () { askDelete(t, txt(w.name), function () { actToast(t, "/api/webhooks/" + w.name, jinit("DELETE"), t("deleted"), props.onDone); }); }
+        }, t("deleteS"))),
+      h("div", null,
+        h("div", { style: { fontSize: "12px", color: "var(--color-muted-foreground,#8c8a9c)", marginBottom: "9px" } }, txt(w.description)),
+        enabled ? h(React.Fragment, null,
+          h("div", { className: "iris-input-row" },
+            h("span", { className: "iris-key-val", style: { flex: 1 } }, url),
+            Btn(copied ? t("copied") : t("copy"), function () {
+              try {
+                navigator.clipboard.writeText(url).then(function () {
+                  setCopied(true); setTimeout(function () { setCopied(false); }, 1500);
+                });
+              } catch (e) { /* noop */ }
+            }, "sm", false, "copy")),
+          h("div", { className: "num", style: { display: "flex", gap: "14px", marginTop: "10px", fontSize: "11px", color: "var(--color-muted-foreground,#8c8a9c)" } },
+            h("span", null, t("whEvents") + " : ", h("b", null, txt(w.event || w.filter) || "*")),
+            h("span", null, t("target") + " : ", h("b", null, txt(w.deliver || w.target) || "local")))
+        ) : null));
+  }
   function Chips(options, value, onChange) {
     return h("div", { className: "iris-chips" }, options.map(function (o, i) {
       return h("button", {
@@ -1465,41 +1558,7 @@
       } catch (e) { return null; }
     }
 
-    function JobForm(props) {
-      var job = props.job;
-      var isEdit = !!(job && (job.id || job.job_id || job.name));
-      var id = isEdit ? (job.id || job.job_id || job.name) : "";
-      var n = useState(isEdit ? txt(job.name) || "" : "");
-      var p = useState(isEdit ? txt(job.prompt) || "" : "");
-      var s = useState(isEdit
-        ? txt(job.schedule && (job.schedule.expr || job.schedule.display || job.schedule.value))
-          || txt(job.schedule_display) || txt(job.schedule) || ""
-        : "0 7 * * *");
-      var d = useState(isEdit ? txt(job.deliver || job.target) || "local" : "local");
-      function closeForm() { setShowForm(false); setEditing(null); }
-      var schedPreview = humanCron(s[0], locale);
-      return Card(isEdit ? t("editJob") : t("newJob"), null, h("div", null,
-        h("div", { className: "iris-field" }, h("label", null, t("nameLbl")),
-          h("input", { className: "iris-input", value: n[0], onChange: function (e) { n[1](e.target.value); } })),
-        h("div", { className: "iris-field" }, h("label", null, t("promptLbl")),
-          h(AutoTextArea, { value: p[0], onChange: function (e) { p[1](e.target.value); } })),
-        h("div", { className: "iris-field" }, h("label", null, t("cronExpr")),
-          h("input", { className: "iris-input iris-mono", value: s[0], onChange: function (e) { s[1](e.target.value); } }),
-          schedPreview ? h("small", { className: "iris-muted", style: { display: "block", marginTop: "4px" } }, schedPreview) : null),
-        h("div", { className: "iris-field" }, h("label", null, t("deliverLbl")),
-          h("input", { className: "iris-input", value: d[0], onChange: function (e) { d[1](e.target.value); } })),
-        h("div", { className: "iris-actions" },
-          isEdit
-            ? Btn(t("save"), function () {
-                actToast(t, "/api/cron/jobs/" + id, jinit("PUT", { updates: { name: n[0], prompt: p[0], schedule: s[0], deliver: d[0] } }), t("updated"),
-                  function () { closeForm(); reload(); });
-              }, "primary", false, "check")
-            : Btn(t("create"), function () {
-                actToast(t, "/api/cron/jobs", jinit("POST", { name: n[0], prompt: p[0], schedule: s[0], deliver: d[0] }), t("created"),
-                  function () { closeForm(); reload(); });
-              }, "primary", false, "plus"),
-          Btn(t("cancel"), closeForm))));
-    }
+    function closeForm() { setShowForm(false); setEditing(null); }
 
     var activeCount = jobs.filter(function (j) { return !isPausedJob(j); }).length;
     var pausedCount = jobs.length - activeCount;
@@ -1517,7 +1576,7 @@
         className: "iris-note",
         style: { marginTop: 0, color: "var(--color-warning,#fab219)", display: "flex", alignItems: "center", gap: "7px" }
       }, Icon("alert", "sm"), t("cronGwDown"), " ", LinkTo("/system", t("navSystem"))) : null,
-      showForm ? h(JobForm, { job: editing }) : null,
+      showForm ? h(CronJobForm, { job: editing, onClose: closeForm, onDone: reload }) : null,
       Table([{ l: t("job") }, { l: t("schedule"), m: 1 }, { l: t("target"), m: 1 }, { l: t("status") },
              { l: t("lastRun"), r: 1, m: 1 }, { l: t("nextRun"), r: 1 }, { l: t("actions"), r: 1 }],
         jobs.length ? jobs.map(function (j, i) {
@@ -1582,73 +1641,15 @@
     var subs = asList(data && data.subscriptions, ["subscriptions"]);
     var reload = function () { setBump(bump + 1); };
 
-    function WebhookForm() {
-      var n = useState(""); var f = useState("");
-      return Card(t("whNew"), null, h("div", null,
-        h("div", { className: "iris-field" }, h("label", null, t("nameLbl")),
-          h("input", { className: "iris-input", value: n[0], onChange: function (e) { n[1](e.target.value); } })),
-        h("div", { className: "iris-field" }, h("label", null, t("whEvents")),
-          h("input", { className: "iris-input", value: f[0], onChange: function (e) { f[1](e.target.value); } })),
-        h("div", { className: "iris-actions" },
-          Btn(t("create"), function () {
-            if (!n[0]) return;
-            act(t, "/api/webhooks", jinit("POST", { name: n[0], event: f[0] }), function (r) {
-              if (r && (r.secret || r.signing_secret)) {
-                irisAlert(t, {
-                  title: t("whNew"), subtitle: n[0], message: t("whSecretNote"),
-                  mono: String(r.secret || r.signing_secret), icon: "shield", tone: "warn"
-                });
-              } else if (r !== null) {
-                toastPush(t("created"));
-              }
-              setShowForm(false); reload();
-            });
-          }, "primary", false, "plus"),
-          Btn(t("cancel"), function () { setShowForm(false); }))));
-    }
-
-    function WebhookCard(props) {
-      var w = props.w;
-      var enabled = w.enabled !== false;
-      var cp = useState(false); var copied = cp[0], setCopied = cp[1];
-      var url = txt(data && data.base_url) + txt(w.path || ("/hooks/" + (w.name || "")));
-      return h("section", { className: "iris-card", style: enabled ? undefined : { opacity: .6 } },
-        h("div", { className: "iris-card-head" },
-          h("h3", null, w.name || "webhook"),
-          Badge(enabled ? t("active") : t("disabled"), enabled ? "good" : "neutral"),
-          h("span", { className: "iris-spacer" }),
-          Switch(enabled, function () { actToast(t, "/api/webhooks/" + (w.name) + "/enabled", jinit("PUT", { enabled: !enabled }), t("updated"), reload); }, w.name || "webhook"),
-          h("button", {
-            className: "iris-link", style: { color: "var(--color-destructive)" },
-            onClick: function () { askDelete(t, txt(w.name), function () { actToast(t, "/api/webhooks/" + w.name, jinit("DELETE"), t("deleted"), reload); }); }
-          }, t("deleteS"))),
-        h("div", null,
-          h("div", { style: { fontSize: "12px", color: "var(--color-muted-foreground,#8c8a9c)", marginBottom: "9px" } }, txt(w.description)),
-          enabled ? h(React.Fragment, null,
-            h("div", { className: "iris-input-row" },
-              h("span", { className: "iris-key-val", style: { flex: 1 } }, url),
-              Btn(copied ? t("copied") : t("copy"), function () {
-                try {
-                  navigator.clipboard.writeText(url).then(function () {
-                    setCopied(true); setTimeout(function () { setCopied(false); }, 1500);
-                  });
-                } catch (e) { /* noop */ }
-              }, "sm", false, "copy")),
-            h("div", { className: "num", style: { display: "flex", gap: "14px", marginTop: "10px", fontSize: "11px", color: "var(--color-muted-foreground,#8c8a9c)" } },
-              h("span", null, t("whEvents") + " : ", h("b", null, txt(w.event || w.filter) || "*")),
-              h("span", null, t("target") + " : ", h("b", null, txt(w.deliver || w.target) || "local")))
-          ) : null));
-    }
-
     return h("div", { className: "iris-page" },
       PageHead(t("whTitle"), t("whDesc"),
         [Btn(t("refresh"), reload, "", false, "refresh"),
          Btn(t("whNew"), function () { setShowForm(!showForm); }, "primary", false, "plus")]),
-      showForm ? h(WebhookForm) : null,
+      showForm ? h(WebhookForm, { t: t, onClose: function () { setShowForm(false); }, onDone: reload }) : null,
       data ? Card(t("whEnableSys"), Switch(data.enabled === true, function () {
         actToast(t, "/api/webhooks/enable", jinit("POST", { enabled: !data.enabled }), t("updated"), reload);
       }, t("whEnableSys")), h("div", { className: "iris-note" }, t("whUrl") + " : " + (data.base_url || "—"))) : null,
-      subs.length ? subs.map(function (w, i) { return h(WebhookCard, { w: w, key: i }); }) : Card(null, null, Empty(t("whNone"))));
+      subs.length ? subs.map(function (w, i) { return h(WebhookCard, { w: w, key: i, t: t, baseUrl: data && data.base_url, onDone: reload }); }) : Card(null, null, Empty(t("whNone"))));
   }
 
   /* ================= SKILLS ================= */
