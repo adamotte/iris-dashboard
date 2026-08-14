@@ -587,6 +587,19 @@
       role: "switch", "aria-checked": !!on, "aria-label": label || undefined, type: "button"
     });
   }
+  function AutoTextArea(props) {
+    var mref = { current: null };
+    function grow() {
+      var el = mref.current; if (!el) return;
+      el.style.height = "auto"; el.style.height = (el.scrollHeight + 2) + "px";
+    }
+    useEffect(function () { grow(); }, [props.value]);
+    return h("textarea", {
+      ref: mref, className: "iris-input iris-textarea" + (props.className ? " " + props.className : ""),
+      value: props.value, placeholder: props.placeholder || "", rows: props.rows || 2,
+      onChange: function (e) { if (props.onChange) props.onChange(e); grow(); }
+    });
+  }
   function PageHead(title, desc, actions) {
     return h("div", { className: "iris-page-head" },
       h("div", null, h("h2", null, title), desc ? h("p", null, desc) : null),
@@ -1407,7 +1420,7 @@
         h("div", { className: "iris-field" }, h("label", null, t("nameLbl")),
           h("input", { className: "iris-input", value: n[0], onChange: function (e) { n[1](e.target.value); } })),
         h("div", { className: "iris-field" }, h("label", null, t("promptLbl")),
-          h("input", { className: "iris-input", value: p[0], onChange: function (e) { p[1](e.target.value); } })),
+          h(AutoTextArea, { value: p[0], onChange: function (e) { p[1](e.target.value); } })),
         h("div", { className: "iris-field" }, h("label", null, t("cronExpr")),
           h("input", { className: "iris-input iris-mono", value: s[0], onChange: function (e) { s[1](e.target.value); } })),
         h("div", { className: "iris-field" }, h("label", null, t("deliverLbl")),
@@ -1462,13 +1475,13 @@
           var jUntil = nr ? timeUntil(nr, locale) : "";
           return h("tr", { key: i, style: isPaused ? { opacity: .55 } : undefined },
             h("td", null, h("b", null, txt(j.name) || id), h("br"),
-              h("small", { className: "iris-muted" }, promptTxt || "")),
+              h("small", { className: "iris-muted iris-cron-prompt", title: promptTxt || "" }, promptTxt || "")),
             h("td", { className: "hide-m" }, dispStr && dispStr !== exprStr
               ? h(React.Fragment, null, h("span", { className: "iris-mono" }, exprStr), h("br"), h("small", { className: "iris-muted" }, dispStr))
               : h("span", { className: "iris-mono" }, exprStr || dispStr)),
             h("td", { className: "hide-m" }, txt(j.deliver || j.target) || "local"),
             h("td", null, Badge(isPaused ? t("paused") : t("active"), isPaused ? "neutral" : "good")),
-            h("td", { className: "r num hide-m" }, lr
+            h("td", { className: "r num hide-m", style: { whiteSpace: "nowrap" } }, lr
               ? h(React.Fragment, null, fmtRel(lr, t, locale) || String(lr).slice(5, 16), lastBadge ? " " : null, lastBadge)
               : "—"),
             h("td", { className: "r num" }, (!isPaused && nr)
