@@ -69,6 +69,7 @@
       cronTitle: "Scheduled automations", cronDesc: "Jobs run even while you sleep — results land on your channels",
       newJob: "New job", job: "Job", schedule: "Schedule", target: "Target", lastRun: "Last run",
       nextRun: "Next run", runNow: "Run now", pause: "Pause", resume: "Resume", paused: "paused",
+      neverRun: "no runs yet",
       active: "active", promptLbl: "Prompt", nameLbl: "Name", cronExpr: "Cron expression (e.g. 0 7 * * *)",
       deliverLbl: "Delivery target", create: "Create", cancel: "Cancel",
       /* webhooks */
@@ -198,6 +199,7 @@
       cronTitle: "Automatisations planifiées", cronDesc: "Les jobs tournent même pendant votre sommeil — résultats sur vos canaux",
       newJob: "Nouveau job", job: "Job", schedule: "Planification", target: "Cible", lastRun: "Dernière",
       nextRun: "Prochaine", runNow: "Exécuter", pause: "Pause", resume: "Reprendre", paused: "en pause",
+      neverRun: "jamais exécuté",
       active: "actif", promptLbl: "Prompt", nameLbl: "Nom", cronExpr: "Expression cron (ex. 0 7 * * *)",
       deliverLbl: "Cible de livraison", create: "Créer", cancel: "Annuler",
       whTitle: "Webhooks", whDesc: "Déclenchez l'agent depuis l'extérieur — CI, monitoring, formulaires, domotique",
@@ -1084,13 +1086,15 @@
     var providerName = txt(memory && (memory.provider || memory.active)) || "—";
     var curatorPaused = !!(curator && curator.paused);
 
-    // cron tile icon mirrors the jobs state: green check while running and
-    // healthy, red cross while running but failing, amber pause when on hold
-    var cronRunning = activeJobs > 0;
+    // cron tile icon mirrors the jobs state: green check only once a job has
+    // actually run and succeeded, red cross while running but failing,
+    // neutral clock when active but never run, amber pause when on hold
+    var cronHasActive = activeJobs > 0;
     var cronFailing = jobs.some(function (j) { return !isPausedJob(j) && (j.last_status === "error" || j.last_status === "failed" || j.last_error); });
-    var cronPaused = jobs.length > 0 && !cronRunning;
-    var cronIcon = cronPaused ? "pause" : cronFailing ? "x" : cronRunning ? "check" : "clock";
-    var cronKind = cronPaused ? "warn-i" : cronFailing ? "crit-i" : cronRunning ? "good-i" : "iris-i";
+    var cronHealthy = jobs.some(function (j) { return !isPausedJob(j) && lastRunOf(j) && !(j.last_status === "error" || j.last_status === "failed" || j.last_error); });
+    var cronPaused = jobs.length > 0 && !cronHasActive;
+    var cronIcon = cronPaused ? "pause" : cronFailing ? "x" : cronHealthy ? "check" : "clock";
+    var cronKind = cronPaused ? "warn-i" : cronFailing ? "crit-i" : cronHealthy ? "good-i" : "iris-i";
 
     return h("div", { className: "iris-home" },
       PageHead(t("hello"),
@@ -1121,16 +1125,27 @@
           Card(t("automationsLastRuns"), LinkTo("/cron", t("cron")),
             jobs.length ? jobs.slice(0, 5).map(function (j, i) {
               var lastRun = lastRunOf(j);
-              var ok = !(j.last_status === "error" || j.last_status === "failed" || j.last_error);
               var hhmm = "";
               if (lastRun) {
                 try { hhmm = new Date(lastRun).toLocaleTimeString(locale === "fr" ? "fr-FR" : "en-US", { hour: "2-digit", minute: "2-digit" }); }
                 catch (e) { /* noop */ }
               }
+              // a paused job is not "ok"; a job that never ran has no verdict
+              if (isPausedJob(j)) {
+                return h(React.Fragment, { key: i },
+                  IconRow("pause", "warn-i", txt(j.name) || "job", t("paused") + (j.deliver ? " · " + txt(j.deliver) : ""),
+                    h(React.Fragment, null, hhmm, " ", Badge(t("paused"), "warn"))));
+              }
+              if (!lastRun) {
+                return h(React.Fragment, { key: i },
+                  IconRow("clock", "iris-i", txt(j.name) || "job", t("neverRun") + (j.deliver ? " · " + txt(j.deliver) : ""),
+                    h(React.Fragment, null, "—", " ", Badge(t("neverRun"), "neutral"))));
+              }
+              var fail = !!(j.last_status === "error" || j.last_status === "failed" || j.last_error);
               return h(React.Fragment, { key: i },
-                IconRow(ok ? "check" : "x", ok ? "good-i" : "crit-i", txt(j.name) || "job",
-                  (ok ? t("executed") : txt(j.last_error || j.last_status)) + (j.deliver ? " · " + txt(j.deliver) : ""),
-                  h(React.Fragment, null, hhmm, " ", Badge(ok ? "ok" : "err", ok ? "good" : "crit"))));
+                IconRow(fail ? "x" : "check", fail ? "crit-i" : "good-i", txt(j.name) || "job",
+                  (fail ? txt(j.last_error || j.last_status) : t("executed")) + (j.deliver ? " · " + txt(j.deliver) : ""),
+                  h(React.Fragment, null, hhmm, " ", Badge(fail ? "err" : "ok", fail ? "crit" : "good"))));
             }) : Empty(t("noCronJob"))),
           Card(t("usage14d"),
             [h("span", { className: "iris-muted", key: "m" }, t("chartAria").toLowerCase()),
