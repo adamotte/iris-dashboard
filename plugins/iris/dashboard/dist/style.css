@@ -205,6 +205,8 @@ select.iris-input{background:var(--color-background,#1a1a22)}
 .iris-badges{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
 .iris-err-dot{display:inline-block;width:8px;height:8px;border-radius:50%;
   background:var(--color-destructive,#e05a6b);cursor:help;vertical-align:middle;margin-left:2px}
+.iris-bp-fields{border-top:1px solid var(--color-border,rgba(128,128,128,.15));padding-top:8px;margin-top:4px}
+.iris-bp-fields .iris-field{margin-bottom:9px}
 
 /* ---- mini-card grids (skills, toolsets, profiles, mcp catalog) ---- */
 .iris-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}

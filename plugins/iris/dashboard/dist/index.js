@@ -125,6 +125,10 @@
       modelTag: "model", badgeSkills: "skills", badgeToolsets: "toolsets",
       repeat: "repeat", forever: "forever",
       lastError: "last error", deliveryError: "delivery error",
+      tabJobs: "Jobs", tabBlueprints: "Blueprints",
+      bpLoading: "Loading blueprints…", bpNone: "No automation blueprints available.",
+      bpLoadError: "Couldn't load blueprints", bpSetup: "Set up", bpScheduled: "scheduled",
+      bpInstantiate: "Schedule it", bpNoFields: "No fields to configure.",
       /* webhooks */
       whTitle: "Webhooks", whDesc: "Trigger the agent from outside — CI, monitoring, forms, home automation",
       whNew: "New webhook", whEvents: "Filter", whEnableSys: "Enable the webhook system", whUrl: "URL",
@@ -281,6 +285,10 @@
       modelTag: "modèle", badgeSkills: "skills", badgeToolsets: "toolsets",
       repeat: "répétition", forever: "permanent",
       lastError: "dernière erreur", deliveryError: "erreur de livraison",
+      tabJobs: "Jobs", tabBlueprints: "Plans",
+      bpLoading: "Chargement des plans…", bpNone: "Aucun plan d'automatisation disponible.",
+      bpLoadError: "Impossible de charger les plans", bpSetup: "Configurer", bpScheduled: "programmé",
+      bpInstantiate: "Planifier", bpNoFields: "Aucun champ à configurer.",
       whTitle: "Webhooks", whDesc: "Déclenchez l'agent depuis l'extérieur — CI, monitoring, formulaires, domotique",
       whNew: "Nouveau webhook", whEvents: "Filtre", whEnableSys: "Activer le système de webhooks", whUrl: "URL",
       whSecretNote: "Le secret de signature n'est montré qu'à la création.",
@@ -1021,6 +1029,82 @@
       h("div", { className: "iris-actions" },
         Btn(isEdit ? t("save") : t("create"), submit, "primary", false, isEdit ? "check" : "plus"),
         Btn(t("cancel"), props.onClose))));
+  }
+  function BlueprintCard(props) {
+    var t = props.t; var locale = props.locale; var bp = props.bp; var profile = props.profile;
+    var fields = Array.isArray(bp.fields) ? bp.fields : [];
+    var open = useState(false);
+    var vals = useState(function () {
+      var o = {};
+      fields.forEach(function (f) { o[f.name] = f.default != null ? f.default : ""; });
+      return o;
+    });
+    var busy = useState(false); var err = useState(null);
+    function setV(fname, nv) {
+      vals[1](function (prev) { var o = Object.assign({}, prev); o[fname] = nv; return o; });
+    }
+    function fieldInput(f, i) {
+      var v = vals[0][f.name] != null ? vals[0][f.name] : "";
+      if (f.type === "enum" || f.type === "weekdays") {
+        var opts = Array.isArray(f.options) ? f.options : [];
+        return h("select", { className: "iris-input", value: v,
+          onChange: function (e) { setV(f.name, e.target.value); } },
+          opts.map(function (o, j) { return h("option", { key: j, value: o }, o); }),
+          v && opts.indexOf(v) < 0 ? h("option", { value: v }, v) : null);
+      }
+      if (f.type === "time") {
+        return h("input", { className: "iris-input", type: "time", value: v,
+          onChange: function (e) { setV(f.name, e.target.value); } });
+      }
+      return h("input", { className: "iris-input", type: "text", placeholder: txt(f.help) || txt(f.label), value: v,
+        onChange: function (e) { setV(f.name, e.target.value); } });
+    }
+    function submit() {
+      busy[1](true); err[1](null);
+      act(t, "/api/cron/blueprints/instantiate" + profileQuery(profile),
+        jinit("POST", { blueprint: bp.key, values: vals[0] }),
+        function (r) {
+          busy[1](false);
+          if (r !== null) {
+            var sd = r && (r.schedule_display || r.schedule_display);
+            toastPush(txt(bp.title) + " " + t("bpScheduled") + (sd ? " — " + sd : ""));
+            open[1](false);
+            props.onCreated();
+          }
+        });
+    }
+    return h("div", { className: "iris-mini" },
+      h("div", { className: "mc-head" }, Icon("puzzle", "sm"), h("b", null, txt(bp.title) || bp.key)),
+      h("p", null, txt(bp.description) || ""),
+      h("div", { className: "iris-badges" },
+        txt(bp.category) ? Badge(txt(bp.category), "neutral") : null,
+        h("span", { title: txt(bp.schedule) || "" }, Badge(txt(bp.scheduleHuman) || txt(bp.schedule) || "?", "neutral")),
+        (Array.isArray(bp.tags) && bp.tags.length) ? Badge(bp.tags.slice(0, 3).join(", "), "neutral") : null),
+      open[0] ? h("div", { className: "iris-bp-fields" },
+        fields.length ? fields.map(function (f, i) {
+          return h("div", { className: "iris-field" },
+            h("label", null, txt(f.label) || f.name),
+            fieldInput(f, i),
+            txt(f.help) && f.type !== "text" ? h("small", { className: "iris-muted" }, txt(f.help)) : null);
+        }) : h("p", { className: "iris-muted" }, t("bpNoFields")),
+        err[0] ? h("p", { className: "iris-note", style: { color: "var(--color-destructive)" } }, err[0]) : null,
+        h("div", { className: "iris-actions" },
+          Btn(t("bpInstantiate"), submit, "primary", busy[0], "plus"),
+          Btn(t("cancel"), function () { open[1](false); })))
+        : h("div", { className: "mc-foot" },
+            Btn(t("bpSetup"), function () { open[1](true); }, "primary", false, "plus")));
+  }
+  function BlueprintsView(props) {
+    var t = props.t; var locale = props.locale; var profile = props.profile;
+    var bp = props.bpData;
+    if (props.error) return h("p", { className: "iris-muted" }, t("bpLoadError") + ": " + props.error);
+    if (bp === null) return h("p", { className: "iris-muted" }, t("bpLoading"));
+    var list = asList(bp, ["blueprints"]);
+    if (!list.length) return h("p", { className: "iris-muted" }, t("bpNone"));
+    return h("div", { className: "iris-cards" },
+      list.map(function (b, i) {
+        return h(BlueprintCard, { key: i, t: t, locale: locale, profile: profile, bp: b, onCreated: props.onCreated });
+      }));
   }
   function WebhookForm(props) {
     var t = props.t;
@@ -1888,6 +1972,9 @@
     var frm = useState(false); var showForm = frm[0], setShowForm = frm[1];
     var edt = useState(null); var editing = edt[0], setEditing = edt[1];
     var flt = useState("all"); var fltProfile = flt[0], setFltProfile = flt[1];
+    var tb = useState("jobs"); var tab = tb[0], setTab = tb[1];
+    var bpd = useState(null); var bpData = bpd[0];
+    var bpe = useState(null); var bpErr = bpe[0];
     // lazy-load cronstrue (cron → human) once; re-render when it arrives
     useEffect(function () {
       loadCronstrue(function () { setBump(function (v) { return v + 1; }); });
@@ -1904,6 +1991,17 @@
     var skills = asList(useJSON("/api/skills" + resQ, 0), ["skills", "items"]);
     var toolsets = asList(useJSON("/api/tools/toolsets" + resQ, 0), ["toolsets", "items"]);
     var modelData = useJSON("/api/model/options" + (resQ ? resQ + "&include_unconfigured=1" : "?include_unconfigured=1"), 0);
+    useEffect(function () {
+      var alive = true;
+      SDK.fetchJSON("/api/cron/blueprints").then(function (r) {
+        if (!alive) return;
+        bpd[1](r && r.blueprints ? r.blueprints : r);
+      }).catch(function (e) {
+        if (!alive) return;
+        bpe[1](String((e && e.message) || e));
+      });
+      return function () { alive = false; };
+    }, []);
 
     function fmtNextRun(v) {
       try {
@@ -1938,6 +2036,15 @@
             h("option", { value: "all" }, t("allProfiles")),
             profiles.map(function (pr, i) { return h("option", { key: i, value: txt(pr.name) }, txt(pr.name) || t("pfDefault")); }))),
         Btn(t("newJob"), function () { setEditing(null); setShowForm(!showForm); }, "primary", false, "plus")]),
+      h("div", { className: "iris-tabs" },
+        h("button", { className: "iris-tab" + (tab === "jobs" ? " on" : ""),
+          onClick: function () { setTab("jobs"); } }, t("tabJobs")),
+        h("button", { className: "iris-tab" + (tab === "blueprints" ? " on" : ""),
+          onClick: function () { setTab("blueprints"); } }, t("tabBlueprints"))),
+      tab === "blueprints"
+        ? h(BlueprintsView, { t: t, locale: locale, profile: createProfile, bpData: bpData, error: bpErr,
+            onCreated: function () { reload(); setTab("jobs"); } })
+        : h(React.Fragment, null,
       // a stopped gateway silently swallows triggered/scheduled runs: say it
       gwStatus && !gwStatus.gateway_running ? h("div", {
         className: "iris-note",
@@ -2002,7 +2109,7 @@
                   style: { color: "var(--color-destructive)" },
                   onClick: function () { askDelete(t, txt(j.name) || id, function () { actToast(t, "/api/cron/jobs/" + id + profileQuery(jp), jinit("DELETE"), t("deleted"), reload); }); }
                 }, Icon("trash", "sm")) : null)));
-        }) : h("tr", null, h("td", { colSpan: 7 }, Empty(t("noCronJob"))))));
+        }) : h("tr", null, h("td", { colSpan: 7 }, Empty(t("noCronJob")))))));
   }
 
   /* ================= WEBHOOKS ================= */
