@@ -2947,6 +2947,15 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
           p.has_api ? Badge(t("plgApi"), "warn") : null,
           hidden ? Badge(t("plgHidden"), "neutral") : null));
     }
+    function agentCard(p) {
+      return h("div", { className: "iris-mini", key: p.name },
+        h("div", { className: "mc-head" }, Icon("plug", "dim"), h("b", null, p.name),
+          Badge(p.runtime_status || "?", p.runtime_status === "active" ? "good" : "neutral")),
+        h("p", null, p.description || ""),
+        h("div", { className: "mc-foot" },
+          h("span", { className: "num" }, p.version ? "v" + p.version : ""),
+          p.auth_required ? Badge(t("plgAuth"), "warn") : null));
+    }
     var catOpts = [
       { v: "all", l: t("plgAll") }, { v: "providers", l: t("plgProviders") },
       { v: "platforms", l: t("plgPlatforms") }, { v: "web", l: t("plgWeb") },
@@ -2988,15 +2997,7 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
         h("div", { className: "iris-filterbar", style: { marginBottom: 10 } },
           h("input", { className: "iris-input", type: "search", placeholder: t("search"), value: q, onChange: function (e) { setQ(e.target.value); } }),
           Chips(catOpts, cat, setCat)),
-        Card(null, null, shown.length ? shown.slice(0, 120).map(function (p, i) {
-          return h(React.Fragment, { key: p.name + i },
-            Row(p.runtime_status === "active" ? "good" : "",
-              p.name + (p.version ? " · v" + p.version : ""),
-              p.description || "",
-              h("span", null,
-                p.auth_required ? Badge(t("plgAuth"), "warn") : null,
-                Badge(p.runtime_status || "?", p.runtime_status === "active" ? "good" : "neutral"))));
-        }) : Empty("—"))) : null);
+        h("div", { className: "iris-cards" }, shown.length ? shown.slice(0, 120).map(agentCard) : Empty("—"))) : null);
   }
 
   /* ================= NAVIGATION (overlay slot) ================= */
