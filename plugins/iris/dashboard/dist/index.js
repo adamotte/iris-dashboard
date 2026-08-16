@@ -102,6 +102,25 @@
       active: "active", promptLbl: "Prompt", nameLbl: "Name", cronExpr: "Cron expression (e.g. 0 7 * * *)",
       deliverLbl: "Delivery target", create: "Create", cancel: "Cancel",
       profileFilter: "Profile", allProfiles: "All profiles",
+      scheduleMode: "Schedule", modeInterval: "Interval", modeDaily: "Daily", modeWeekly: "Weekly",
+      modeMonthly: "Monthly", modeOnce: "Once", modeCustom: "Custom",
+      intervalEvery: "Every", intervalUnit: "Unit", unitMinutes: "minutes", unitHours: "hours", unitDays: "days",
+      timeOfDay: "Time of day", weekdays: "Weekdays", dayOfMonth: "Day of month", onceAt: "Run at",
+      customLabel: "Custom expression", customPlaceholder: "e.g. */15 9-17 * * 1-5", customHint: "5-field cron expression",
+      schedulePreview: "Preview",
+      wdSun: "Sun", wdMon: "Mon", wdTue: "Tue", wdWed: "Wed", wdThu: "Thu", wdFri: "Fri", wdSat: "Sat",
+      deliveryLocal: "Local", deliverTo: "Deliver to", homeChannelFirst: "set a home channel first",
+      deliveryNone: "No messaging platforms configured — set one up under Channels to deliver reports.",
+      skillsLbl: "Skills (optional)", skillsHint: "Selected skills are loaded before the prompt runs — the cron sets when, the skill sets how.",
+      noSkillsAvail: "No skills installed for this profile.",
+      advTitle: "Advanced fields", baseUrlLbl: "Base URL override", baseUrlPh: "https://api.example.com/v1",
+      noAgentLbl: "no_agent: run the script only and deliver stdout verbatim",
+      scriptLbl: "Script", scriptPh: "relative/path/in/scripts", workdirLbl: "Workdir", workdirPh: "/absolute/project/path",
+      contextFromLbl: "context_from job IDs", contextFromPh: "one job id per line",
+      toolsetsLbl: "enabled_toolsets", noToolsetsAvail: "No toolsets available.",
+      defaultOpt: "Default",
+      errScheduleReq: "A schedule is required", errContentReq: "A prompt, script or skill is required",
+      errNoAgentScript: "no_agent jobs require a script",
       /* webhooks */
       whTitle: "Webhooks", whDesc: "Trigger the agent from outside — CI, monitoring, forms, home automation",
       whNew: "New webhook", whEvents: "Filter", whEnableSys: "Enable the webhook system", whUrl: "URL",
@@ -235,6 +254,25 @@
       active: "actif", promptLbl: "Prompt", nameLbl: "Nom", cronExpr: "Expression cron (ex. 0 7 * * *)",
       deliverLbl: "Cible de livraison", create: "Créer", cancel: "Annuler",
       profileFilter: "Profil", allProfiles: "Tous les profils",
+      scheduleMode: "Planification", modeInterval: "Intervalle", modeDaily: "Quotidien", modeWeekly: "Hebdomadaire",
+      modeMonthly: "Mensuel", modeOnce: "Une fois", modeCustom: "Personnalisé",
+      intervalEvery: "Toutes les", intervalUnit: "Unité", unitMinutes: "minutes", unitHours: "heures", unitDays: "jours",
+      timeOfDay: "Heure", weekdays: "Jours", dayOfMonth: "Jour du mois", onceAt: "Exécuter à",
+      customLabel: "Expression personnalisée", customPlaceholder: "ex. */15 9-17 * * 1-5", customHint: "Expression cron à 5 champs",
+      schedulePreview: "Aperçu",
+      wdSun: "Dim", wdMon: "Lun", wdTue: "Mar", wdWed: "Mer", wdThu: "Jeu", wdFri: "Ven", wdSat: "Sam",
+      deliveryLocal: "Local", deliverTo: "Livrer à", homeChannelFirst: "définissez d'abord un canal d'accueil",
+      deliveryNone: "Aucune plateforme de messagerie configurée — configurez-en une sous Canaux pour livrer les rapports.",
+      skillsLbl: "Skills (optionnel)", skillsHint: "Les skills sélectionnées sont chargées avant l'exécution du prompt — le cron décide du quand, la skill du comment.",
+      noSkillsAvail: "Aucune skill installée pour ce profil.",
+      advTitle: "Champs avancés", baseUrlLbl: "Surcharge de l'URL de base", baseUrlPh: "https://api.example.com/v1",
+      noAgentLbl: "no_agent : exécuter uniquement le script et livrer la sortie brute",
+      scriptLbl: "Script", scriptPh: "chemin/relatif/dans/scripts", workdirLbl: "Répertoire de travail", workdirPh: "/chemin/absolu/projet",
+      contextFromLbl: "IDs de jobs context_from", contextFromPh: "un id de job par ligne",
+      toolsetsLbl: "enabled_toolsets", noToolsetsAvail: "Aucun toolset disponible.",
+      defaultOpt: "Défaut",
+      errScheduleReq: "Une planification est requise", errContentReq: "Un prompt, un script ou une skill est requis",
+      errNoAgentScript: "les jobs no_agent nécessitent un script",
       whTitle: "Webhooks", whDesc: "Déclenchez l'agent depuis l'extérieur — CI, monitoring, formulaires, domotique",
       whNew: "Nouveau webhook", whEvents: "Filtre", whEnableSys: "Activer le système de webhooks", whUrl: "URL",
       whSecretNote: "Le secret de signature n'est montré qu'à la création.",
@@ -673,41 +711,283 @@
       h("div", null, h("h2", null, title), desc ? h("p", null, desc) : null),
       actions ? h("div", { className: "iris-actions" }, actions) : null);
   }
+  var SCHED_DEFAULTS = { mode: "interval", intervalValue: 30, intervalUnit: "minutes", timeOfDay: "09:00", weekdays: [1, 2, 3, 4, 5], dayOfMonth: 1, onceAt: "", custom: "" };
+  function pad2(v) { return String(v).length < 2 ? "0" + v : String(v); }
+  function schedToExpr(st) {
+    var mode = st && st.mode;
+    var v = Math.floor(Number(st.intervalValue));
+    if (mode === "interval") {
+      if (!isFinite(v) || v < 1) return "";
+      var u = st.intervalUnit === "hours" ? "h" : st.intervalUnit === "days" ? "d" : "m";
+      return "every " + v + u;
+    }
+    if (mode === "daily") {
+      var hm = String(st.timeOfDay || "09:00").split(":");
+      return (pad2(hm[0]) || "9") + " " + (pad2(hm[1]) || "0") + " * * *";
+    }
+    if (mode === "weekly") {
+      var whm = String(st.timeOfDay || "09:00").split(":");
+      return (pad2(whm[0]) || "9") + " " + (pad2(whm[1]) || "0") + " * * " + ((st.weekdays && st.weekdays.length) ? st.weekdays.join(",") : "*");
+    }
+    if (mode === "monthly") {
+      var d = Math.floor(Number(st.dayOfMonth));
+      if (!isFinite(d) || d < 1 || d > 31) return "";
+      var mhm = String(st.timeOfDay || "09:00").split(":");
+      return (pad2(mhm[0]) || "9") + " " + (pad2(mhm[1]) || "0") + " " + d + " * *";
+    }
+    if (mode === "once") {
+      var od = new Date(st.onceAt);
+      if (!isFinite(od.getTime())) return "";
+      return od.getFullYear() + "-" + pad2(od.getMonth() + 1) + "-" + pad2(od.getDate()) + "T" + pad2(od.getHours()) + ":" + pad2(od.getMinutes());
+    }
+    if (mode === "custom") return String(st.custom || "").trim();
+    return "";
+  }
+  function schedToState(str) {
+    var raw = String(str || "").trim();
+    if (!raw) return { mode: "custom", custom: "" };
+    var m = raw.match(/^every\s+(\d+)\s*(m|min|h|hr|hour|d|day)s?$/i);
+    if (m) {
+      var u = /h/i.test(m[2]) ? "hours" : /d/i.test(m[2]) ? "days" : "minutes";
+      return { mode: "interval", intervalValue: Number(m[1]), intervalUnit: u };
+    }
+    m = raw.match(/^(\d+)\s*(m|min|h|hr|hour|d|day)s?$/i);
+    if (m) {
+      var u2 = /h/i.test(m[2]) ? "hours" : /d/i.test(m[2]) ? "days" : "minutes";
+      return { mode: "interval", intervalValue: Number(m[1]), intervalUnit: u2 };
+    }
+    m = raw.match(/^(\d{1,2}):(\d{2})\s+(\d{1,2})\s+(\d{1,2})\s+\*\s+\*\s*$/);
+    if (m) return { mode: "daily", timeOfDay: pad2(m[1]) + ":" + m[2] };
+    m = raw.match(/^(\d{1,2}):(\d{2})\s+(\d{1,2})\s+(\d{1,2})\s+\*\s+([\d,]+)\s*$/);
+    if (m) return { mode: "weekly", timeOfDay: pad2(m[1]) + ":" + m[2], weekdays: String(m[5]).split(",").map(Number) };
+    m = raw.match(/^(\d{1,2}):(\d{2})\s+(\d{1,2})\s+(\d{1,2})\s+(\d{1,2})\s+\*\s*$/);
+    if (m) return { mode: "monthly", timeOfDay: pad2(m[1]) + ":" + m[2], dayOfMonth: Number(m[3]) };
+    m = raw.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/);
+    if (m) return { mode: "once", onceAt: raw };
+    return { mode: "custom", custom: raw };
+  }
+  function humanSched(st, t, locale) {
+    var e = schedToExpr(st);
+    if (!e) return "";
+    if (st.mode === "interval") {
+      var v = Math.floor(Number(st.intervalValue));
+      if (!isFinite(v) || v < 1) return "";
+      var u = { minutes: t("unitMinutes"), hours: t("unitHours"), days: t("unitDays") }[st.intervalUnit] || "";
+      return "every " + v + " " + u;
+    }
+    if (st.mode === "once") {
+      var d = new Date(st.onceAt);
+      if (isFinite(d.getTime())) {
+        try { return "once at " + d.toLocaleString(locale === "fr" ? "fr-FR" : "en-US"); } catch (x) { return e; }
+      }
+      return e;
+    }
+    return humanCron(e, locale) || e;
+  }
+  function jobSchedStr(j) {
+    var s = j.schedule;
+    if (s && typeof s === "object") {
+      return txt(s.expr) || txt(s.run_at) || txt(s.display) || txt(s.value);
+    }
+    return txt(j.schedule_display) || txt(s) || txt(j.schedule);
+  }
+  function buildCronPayload(f) {
+    var out = { name: f.name, prompt: f.prompt, schedule: f.schedule, deliver: f.deliver || "local" };
+    if (f.skills && f.skills.length) out.skills = f.skills;
+    if (f.provider) out.provider = f.provider;
+    if (f.model) out.model = f.model;
+    if (f.base_url) out.base_url = f.base_url;
+    if (f.no_agent) out.no_agent = true;
+    if (f.script) out.script = f.script;
+    if (f.workdir) out.workdir = f.workdir;
+    if (f.context_from && String(f.context_from).trim()) {
+      out.context_from = String(f.context_from).split(/[\n,]/).map(function (x) { return x.trim(); }).filter(Boolean);
+    }
+    if (f.enabled_toolsets && f.enabled_toolsets.length) out.enabled_toolsets = f.enabled_toolsets;
+    return out;
+  }
+  function CheckList(props) {
+    var avail = props.available || [];
+    var selected = props.selected || [];
+    function toggle(name, on) {
+      props.onChange(on
+        ? (selected.indexOf(name) < 0 ? selected.concat([name]) : selected)
+        : selected.filter(function (x) { return x !== name; }));
+    }
+    if (!avail.length) return h("p", { className: "iris-muted" }, props.emptyLabel);
+    return h("div", { className: "iris-checklist" },
+      avail.map(function (it, i) {
+        var name = txt(it.name);
+        var on = selected.indexOf(name) >= 0;
+        return h("label", { key: i, className: "iris-check", title: txt(it.description) || undefined },
+          h("input", { type: "checkbox", checked: on, onChange: function (e) { toggle(name, e.target.checked); } }),
+          h("span", null, name));
+      }));
+  }
+  function CronTimeField(props) {
+    return h("input", { className: "iris-input", type: "time", value: props.value,
+      onChange: function (e) { props.onChange(e.target.value); } });
+  }
+  function CronScheduleField(props) {
+    var st = props.value;
+    var t = props.t; var locale = props.locale;
+    var set = function (patch) { props.onChange(Object.assign({}, st, patch)); };
+    return h("div", { className: "iris-sched" },
+      h("div", { className: "iris-field" }, h("label", null, t("scheduleMode")),
+        h("div", { className: "iris-seg" },
+          ["interval", "daily", "weekly", "monthly", "once", "custom"].map(function (mode, i) {
+            var lbl = { interval: t("modeInterval"), daily: t("modeDaily"), weekly: t("modeWeekly"), monthly: t("modeMonthly"), once: t("modeOnce"), custom: t("modeCustom") }[mode];
+            return h("button", { key: i, type: "button", className: "iris-seg-btn" + (st.mode === mode ? " on" : ""),
+              onClick: function () { set({ mode: mode }); } }, lbl);
+          }))),
+      st.mode === "interval" ? h("div", { className: "iris-field-row" },
+        h("div", { className: "iris-field" }, h("label", null, t("intervalEvery")),
+          h("input", { className: "iris-input", type: "number", min: "1", value: st.intervalValue,
+            onChange: function (e) { set({ intervalValue: e.target.value }); } })),
+        h("div", { className: "iris-field" }, h("label", null, t("intervalUnit")),
+          h("select", { className: "iris-input", value: st.intervalUnit,
+            onChange: function (e) { set({ intervalUnit: e.target.value }); } },
+            h("option", { value: "minutes" }, t("unitMinutes")),
+            h("option", { value: "hours" }, t("unitHours")),
+            h("option", { value: "days" }, t("unitDays"))))) : null,
+      st.mode === "daily" ? h("div", { className: "iris-field-row" },
+        h("div", { className: "iris-field" }, h("label", null, t("timeOfDay")),
+          h(CronTimeField, { value: st.timeOfDay, onChange: function (v) { set({ timeOfDay: v }); } }))) : null,
+      st.mode === "weekly" ? h("div", { className: "iris-field-row" },
+        h("div", { className: "iris-field" }, h("label", null, t("timeOfDay")),
+          h(CronTimeField, { value: st.timeOfDay, onChange: function (v) { set({ timeOfDay: v }); } })),
+        h("div", { className: "iris-field" }, h("label", null, t("weekdays")),
+          h("div", { className: "iris-days" },
+            [0, 1, 2, 3, 4, 5, 6].map(function (w, i) {
+              var on = (st.weekdays || []).indexOf(w) >= 0;
+              var wd = { 0: t("wdSun"), 1: t("wdMon"), 2: t("wdTue"), 3: t("wdWed"), 4: t("wdThu"), 5: t("wdFri"), 6: t("wdSat") }[w];
+              return h("button", { key: i, type: "button", className: "iris-day" + (on ? " on" : ""),
+                onClick: function () {
+                  var cur = st.weekdays || [];
+                  set({ weekdays: on ? cur.filter(function (x) { return x !== w; }) : cur.concat([w]) });
+                } }, wd);
+            })))) : null,
+      st.mode === "monthly" ? h("div", { className: "iris-field-row" },
+        h("div", { className: "iris-field" }, h("label", null, t("timeOfDay")),
+          h(CronTimeField, { value: st.timeOfDay, onChange: function (v) { set({ timeOfDay: v }); } })),
+        h("div", { className: "iris-field" }, h("label", null, t("dayOfMonth")),
+          h("input", { className: "iris-input", type: "number", min: "1", max: "31", value: st.dayOfMonth,
+            onChange: function (e) { set({ dayOfMonth: e.target.value }); } }))) : null,
+      st.mode === "once" ? h("div", { className: "iris-field-row" },
+        h("div", { className: "iris-field" }, h("label", null, t("onceAt")),
+          h("input", { className: "iris-input", type: "datetime-local", value: st.onceAt,
+            onChange: function (e) { set({ onceAt: e.target.value }); } }))) : null,
+      st.mode === "custom" ? h("div", { className: "iris-field" },
+        h("label", null, t("customLabel")),
+        h("input", { className: "iris-input iris-mono", placeholder: t("customPlaceholder"), value: st.custom,
+          onChange: function (e) { set({ custom: e.target.value }); } }),
+        h("small", { className: "iris-muted" }, t("customHint"))) : null,
+      h("div", { className: "iris-field" }, h("label", null, t("schedulePreview")),
+        h("div", { className: "iris-sched-preview" },
+          h("span", { className: "iris-mono" }, schedToExpr(st) || "—"),
+          h("small", { className: "iris-muted" }, humanSched(st, t, props.locale) || ""))));
+  }
   function CronJobForm(props) {
     var locale = useLocale(); var t = makeT(locale);
     var job = props.job;
     var profile = props.profile || "default";
     var isEdit = !!(job && (job.id || job.job_id || job.name));
     var id = isEdit ? (job.id || job.job_id || job.name) : "";
+    var res = props.resources || {};
     var n = useState(isEdit ? txt(job.name) || "" : "");
     var p = useState(isEdit ? txt(job.prompt) || "" : "");
-    var s = useState(isEdit
-      ? txt(job.schedule && (job.schedule.expr || job.schedule.display || job.schedule.value))
-        || txt(job.schedule_display) || txt(job.schedule) || ""
-      : "0 7 * * *");
+    var ss = useState(isEdit ? schedToState(jobSchedStr(job)) : Object.assign({}, SCHED_DEFAULTS));
     var d = useState(isEdit ? txt(job.deliver || job.target) || "local" : "local");
-    var schedPreview = humanCron(s[0], locale);
+    var sk = useState(isEdit ? (Array.isArray(job.skills) ? job.skills.filter(Boolean) : []) : []);
+    var pr = useState(isEdit ? txt(job.provider) : "");
+    var mo = useState(isEdit ? txt(job.model) : "");
+    var bu = useState(isEdit ? txt(job.base_url) : "");
+    var na = useState(!!(isEdit && job.no_agent));
+    var sc = useState(isEdit ? txt(job.script) : "");
+    var wd = useState(isEdit ? txt(job.workdir) : "");
+    var cf = useState(isEdit ? (Array.isArray(job.context_from) ? job.context_from.join("\n") : txt(job.context_from)) : "");
+    var ts = useState(isEdit ? (Array.isArray(job.enabled_toolsets) ? job.enabled_toolsets.filter(Boolean) : []) : []);
+    var err = useState(null);
     var pq = "?profile=" + encProfile(profile);
+    var targets = res.targets || [];
+    var onlyLocal = targets.filter(function (x) { return x.id !== "local"; }).length === 0;
+    var moData = res.models || {};
+    var providers = Array.isArray(moData.providers)
+      ? moData.providers.filter(function (prv) { return prv.authenticated !== false; }) : [];
+    var curProv = providers.filter(function (p2) { return p2.slug === pr[0]; })[0];
+    var models = (curProv && Array.isArray(curProv.models)) ? curProv.models : [];
+    function submit() {
+      var schedule = schedToExpr(ss[0]);
+      if (!schedule) { err[1](t("errScheduleReq")); return; }
+      var payload = buildCronPayload({
+        name: n[0], prompt: p[0], schedule: schedule, deliver: d[0],
+        skills: sk[0], provider: pr[0], model: mo[0], base_url: bu[0],
+        no_agent: na[0], script: sc[0], workdir: wd[0],
+        context_from: cf[0], enabled_toolsets: ts[0]
+      });
+      if (!payload.no_agent && !String(payload.prompt || "").trim() && !payload.script && !(payload.skills && payload.skills.length)) {
+        err[1](t("errContentReq")); return;
+      }
+      if (payload.no_agent && !payload.script) { err[1](t("errNoAgentScript")); return; }
+      err[1](null);
+      if (isEdit) {
+        actToast(t, "/api/cron/jobs/" + id + pq, jinit("PUT", { updates: payload }), t("updated"),
+          function () { props.onClose(); props.onDone(); });
+      } else {
+        actToast(t, "/api/cron/jobs" + pq, jinit("POST", payload), t("created"),
+          function () { props.onClose(); props.onDone(); });
+      }
+    }
     return Card(isEdit ? t("editJob") : t("newJob"), null, h("div", null,
       h("div", { className: "iris-field" }, h("label", null, t("nameLbl")),
         h("input", { className: "iris-input", value: n[0], onChange: function (e) { n[1](e.target.value); } })),
       h("div", { className: "iris-field" }, h("label", null, t("promptLbl")),
         h(AutoTextArea, { value: p[0], onChange: function (e) { p[1](e.target.value); } })),
-      h("div", { className: "iris-field" }, h("label", null, t("cronExpr")),
-        h("input", { className: "iris-input iris-mono", value: s[0], onChange: function (e) { s[1](e.target.value); } }),
-        schedPreview ? h("small", { className: "iris-muted", style: { display: "block", marginTop: "4px" } }, schedPreview) : null),
-      h("div", { className: "iris-field" }, h("label", null, t("deliverLbl")),
-        h("input", { className: "iris-input", value: d[0], onChange: function (e) { d[1](e.target.value); } })),
+      h(CronScheduleField, { t: t, locale: locale, value: ss[0], onChange: ss[1] }),
+      h("div", { className: "iris-field" }, h("label", null, t("deliverTo")),
+        h("select", { className: "iris-input", value: d[0], onChange: function (e) { d[1](e.target.value); } },
+          targets.map(function (tg, i) {
+            var lbl = tg.id === "local" ? t("deliveryLocal") : (txt(tg.name) || tg.id);
+            if (tg.id !== "local" && !tg.home_target_set) lbl += " — " + t("homeChannelFirst");
+            return h("option", { key: i, value: tg.id }, lbl);
+          }),
+          d[0] && !targets.some(function (x) { return x.id === d[0]; }) ? h("option", { value: d[0] }, d[0]) : null),
+        onlyLocal ? h("p", { className: "iris-muted" }, t("deliveryNone")) : null),
+      h("div", { className: "iris-field" }, h("label", null, t("skillsLbl")),
+        h(CheckList, { available: res.skills, selected: sk[0], onChange: sk[1], emptyLabel: t("noSkillsAvail") }),
+        h("small", { className: "iris-muted" }, t("skillsHint"))),
+      h("details", { className: "iris-adv" },
+        h("summary", null, t("advTitle")),
+        h("div", { className: "iris-adv-body" },
+          h("div", { className: "iris-field-row" },
+            h("div", { className: "iris-field" }, h("label", null, t("provider")),
+              h("select", { className: "iris-input", value: pr[0],
+                onChange: function (e) { pr[1](e.target.value); mo[1](""); } },
+                h("option", { value: "" }, t("defaultOpt")),
+                providers.map(function (prv, i) { return h("option", { key: i, value: prv.slug }, txt(prv.name) || prv.slug); }),
+                pr[0] && !providers.some(function (x) { return x.slug === pr[0]; }) ? h("option", { value: pr[0] }, pr[0]) : null)),
+            h("div", { className: "iris-field" }, h("label", null, t("model")),
+              h("select", { className: "iris-input", value: mo[0], onChange: function (e) { mo[1](e.target.value); } },
+                h("option", { value: "" }, t("defaultOpt")),
+                models.map(function (m, i) { return h("option", { key: i, value: m }, m); }),
+                mo[0] && models.indexOf(mo[0]) < 0 ? h("option", { value: mo[0] }, mo[0]) : null))),
+          h("div", { className: "iris-field" }, h("label", null, t("baseUrlLbl")),
+            h("input", { className: "iris-input", placeholder: t("baseUrlPh"), value: bu[0], onChange: function (e) { bu[1](e.target.value); } })),
+          h("div", { className: "iris-field-row" },
+            h("div", { className: "iris-field" }, h("label", { className: "iris-check" },
+              h("input", { type: "checkbox", checked: na[0], onChange: function (e) { na[1](e.target.checked); } }),
+              h("span", null, t("noAgentLbl")))),
+            h("div", { className: "iris-field" }, h("label", null, t("scriptLbl")),
+              h("input", { className: "iris-input", placeholder: t("scriptPh"), value: sc[0], onChange: function (e) { sc[1](e.target.value); } }))),
+          h("div", { className: "iris-field" }, h("label", null, t("workdirLbl")),
+            h("input", { className: "iris-input", placeholder: t("workdirPh"), value: wd[0], onChange: function (e) { wd[1](e.target.value); } })),
+          h("div", { className: "iris-field" }, h("label", null, t("contextFromLbl")),
+            h("textarea", { className: "iris-input iris-textarea", placeholder: t("contextFromPh"), value: cf[0], onChange: function (e) { cf[1](e.target.value); } })),
+          h("div", { className: "iris-field" }, h("label", null, t("toolsetsLbl")),
+            h(CheckList, { available: res.toolsets, selected: ts[0], onChange: ts[1], emptyLabel: t("noToolsetsAvail") })))),
+      err[0] ? h("p", { className: "iris-note", style: { color: "var(--color-destructive)" } }, err[0]) : null,
       h("div", { className: "iris-actions" },
-        isEdit
-          ? Btn(t("save"), function () {
-              actToast(t, "/api/cron/jobs/" + id + pq, jinit("PUT", { updates: { name: n[0], prompt: p[0], schedule: s[0], deliver: d[0] } }), t("updated"),
-                function () { props.onClose(); props.onDone(); });
-            }, "primary", false, "check")
-          : Btn(t("create"), function () {
-              actToast(t, "/api/cron/jobs" + pq, jinit("POST", { name: n[0], prompt: p[0], schedule: s[0], deliver: d[0] }), t("created"),
-                function () { props.onClose(); props.onDone(); });
-            }, "primary", false, "plus"),
+        Btn(isEdit ? t("save") : t("create"), submit, "primary", false, isEdit ? "check" : "plus"),
         Btn(t("cancel"), props.onClose))));
   }
   function WebhookForm(props) {
@@ -1586,6 +1866,12 @@
     var jobs = asList(data, ["jobs", "items"]);
     var reload = function () { setBump(bump + 1); };
     var createProfile = fltProfile !== "all" ? fltProfile : "default";
+    var resProfile = editing ? jobProfile(editing) : createProfile;
+    var resQ = resProfile !== "default" ? "?profile=" + encProfile(resProfile) : "";
+    var targets = asList(useJSON("/api/cron/delivery-targets", 0), ["targets"]);
+    var skills = asList(useJSON("/api/skills" + resQ, 0), ["skills", "items"]);
+    var toolsets = asList(useJSON("/api/tools/toolsets" + resQ, 0), ["toolsets", "items"]);
+    var modelData = useJSON("/api/model/options" + (resQ ? resQ + "&include_unconfigured=1" : "?include_unconfigured=1"), 0);
 
     function fmtNextRun(v) {
       try {
@@ -1625,7 +1911,7 @@
         className: "iris-note",
         style: { marginTop: 0, color: "var(--color-warning,#fab219)", display: "flex", alignItems: "center", gap: "7px" }
       }, Icon("alert", "sm"), t("cronGwDown"), " ", LinkTo("/system", t("navSystem"))) : null,
-      showForm ? h(CronJobForm, { job: editing, profile: editing ? jobProfile(editing) : createProfile, onClose: closeForm, onDone: reload }) : null,
+      showForm ? h(CronJobForm, { job: editing, profile: editing ? jobProfile(editing) : createProfile, resources: { skills: skills, toolsets: toolsets, targets: targets, models: modelData }, onClose: closeForm, onDone: reload }) : null,
       Table([{ l: t("job") }, { l: t("schedule"), m: 1 }, { l: t("target"), m: 1 }, { l: t("status") },
              { l: t("lastRun"), r: 1, m: 1 }, { l: t("nextRun"), r: 1 }, { l: t("actions"), r: 1 }],
         jobs.length ? jobs.map(function (j, i) {
