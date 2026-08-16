@@ -152,12 +152,14 @@
       /* plugins */
       plgTitle: "Plugins", plgDesc: "Dashboard pages, agent plugins and providers",
       plgRescan: "Rescan", plgDash: "Dashboard plugins", plgAgents: "Agent plugins",
+      plgIris: "Iris pack",
       plgActive: "{0} active", plgVisible: "{0} visible", plgHiddenT: "Hidden",
       plgHidden: "hidden", plgOverride: "overrides {0}", plgTab: "tab {0}",
       plgSlotsN: "{0} slot(s)", plgApi: "backend API", plgAuth: "auth required",
       plgNote: "Hidden plugins stay installed but are no longer loaded — hide an Iris page to get the native page back.",
       plgAll: "All", plgProviders: "Providers", plgPlatforms: "Platforms",
       plgWeb: "Web search", plgBrowser: "Browser", plgOther: "Other",
+      plgOtherDash: "Other dashboard plugins",
       /* mockup-fidelity pass */
       hello: "Hello", newSession: "New session", sessionsToday: "{0} sessions today",
       jobsActive: "{0} active jobs", inTime: "in {0}", executed: "Executed",
@@ -270,12 +272,14 @@
       launched: "{0} lancé — voir les logs", curatorPause: "Pause", curatorResume: "Reprendre",
       plgTitle: "Plugins", plgDesc: "Pages du dashboard, plugins agent et providers",
       plgRescan: "Rescanner", plgDash: "Plugins dashboard", plgAgents: "Plugins agent",
+      plgIris: "Pack Iris",
       plgActive: "{0} actifs", plgVisible: "{0} visibles", plgHiddenT: "Masqués",
       plgHidden: "masqué", plgOverride: "surcharge {0}", plgTab: "onglet {0}",
       plgSlotsN: "{0} slot(s)", plgApi: "API backend", plgAuth: "auth requise",
       plgNote: "Un plugin masqué reste installé mais n'est plus chargé — masquez une page Iris pour retrouver la page native.",
       plgAll: "Tous", plgProviders: "Providers", plgPlatforms: "Plateformes",
       plgWeb: "Recherche web", plgBrowser: "Navigateur", plgOther: "Autres",
+      plgOtherDash: "Autres plugins dashboard",
       hello: "Bonjour", newSession: "Nouvelle session", sessionsToday: "{0} sessions aujourd'hui",
       jobsActive: "{0} jobs actifs", inTime: "dans {0}", executed: "Exécuté",
       cacheAvg: "Cache moyen", missingKey: "Clé API manquante", configure: "Configurer",
@@ -2442,6 +2446,9 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
     if (n.indexOf("browser-") === 0) return "browser";
     return "other";
   }
+  function isIris(name) {
+    return /^iris(-|$)/.test(String(name));
+  }
   function PluginsPage() {
     var locale = useLocale(); var t = makeT(locale);
     var bp = useState(0); var bump = bp[0], setBump = bp[1];
@@ -2457,6 +2464,8 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
     var agents = hub ? asList(hub.plugins, []) : [];
     var hiddenCount = hub ? dash.filter(function (p) { return !loadedSet[p.name]; }).length : 0;
     var activeAgents = agents.filter(function (p) { return p.runtime_status === "active"; });
+    var irisDash = dash.filter(function (p) { return isIris(p.name); });
+    var otherDash = dash.filter(function (p) { return !isIris(p.name); });
     function setHidden(name, hidden) {
       // the shell reads plugin visibility only at boot, so a reload is the
       // only way to hand the route back to the native page (or restore it)
@@ -2512,7 +2521,10 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
           hub && hub.providers ? (hub.providers.context_engine || " ") : " ")),
       h("div", null,
         h("div", { className: "iris-nav-label", style: { padding: "6px 0" } }, t("plgDash")),
-        h("div", { className: "iris-cards" }, dash.map(dashCard)),
+        h("div", { className: "iris-nav-label", style: { padding: "10px 0 6px" } }, t("plgIris") + " (" + irisDash.length + ")"),
+        h("div", { className: "iris-cards" }, irisDash.map(dashCard)),
+        h("div", { className: "iris-nav-label", style: { padding: "10px 0 6px" } }, t("plgOtherDash") + " (" + otherDash.length + ")"),
+        h("div", { className: "iris-cards" }, otherDash.map(dashCard)),
         h("div", { className: "iris-note" }, t("plgNote"))),
       agents.length ? h("div", null,
         h("div", { className: "iris-nav-label", style: { padding: "10px 0 6px" } },
