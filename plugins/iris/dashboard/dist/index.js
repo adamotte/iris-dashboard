@@ -101,6 +101,7 @@
       neverRun: "no runs yet",
       active: "active", promptLbl: "Prompt", nameLbl: "Name", cronExpr: "Cron expression (e.g. 0 7 * * *)",
       deliverLbl: "Delivery target", create: "Create", cancel: "Cancel",
+      profileFilter: "Profile", allProfiles: "All profiles",
       /* webhooks */
       whTitle: "Webhooks", whDesc: "Trigger the agent from outside — CI, monitoring, forms, home automation",
       whNew: "New webhook", whEvents: "Filter", whEnableSys: "Enable the webhook system", whUrl: "URL",
@@ -233,6 +234,7 @@
       neverRun: "jamais exécuté",
       active: "actif", promptLbl: "Prompt", nameLbl: "Nom", cronExpr: "Expression cron (ex. 0 7 * * *)",
       deliverLbl: "Cible de livraison", create: "Créer", cancel: "Annuler",
+      profileFilter: "Profil", allProfiles: "Tous les profils",
       whTitle: "Webhooks", whDesc: "Déclenchez l'agent depuis l'extérieur — CI, monitoring, formulaires, domotique",
       whNew: "Nouveau webhook", whEvents: "Filtre", whEnableSys: "Activer le système de webhooks", whUrl: "URL",
       whSecretNote: "Le secret de signature n'est montré qu'à la création.",
@@ -401,6 +403,10 @@
   function lastRunOf(j) { return j.last_run_at || j.last_run || j.lastRun || null; }
   function nextRunOf(j) { return j.next_run_at || j.next_run || j.nextRun || j.next || null; }
   function isPausedJob(j) { return !!(j.paused || j.paused_at || j.state === "paused" || j.enabled === false); }
+  // a cron job belongs to a profile; every cron API call is profile-scoped
+  function jobProfile(j) { return txt(j.profile) || txt(j.profile_name) || "default"; }
+  function encProfile(p) { try { return encodeURIComponent(p); } catch (e) { return p; } }
+  function profileQuery(p) { return p && p !== "all" && p !== "default" ? "?profile=" + encProfile(p) : ""; }
   function fmtBytes(n, locale) {
     if (n == null) return "—";
     var u = locale === "fr" ? ["o", "Ko", "Mo", "Go"] : ["B", "KB", "MB", "GB"];
@@ -670,6 +676,7 @@
   function CronJobForm(props) {
     var locale = useLocale(); var t = makeT(locale);
     var job = props.job;
+    var profile = props.profile || "default";
     var isEdit = !!(job && (job.id || job.job_id || job.name));
     var id = isEdit ? (job.id || job.job_id || job.name) : "";
     var n = useState(isEdit ? txt(job.name) || "" : "");
@@ -680,6 +687,7 @@
       : "0 7 * * *");
     var d = useState(isEdit ? txt(job.deliver || job.target) || "local" : "local");
     var schedPreview = humanCron(s[0], locale);
+    var pq = "?profile=" + encProfile(profile);
     return Card(isEdit ? t("editJob") : t("newJob"), null, h("div", null,
       h("div", { className: "iris-field" }, h("label", null, t("nameLbl")),
         h("input", { className: "iris-input", value: n[0], onChange: function (e) { n[1](e.target.value); } })),
@@ -693,11 +701,11 @@
       h("div", { className: "iris-actions" },
         isEdit
           ? Btn(t("save"), function () {
-              actToast(t, "/api/cron/jobs/" + id, jinit("PUT", { updates: { name: n[0], prompt: p[0], schedule: s[0], deliver: d[0] } }), t("updated"),
+              actToast(t, "/api/cron/jobs/" + id + pq, jinit("PUT", { updates: { name: n[0], prompt: p[0], schedule: s[0], deliver: d[0] } }), t("updated"),
                 function () { props.onClose(); props.onDone(); });
             }, "primary", false, "check")
           : Btn(t("create"), function () {
-              actToast(t, "/api/cron/jobs", jinit("POST", { name: n[0], prompt: p[0], schedule: s[0], deliver: d[0] }), t("created"),
+              actToast(t, "/api/cron/jobs" + pq, jinit("POST", { name: n[0], prompt: p[0], schedule: s[0], deliver: d[0] }), t("created"),
                 function () { props.onClose(); props.onDone(); });
             }, "primary", false, "plus"),
         Btn(t("cancel"), props.onClose))));
@@ -1567,14 +1575,17 @@
     var bp = useState(0); var bump = bp[0], setBump = bp[1];
     var frm = useState(false); var showForm = frm[0], setShowForm = frm[1];
     var edt = useState(null); var editing = edt[0], setEditing = edt[1];
+    var flt = useState("all"); var fltProfile = flt[0], setFltProfile = flt[1];
     // lazy-load cronstrue (cron → human) once; re-render when it arrives
     useEffect(function () {
       loadCronstrue(function () { setBump(function (v) { return v + 1; }); });
     }, []);
-    var data = useJSON("/api/cron/jobs", 20000, bump);
+    var data = useJSON("/api/cron/jobs" + (fltProfile !== "all" ? profileQuery(fltProfile) : ""), 20000, bump);
     var gwStatus = useJSON("/api/status", 30000);
+    var profiles = asList(useJSON("/api/profiles", 0), ["profiles"]);
     var jobs = asList(data, ["jobs", "items"]);
     var reload = function () { setBump(bump + 1); };
+    var createProfile = fltProfile !== "all" ? fltProfile : "default";
 
     function fmtNextRun(v) {
       try {
@@ -1601,17 +1612,25 @@
     var sub = t("cronSub", activeCount, pausedCount) + (untilNext ? " · " + t("nextRun").toLowerCase() + " " + t("inTime", untilNext) : "");
 
     return h("div", { className: "iris-page" },
-      PageHead(t("cronTitle"), sub, Btn(t("newJob"), function () { setEditing(null); setShowForm(!showForm); }, "primary", false, "plus")),
+      PageHead(t("cronTitle"), sub, [
+        h("div", { className: "iris-field", style: { minWidth: "190px", margin: 0 } },
+          h("label", null, t("profileFilter")),
+          h("select", { className: "iris-input", value: fltProfile,
+            onChange: function (e) { setFltProfile(e.target.value); } },
+            h("option", { value: "all" }, t("allProfiles")),
+            profiles.map(function (pr, i) { return h("option", { key: i, value: txt(pr.name) }, txt(pr.name) || t("pfDefault")); }))),
+        Btn(t("newJob"), function () { setEditing(null); setShowForm(!showForm); }, "primary", false, "plus")]),
       // a stopped gateway silently swallows triggered/scheduled runs: say it
       gwStatus && !gwStatus.gateway_running ? h("div", {
         className: "iris-note",
         style: { marginTop: 0, color: "var(--color-warning,#fab219)", display: "flex", alignItems: "center", gap: "7px" }
       }, Icon("alert", "sm"), t("cronGwDown"), " ", LinkTo("/system", t("navSystem"))) : null,
-      showForm ? h(CronJobForm, { job: editing, onClose: closeForm, onDone: reload }) : null,
+      showForm ? h(CronJobForm, { job: editing, profile: editing ? jobProfile(editing) : createProfile, onClose: closeForm, onDone: reload }) : null,
       Table([{ l: t("job") }, { l: t("schedule"), m: 1 }, { l: t("target"), m: 1 }, { l: t("status") },
              { l: t("lastRun"), r: 1, m: 1 }, { l: t("nextRun"), r: 1 }, { l: t("actions"), r: 1 }],
         jobs.length ? jobs.map(function (j, i) {
           var id = j.id || j.job_id || j.name;
+          var jp = jobProfile(j);
           var isPaused = isPausedJob(j);
           var lr = lastRunOf(j), nr = nextRunOf(j);
           var promptTxt = txt(j.prompt);
@@ -1648,17 +1667,17 @@
             h("td", { className: "r" },
               h("div", { className: "iris-actions-cell" },
                 h("button", { className: "iris-icon-btn sm", title: t("runNow"), "aria-label": t("runNow"),
-                  onClick: function () { actToast(t, "/api/cron/jobs/" + id + "/trigger", jinit("POST"), t("triggered"), reload); } }, Icon("zap", "sm")),
+                  onClick: function () { actToast(t, "/api/cron/jobs/" + id + "/trigger" + profileQuery(jp), jinit("POST"), t("triggered"), reload); } }, Icon("zap", "sm")),
                 h("button", { className: "iris-icon-btn sm", title: isPaused ? t("resume") : t("pause"),
                   "aria-label": isPaused ? t("resume") : t("pause"),
-                  onClick: function () { actToast(t, "/api/cron/jobs/" + id + (isPaused ? "/resume" : "/pause"), jinit("POST"), t("updated"), reload); }
+                  onClick: function () { actToast(t, "/api/cron/jobs/" + id + (isPaused ? "/resume" : "/pause") + profileQuery(jp), jinit("POST"), t("updated"), reload); }
                 }, Icon(isPaused ? "play" : "pause", "sm")),
                 h("button", { className: "iris-icon-btn sm", title: t("editJob"), "aria-label": t("editJob"),
                   onClick: function () { setEditing(j); setShowForm(true); } }, Icon("pencil", "sm")),
                 isPaused ? h("button", {
                   className: "iris-icon-btn sm", title: t("deleteS"), "aria-label": t("deleteS"),
                   style: { color: "var(--color-destructive)" },
-                  onClick: function () { askDelete(t, txt(j.name) || id, function () { actToast(t, "/api/cron/jobs/" + id, jinit("DELETE"), t("deleted"), reload); }); }
+                  onClick: function () { askDelete(t, txt(j.name) || id, function () { actToast(t, "/api/cron/jobs/" + id + profileQuery(jp), jinit("DELETE"), t("deleted"), reload); }); }
                 }, Icon("trash", "sm")) : null)));
         }) : h("tr", null, h("td", { colSpan: 7 }, Empty(t("noCronJob"))))));
   }
