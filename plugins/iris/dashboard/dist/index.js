@@ -182,6 +182,7 @@
       plgRescan: "Rescan", plgDash: "Dashboard plugins", plgAgents: "Agent plugins",
       plgIris: "Iris pack",
       plgActive: "{0} active", plgVisible: "{0} visible", plgHiddenT: "Hidden",
+      plgHiddenN: "Hidden ({0})", plgVisibleN: "Visible ({0})", plgInactiveN: "{0} inactive",
       plgHidden: "hidden", plgOverride: "overrides {0}", plgTab: "tab {0}",
       plgSlotsN: "{0} slot(s)", plgApi: "backend API", plgAuth: "auth required",
       plgNote: "Hidden plugins stay installed but are no longer loaded — hide an Iris page to get the native page back.",
@@ -330,6 +331,7 @@
       plgRescan: "Rescanner", plgDash: "Plugins dashboard", plgAgents: "Plugins agent",
       plgIris: "Pack Iris",
       plgActive: "{0} actifs", plgVisible: "{0} visibles", plgHiddenT: "Masqués",
+      plgHiddenN: "Masqués ({0})", plgVisibleN: "Visibles ({0})", plgInactiveN: "{0} inactifs",
       plgHidden: "masqué", plgOverride: "surcharge {0}", plgTab: "onglet {0}",
       plgSlotsN: "{0} slot(s)", plgApi: "API backend", plgAuth: "auth requise",
       plgNote: "Un plugin masqué reste installé mais n'est plus chargé — masquez une page Iris pour retrouver la page native.",
@@ -654,6 +656,7 @@
     upload: [P("M12 15V3"), P("m7 8 5-5 5 5"), P("M4 20h16")],
     refresh: [P("M21 12a9 9 0 1 1-2.6-6.4L21 8"), P("M21 3v5h-5")],
     eye: [P("M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12Z"), C(12, 12, 2.8)],
+    eyeOff: [P("M9.88 9.88a3 3 0 1 0 4.24 4.24"), P("M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"), P("M6.61 6.61A13.526 13.526 0 0 0 2 12s3.5 7 10 7a9.74 9.74 0 0 0 5.39-1.61"), P("m2 2 20 20")],
     play: [P("M7 4.5v15l12-7.5L7 4.5Z")],
     pause: [P("M8 5v14M16 5v14")],
     zap: [P("M13 2 3 14h7l-1 8 11-12h-7l1-8Z")],
@@ -2903,6 +2906,7 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
     var bp = useState(0); var bump = bp[0], setBump = bp[1];
     var qs = useState(""); var q = qs[0], setQ = qs[1];
     var cs = useState("all"); var cat = cs[0], setCat = cs[1];
+    var shs = useState(false); var showHidden = shs[0], setShowHidden = shs[1];
     var loaded = useJSON("/api/dashboard/plugins", 60000, bump);
     var hub = useJSON("/api/dashboard/plugins/hub", 60000, bump);
     var reload = function () { setBump(bump + 1); };
@@ -2911,10 +2915,12 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
     // hub knows hidden plugins too; before it answers, fall back to the loader list
     var dash = hub ? asList(hub.orphan_dashboard_plugins, []) : asList(loaded, []);
     var agents = hub ? asList(hub.plugins, []) : [];
-    var hiddenCount = hub ? dash.filter(function (p) { return !loadedSet[p.name]; }).length : 0;
+    var isHiddenP = function (p) { return hub ? !loadedSet[p.name] : false; };
+    var hiddenCount = hub ? dash.filter(isHiddenP).length : 0;
     var activeAgents = agents.filter(function (p) { return p.runtime_status === "active"; });
-    var irisDash = dash.filter(function (p) { return isIris(p.name); });
-    var otherDash = dash.filter(function (p) { return !isIris(p.name); });
+    var visDash = showHidden ? dash : dash.filter(function (p) { return !isHiddenP(p); });
+    var irisDash = visDash.filter(function (p) { return isIris(p.name); });
+    var otherDash = visDash.filter(function (p) { return !isIris(p.name); });
     function setHidden(name, hidden) {
       // the shell reads plugin visibility only at boot, so a reload is the
       // only way to hand the route back to the native page (or restore it)
@@ -2952,6 +2958,8 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
     });
     return h("div", { className: "iris-page" },
       PageHead(t("plgTitle"), t("plgDesc"),
+        Btn(showHidden ? t("plgVisibleN", dash.length - hiddenCount) : t("plgHiddenN", hiddenCount),
+          function () { setShowHidden(!showHidden); }, "", false, showHidden ? "eye" : "eyeOff"),
         Btn(t("plgRescan"), function () {
           // newly discovered plugins only load at boot: drop the manifest
           // cache and reload the page so the rescan has a visible effect
@@ -2963,9 +2971,8 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
           });
         }, "primary")),
       h("div", { className: "iris-tiles" },
-        Tile(TL("puzzle", t("plgDash")), dash.length, t("plgVisible", dash.length - hiddenCount)),
-        Tile(TL("plug", t("plgAgents")), agents.length, t("plgActive", activeAgents.length)),
-        Tile(TL("x", t("plgHiddenT")), hiddenCount, " "),
+        Tile(TL("puzzle", t("plgDash")), dash.length - hiddenCount, t("plgHiddenN", hiddenCount)),
+        Tile(TL("plug", t("plgAgents")), activeAgents.length, t("plgInactiveN", agents.length - activeAgents.length)),
         Tile(TL("brain", t("provider")), (hub && hub.providers && hub.providers.memory_provider) || "built-in",
           hub && hub.providers ? (hub.providers.context_engine || " ") : " ")),
       h("div", null,
