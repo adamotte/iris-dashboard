@@ -121,6 +121,10 @@
       defaultOpt: "Default",
       errScheduleReq: "A schedule is required", errContentReq: "A prompt, script or skill is required",
       errNoAgentScript: "no_agent jobs require a script",
+      modeAgent: "agent", modeScript: "script+agent", modeNoAgent: "no_agent",
+      modelTag: "model", badgeSkills: "skills", badgeToolsets: "toolsets",
+      repeat: "repeat", forever: "forever",
+      lastError: "last error", deliveryError: "delivery error",
       /* webhooks */
       whTitle: "Webhooks", whDesc: "Trigger the agent from outside — CI, monitoring, forms, home automation",
       whNew: "New webhook", whEvents: "Filter", whEnableSys: "Enable the webhook system", whUrl: "URL",
@@ -273,6 +277,10 @@
       defaultOpt: "Défaut",
       errScheduleReq: "Une planification est requise", errContentReq: "Un prompt, un script ou une skill est requis",
       errNoAgentScript: "les jobs no_agent nécessitent un script",
+      modeAgent: "agent", modeScript: "script+agent", modeNoAgent: "no_agent",
+      modelTag: "modèle", badgeSkills: "skills", badgeToolsets: "toolsets",
+      repeat: "répétition", forever: "permanent",
+      lastError: "dernière erreur", deliveryError: "erreur de livraison",
       whTitle: "Webhooks", whDesc: "Déclenchez l'agent depuis l'extérieur — CI, monitoring, formulaires, domotique",
       whNew: "Nouveau webhook", whEvents: "Filtre", whEnableSys: "Activer le système de webhooks", whUrl: "URL",
       whSecretNote: "Le secret de signature n'est montré qu'à la création.",
@@ -445,6 +453,30 @@
   function jobProfile(j) { return txt(j.profile) || txt(j.profile_name) || "default"; }
   function encProfile(p) { try { return encodeURIComponent(p); } catch (e) { return p; } }
   function profileQuery(p) { return p && p !== "all" && p !== "default" ? "?profile=" + encProfile(p) : ""; }
+  function jobMode(j) {
+    if (j.no_agent) return "no_agent";
+    if (txt(j.script)) return "script+agent";
+    return "agent";
+  }
+  function jobBadges(j, t) {
+    var out = [];
+    out.push(Badge(jobProfile(j), "neutral"));
+    var md = jobMode(j);
+    var mdl = md === "no_agent" ? t("modeNoAgent") : md === "script+agent" ? t("modeScript") : t("modeAgent");
+    out.push(Badge(mdl, "neutral"));
+    var m = txt(j.model);
+    if (m) out.push(Badge(t("modelTag") + " " + m, "neutral"));
+    if (Array.isArray(j.skills) && j.skills.length) {
+      out.push(Badge(t("badgeSkills") + " " + j.skills.filter(Boolean).slice(0, 3).join(", ") + (j.skills.length > 3 ? " +" + (j.skills.length - 3) : ""), "neutral"));
+    }
+    if (Array.isArray(j.enabled_toolsets) && j.enabled_toolsets.length) {
+      out.push(Badge(t("badgeToolsets") + " " + j.enabled_toolsets.slice(0, 3).join(", "), "neutral"));
+    }
+    if (j.repeat != null && j.repeat !== "" && isFinite(Number(j.repeat)) && Number(j.repeat) > 0) {
+      out.push(Badge(t("repeat") + " " + Number(j.repeat), "neutral"));
+    }
+    return out;
+  }
   function fmtBytes(n, locale) {
     if (n == null) return "—";
     var u = locale === "fr" ? ["o", "Ko", "Mo", "Go"] : ["B", "KB", "MB", "GB"];
@@ -1935,16 +1967,21 @@
             else lastBadge = Badge(txt(lastStatus), "warn");
           }
           var jUntil = nr ? timeUntil(nr, locale) : "";
+          var jobErr = txt(j.last_error) || txt(j.last_delivery_error);
+          var jobErrTitle = txt(j.last_error) ? t("lastError") + ": " + txt(j.last_error)
+            : t("deliveryError") + ": " + txt(j.last_delivery_error);
           return h("tr", { key: i, style: isPaused ? { opacity: .55 } : undefined },
             h("td", null, h("b", null, txt(j.name) || id), h("br"),
-              h("small", { className: "iris-muted iris-cron-prompt", title: promptTxt || "" }, promptTxt || "")),
+              h("small", { className: "iris-muted iris-cron-prompt", title: promptTxt || "" }, promptTxt || ""),
+              h("div", { className: "iris-badges" }, jobBadges(j, t))),
             h("td", { className: "hide-m" },
               h("span", { className: "iris-mono" }, exprStr || dispStr),
               schedSub ? h(React.Fragment, null, h("br"), h("small", { className: "iris-muted" }, schedSub)) : null),
             h("td", { className: "hide-m" }, txt(j.deliver || j.target) || "local"),
             h("td", null, Badge(isPaused ? t("paused") : t("active"), isPaused ? "neutral" : "good")),
             h("td", { className: "r num hide-m", style: { whiteSpace: "nowrap" } }, lr
-              ? h(React.Fragment, null, fmtRel(lr, t, locale) || String(lr).slice(5, 16), lastBadge ? " " : null, lastBadge)
+              ? h(React.Fragment, null, fmtRel(lr, t, locale) || String(lr).slice(5, 16), lastBadge ? " " : null, lastBadge,
+                  jobErr ? " " : null, jobErr ? h("span", { title: jobErrTitle, className: "iris-err-dot", "aria-label": jobErrTitle }) : null)
               : "—"),
             h("td", { className: "r num" }, (!isPaused && nr)
               ? h(React.Fragment, null, h("b", null, fmtNextRun(nr) || "—"),
