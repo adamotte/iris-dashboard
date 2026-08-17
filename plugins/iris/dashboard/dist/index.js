@@ -189,6 +189,12 @@
       plgAll: "All", plgProviders: "Providers", plgPlatforms: "Platforms",
       plgWeb: "Web search", plgBrowser: "Browser", plgOther: "Other",
       plgOtherDash: "Other dashboard plugins",
+      plgInstall: "Install", plgInstallTitle: "Install a plugin",
+      plgInstallLabel: "Source", plgInstallPh: "owner/repo or a git URL",
+      plgInstallHint: "Installs from a Git repository (owner/repo[/subdir] or a git URL) and enables it.",
+      plgInstalled: "Installed {0}", plgUpdate: "Update",
+      plgUpdateConfirm: "Pull the latest version of \"{0}\" from its git repository?",
+      plgUpdated: "Updated {0}",
       /* mockup-fidelity pass */
       hello: "Hello", newSession: "New session", sessionsToday: "{0} sessions today",
       jobsActive: "{0} active jobs", inTime: "in {0}", executed: "Executed",
@@ -338,6 +344,12 @@
       plgAll: "Tous", plgProviders: "Providers", plgPlatforms: "Plateformes",
       plgWeb: "Recherche web", plgBrowser: "Navigateur", plgOther: "Autres",
       plgOtherDash: "Autres plugins dashboard",
+      plgInstall: "Installer", plgInstallTitle: "Installer un plugin",
+      plgInstallLabel: "Source", plgInstallPh: "propriétaire/dépôt ou URL git",
+      plgInstallHint: "Installe depuis un dépôt Git (propriétaire/dépôt[/sous-dossier] ou URL git) puis l'active.",
+      plgInstalled: "{0} installé", plgUpdate: "Mettre à jour",
+      plgUpdateConfirm: "Tirer la dernière version de \"{0}\" depuis son dépôt git ?",
+      plgUpdated: "{0} mis à jour",
       hello: "Bonjour", newSession: "Nouvelle session", sessionsToday: "{0} sessions aujourd'hui",
       jobsActive: "{0} jobs actifs", inTime: "dans {0}", executed: "Exécuté",
       cacheAvg: "Cache moyen", missingKey: "Clé API manquante", configure: "Configurer",
@@ -1077,7 +1089,7 @@
         });
     }
     return h("div", { className: "iris-mini" },
-      h("div", { className: "mc-head" }, Icon("puzzle", "sm"), h("b", null, txt(bp.title) || bp.key)),
+      h("div", { className: "mc-head" }, Icon("clock", "sm"), h("b", null, txt(bp.title) || bp.key)),
       h("p", null, txt(bp.description) || ""),
       h("div", { className: "iris-badges" },
         txt(bp.category) ? Badge(txt(bp.category), "neutral") : null,
@@ -2917,7 +2929,7 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
     var agents = hub ? asList(hub.plugins, []) : [];
     var isHiddenP = function (p) { return hub ? !loadedSet[p.name] : false; };
     var hiddenCount = hub ? dash.filter(isHiddenP).length : 0;
-    var activeAgents = agents.filter(function (p) { return p.runtime_status === "active"; });
+    var activeAgents = agents.filter(function (p) { return p.runtime_status === "enabled"; });
     var visDash = showHidden ? dash : dash.filter(function (p) { return !isHiddenP(p); });
     var irisDash = visDash.filter(function (p) { return isIris(p.name); });
     var otherDash = visDash.filter(function (p) { return !isIris(p.name); });
@@ -2932,6 +2944,40 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
           }
         });
     }
+    function installPlugin() {
+      irisPrompt(t, {
+        icon: "download", tone: "iris", title: t("plgInstallTitle"),
+        label: t("plgInstallLabel"), placeholder: t("plgInstallPh"),
+        hint: t("plgInstallHint"), ok: t("plgInstall")
+      }).then(function (id) {
+        if (!id) return;
+        act(t, "/api/dashboard/agent-plugins/install",
+          jinit("POST", { identifier: id, enable: true }), function (r) {
+            if (r) {
+              toastPush(t("plgInstalled", id));
+              // newly discovered plugins only load at boot: drop the manifest
+              // cache and reload so the new routes actually register
+              try { sessionStorage.removeItem("hermes:plugin-manifests"); } catch (e) { /* noop */ }
+              setTimeout(function () { location.reload(); }, 400);
+            }
+          });
+      });
+    }
+    function updatePlugin(name) {
+      irisConfirm(t, {
+        title: t("plgUpdate"), subtitle: name,
+        message: t("plgUpdateConfirm", name), ok: t("plgUpdate"), icon: "refresh"
+      }).then(function (ok) {
+        if (!ok) return;
+        act(t, "/api/dashboard/agent-plugins/" + encodeURIComponent(name) + "/update",
+          jinit("POST"), function (r) {
+            if (r) {
+              toastPush(t("plgUpdated", name));
+              reload();
+            }
+          });
+      });
+    }
     function dashCard(p) {
       var hidden = hub ? !loadedSet[p.name] : false;
       var tab = p.tab || {};
@@ -2945,16 +2991,18 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
             : (tab.path ? Badge(t("plgTab", tab.path), "neutral") : null),
           p.slots && p.slots.length ? Badge(t("plgSlotsN", p.slots.length), "neutral") : null,
           p.has_api ? Badge(t("plgApi"), "warn") : null,
-          hidden ? Badge(t("plgHidden"), "neutral") : null));
+          hidden ? Badge(t("plgHidden"), "neutral") : null,
+          p.source === "user" ? Btn(t("plgUpdate"), function () { updatePlugin(p.name); }, "sm", false, "refresh") : null));
     }
     function agentCard(p) {
       return h("div", { className: "iris-mini", key: p.name },
         h("div", { className: "mc-head" }, Icon("plug", "dim"), h("b", null, p.name),
-          Badge(p.runtime_status || "?", p.runtime_status === "active" ? "good" : "neutral")),
+          Badge(p.runtime_status || "?", p.runtime_status === "enabled" ? "good" : "neutral")),
         h("p", null, p.description || ""),
         h("div", { className: "mc-foot" },
           h("span", { className: "num" }, p.version ? "v" + p.version : ""),
-          p.auth_required ? Badge(t("plgAuth"), "warn") : null));
+          p.auth_required ? Badge(t("plgAuth"), "warn") : null,
+          p.can_update_git ? Btn(t("plgUpdate"), function () { updatePlugin(p.name); }, "sm", false, "refresh") : null));
     }
     var catOpts = [
       { v: "all", l: t("plgAll") }, { v: "providers", l: t("plgProviders") },
@@ -2969,6 +3017,7 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
       PageHead(t("plgTitle"), t("plgDesc"),
         Btn(showHidden ? t("plgVisibleN", dash.length - hiddenCount) : t("plgHiddenN", hiddenCount),
           function () { setShowHidden(!showHidden); }, "", false, showHidden ? "eye" : "eyeOff"),
+        Btn(t("plgInstall"), installPlugin, "", false, "download"),
         Btn(t("plgRescan"), function () {
           // newly discovered plugins only load at boot: drop the manifest
           // cache and reload the page so the rescan has a visible effect
