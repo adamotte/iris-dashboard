@@ -1,0 +1,12 @@
+{
+  "name": "iris-system",
+  "label": "System",
+  "description": "Iris redesigned page: System",
+  "icon": "Sparkles",
+  "version": "0.1.0",
+  "entry": "dist/index.js",
+  "tab": {
+    "path": "/system",
+    "override": "/system"
+  }
+}
