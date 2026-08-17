@@ -53,6 +53,18 @@ for p in $IRIS_PLUGINS; do
 done
 echo "  $(echo "$IRIS_PLUGINS" | wc -w) plugins installed."
 
+# In docker mode the volume is host-owned but the container's git runs as the
+# hermes user (HOME=/opt/data, so it reads /opt/data/.gitconfig). Git refuses
+# host-owned repos ("dubious ownership"); whitelist each plugin dir there.
+# Native installs run as the same user that clones, so no entry is needed.
+if [ "$DOCKER_MODE" = 1 ]; then
+  DOCKER_DATA="${DOCKER_DATA_PATH:-/opt/data}"
+  echo "→ Whitelisting plugin dirs in $HERMES_HOME/.gitconfig (container git HOME=$DOCKER_DATA)…"
+  for p in $IRIS_PLUGINS; do
+    git config --file "$HERMES_HOME/.gitconfig" --add safe.directory "$DOCKER_DATA/plugins/$p"
+  done
+fi
+
 echo "→ Installing the iris-dark / iris-light themes…"
 mkdir -p "$HERMES_HOME/dashboard-themes"
 cp "$SRC_DIR/themes/iris-dark.yaml" "$SRC_DIR/themes/iris-light.yaml" "$HERMES_HOME/dashboard-themes/"

@@ -60,6 +60,10 @@ dashboard.
 docker restart hermes
 ```
 
+`install.sh` also whitelists the plugin dirs in the container's `.gitconfig`
+(`/opt/data/.gitconfig`) so the « Update » buttons / `hermes plugins update`
+work despite the host-owned volume.
+
 ### 📦 Plugin pack (Hermes builds with pack support)
 
 `hermes-pack.yaml` pins all 16 plugins to a single commit of this repo:
