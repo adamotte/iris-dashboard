@@ -2919,13 +2919,28 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
   function isIris(name) {
     return /^iris(-|$)/.test(String(name));
   }
+  // Persist the Plugins page filter across reloads (the reload after
+  // re-enabling a plugin must not lose the search/category/view state).
+  var PLGFLT_KEY = "iris:plugins:filter";
+  function plgFlt() {
+    try { return JSON.parse(sessionStorage.getItem(PLGFLT_KEY) || "null"); }
+    catch (e) { return null; }
+  }
+  function plgFltSave(q, cat, showInactive) {
+    try { sessionStorage.setItem(PLGFLT_KEY, JSON.stringify({ q: q, cat: cat, showInactive: showInactive })); }
+    catch (e) { /* noop */ }
+  }
   function PluginsPage() {
     var locale = useLocale(); var t = makeT(locale);
     var bp = useState(0); var bump = bp[0], setBump = bp[1];
-    var qs = useState(""); var q = qs[0], setQ = qs[1];
-    var cs = useState("all"); var cat = cs[0], setCat = cs[1];
-    var shs = useState(false); var showInactive = shs[0], setShowInactive = shs[1];
+    var qs = useState(function () { return (plgFlt() || {}).q || ""; });
+    var q = qs[0], setQ = qs[1];
+    var cs = useState(function () { return (plgFlt() || {}).cat || "all"; });
+    var cat = cs[0], setCat = cs[1];
+    var shs = useState(function () { return !!(plgFlt() || {}).showInactive; });
+    var showInactive = shs[0], setShowInactive = shs[1];
     var bsy = useState(null); var busyName = bsy[0], setBusyName = bsy[1];
+    useEffect(function () { plgFltSave(q, cat, showInactive); }, [q, cat, showInactive]);
     var loaded = useJSON("/api/dashboard/plugins", 60000, bump);
     var hub = useJSON("/api/dashboard/plugins/hub", 60000, bump);
     var reload = function () { setBump(bump + 1); };
