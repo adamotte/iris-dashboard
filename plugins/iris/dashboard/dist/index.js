@@ -181,11 +181,13 @@
       plgTitle: "Plugins", plgDesc: "Dashboard pages, agent plugins and providers",
       plgRescan: "Rescan", plgDash: "Dashboard plugins", plgAgents: "Agent plugins",
       plgIris: "Iris pack",
-      plgActive: "{0} active", plgVisible: "{0} visible", plgHiddenT: "Hidden",
-      plgHiddenN: "Hidden ({0})", plgVisibleN: "Visible ({0})", plgInactiveN: "{0} inactive",
-      plgHidden: "hidden", plgOverride: "overrides {0}", plgTab: "tab {0}",
+      plgActive: "{0} active", plgVisible: "{0} visible",
+      plgInactiveN: "{0} inactive", plgInactive: "inactive",
+      plgInactiveBtn: "Inactive/Disabled ({0})", plgActiveBtn: "Enabled ({0})",
+      plgEnabled: "Enabled {0}", plgDisabled: "Disabled {0}",
+      plgOverride: "overrides {0}", plgTab: "tab {0}",
       plgSlotsN: "{0} slot(s)", plgApi: "backend API", plgAuth: "auth required",
-      plgNote: "Hidden plugins stay installed but are no longer loaded — hide an Iris page to get the native page back.",
+      plgNote: "Inactive/disabled plugins stay installed but are no longer loaded — toggle an Iris page off to get the native page back.",
       plgAll: "All", plgProviders: "Providers", plgPlatforms: "Platforms",
       plgWeb: "Web search", plgBrowser: "Browser", plgOther: "Other",
       plgOtherDash: "Other dashboard plugins",
@@ -336,11 +338,13 @@
       plgTitle: "Plugins", plgDesc: "Pages du dashboard, plugins agent et providers",
       plgRescan: "Rescanner", plgDash: "Plugins dashboard", plgAgents: "Plugins agent",
       plgIris: "Pack Iris",
-      plgActive: "{0} actifs", plgVisible: "{0} visibles", plgHiddenT: "Masqués",
-      plgHiddenN: "Masqués ({0})", plgVisibleN: "Visibles ({0})", plgInactiveN: "{0} inactifs",
-      plgHidden: "masqué", plgOverride: "surcharge {0}", plgTab: "onglet {0}",
+      plgActive: "{0} actifs", plgVisible: "{0} visibles",
+      plgInactiveN: "{0} inactifs", plgInactive: "inactif",
+      plgInactiveBtn: "Inactifs/Désactivés ({0})", plgActiveBtn: "Actifs ({0})",
+      plgEnabled: "{0} activé", plgDisabled: "{0} désactivé",
+      plgOverride: "surcharge {0}", plgTab: "onglet {0}",
       plgSlotsN: "{0} slot(s)", plgApi: "API backend", plgAuth: "auth requise",
-      plgNote: "Un plugin masqué reste installé mais n'est plus chargé — masquez une page Iris pour retrouver la page native.",
+      plgNote: "Un plugin inactif/désactivé reste installé mais n'est plus chargé — désactivez une page Iris pour retrouver la page native.",
       plgAll: "Tous", plgProviders: "Providers", plgPlatforms: "Plateformes",
       plgWeb: "Recherche web", plgBrowser: "Navigateur", plgOther: "Autres",
       plgOtherDash: "Autres plugins dashboard",
@@ -2918,29 +2922,44 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
     var bp = useState(0); var bump = bp[0], setBump = bp[1];
     var qs = useState(""); var q = qs[0], setQ = qs[1];
     var cs = useState("all"); var cat = cs[0], setCat = cs[1];
-    var shs = useState(false); var showHidden = shs[0], setShowHidden = shs[1];
+    var shs = useState(false); var showInactive = shs[0], setShowInactive = shs[1];
     var loaded = useJSON("/api/dashboard/plugins", 60000, bump);
     var hub = useJSON("/api/dashboard/plugins/hub", 60000, bump);
     var reload = function () { setBump(bump + 1); };
     var loadedSet = {};
     asList(loaded, []).forEach(function (p) { loadedSet[p.name] = 1; });
-    // hub knows hidden plugins too; before it answers, fall back to the loader list
+    // A dashboard plugin is "enabled" when the loader serves it: hidden via
+    // /visibility, disabled, or never-opted-in all drop it from the list.
     var dash = hub ? asList(hub.orphan_dashboard_plugins, []) : asList(loaded, []);
     var agents = hub ? asList(hub.plugins, []) : [];
-    var isHiddenP = function (p) { return hub ? !loadedSet[p.name] : false; };
-    var hiddenCount = hub ? dash.filter(isHiddenP).length : 0;
+    var isInactiveP = function (p) { return hub ? !loadedSet[p.name] : false; };
+    var activeDash = dash.filter(function (p) { return !isInactiveP(p); });
+    var inactiveDash = dash.filter(isInactiveP);
     var activeAgents = agents.filter(function (p) { return p.runtime_status === "enabled"; });
-    var visDash = showHidden ? dash : dash.filter(function (p) { return !isHiddenP(p); });
+    var inactiveAgents = agents.filter(function (p) { return p.runtime_status !== "enabled"; });
+    var inactiveCount = inactiveDash.length + inactiveAgents.length;
+    var activeCount = activeDash.length + activeAgents.length;
+    var visDash = showInactive ? dash : activeDash;
+    var visAgents = showInactive ? agents : activeAgents;
     var irisDash = visDash.filter(function (p) { return isIris(p.name); });
     var otherDash = visDash.filter(function (p) { return !isIris(p.name); });
-    function setHidden(name, hidden) {
-      // the shell reads plugin visibility only at boot, so a reload is the
-      // only way to hand the route back to the native page (or restore it)
+    function setEnabled(name, enabled) {
+      // the shell reads plugin state only at boot, so a reload is the only
+      // way to hand the route back to the native page (or restore it)
       act(t, "/api/dashboard/plugins/" + encodeURIComponent(name) + "/visibility",
-        jinit("POST", { hidden: hidden }), function (r) {
+        jinit("POST", { hidden: !enabled }), function (r) {
           if (r) {
             try { sessionStorage.removeItem("hermes:plugin-manifests"); } catch (e) { /* noop */ }
             location.reload();
+          }
+        });
+    }
+    function setAgentEnabled(name, enabled) {
+      act(t, "/api/dashboard/agent-plugins/" + encodeURIComponent(name) + (enabled ? "/enable" : "/disable"),
+        jinit("POST"), function (r) {
+          if (r) {
+            toastPush(enabled ? t("plgEnabled", name) : t("plgDisabled", name));
+            reload();
           }
         });
     }
@@ -2979,11 +2998,11 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
       });
     }
     function dashCard(p) {
-      var hidden = hub ? !loadedSet[p.name] : false;
+      var enabled = hub ? !!loadedSet[p.name] : true;
       var tab = p.tab || {};
-      return h("div", { className: "iris-mini", key: p.name, style: hidden ? { opacity: 0.55 } : null },
+      return h("div", { className: "iris-mini", key: p.name, style: enabled ? null : { opacity: 0.55 } },
         h("div", { className: "mc-head" }, Icon("puzzle", "dim"), h("b", null, p.label || p.name),
-          Switch(!hidden, function () { setHidden(p.name, !hidden); }, p.label || p.name)),
+          Switch(enabled, function () { setEnabled(p.name, !enabled); }, p.label || p.name)),
         h("p", null, p.description || ""),
         h("div", { className: "mc-foot" },
           h("span", { className: "num" }, p.name + (p.version ? " · v" + p.version : "")),
@@ -2991,13 +3010,15 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
             : (tab.path ? Badge(t("plgTab", tab.path), "neutral") : null),
           p.slots && p.slots.length ? Badge(t("plgSlotsN", p.slots.length), "neutral") : null,
           p.has_api ? Badge(t("plgApi"), "warn") : null,
-          hidden ? Badge(t("plgHidden"), "neutral") : null,
+          !enabled ? Badge(t("plgInactive"), "neutral") : null,
           p.source === "user" ? Btn(t("plgUpdate"), function () { updatePlugin(p.name); }, "sm", false, "refresh") : null));
     }
     function agentCard(p) {
-      return h("div", { className: "iris-mini", key: p.name },
+      var on = p.runtime_status === "enabled";
+      return h("div", { className: "iris-mini", key: p.name, style: on ? null : { opacity: 0.55 } },
         h("div", { className: "mc-head" }, Icon("plug", "dim"), h("b", null, p.name),
-          Badge(p.runtime_status || "?", p.runtime_status === "enabled" ? "good" : "neutral")),
+          Switch(on, function () { setAgentEnabled(p.name, !on); }, p.name),
+          Badge(p.runtime_status || "?", on ? "good" : "neutral")),
         h("p", null, p.description || ""),
         h("div", { className: "mc-foot" },
           h("span", { className: "num" }, p.version ? "v" + p.version : ""),
@@ -3008,15 +3029,15 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
       { v: "all", l: t("plgAll") }, { v: "providers", l: t("plgProviders") },
       { v: "platforms", l: t("plgPlatforms") }, { v: "web", l: t("plgWeb") },
       { v: "browser", l: t("plgBrowser") }, { v: "other", l: t("plgOther") }];
-    var shown = agents.filter(function (p) {
+    var shown = visAgents.filter(function (p) {
       if (cat !== "all" && agentCat(p.name) !== cat) return false;
       if (q && (p.name + " " + (p.description || "")).toLowerCase().indexOf(q.toLowerCase()) < 0) return false;
       return true;
     });
     return h("div", { className: "iris-page" },
       PageHead(t("plgTitle"), t("plgDesc"),
-        [Btn(showHidden ? t("plgVisibleN", dash.length - hiddenCount) : t("plgHiddenN", hiddenCount),
-          function () { setShowHidden(!showHidden); }, "", false, showHidden ? "eye" : "eyeOff"),
+        [Btn(showInactive ? t("plgActiveBtn", activeCount) : t("plgInactiveBtn", inactiveCount),
+          function () { setShowInactive(!showInactive); }, "", false, showInactive ? "eye" : "eyeOff"),
          Btn(t("plgInstall"), installPlugin, "", false, "download"),
          Btn(t("plgRescan"), function () {
            // newly discovered plugins only load at boot: drop the manifest
@@ -3029,8 +3050,8 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
            });
          }, "primary")]),
       h("div", { className: "iris-tiles" },
-        Tile(TL("puzzle", t("plgDash")), dash.length - hiddenCount, t("plgHiddenN", hiddenCount)),
-        Tile(TL("plug", t("plgAgents")), activeAgents.length, t("plgInactiveN", agents.length - activeAgents.length)),
+        Tile(TL("puzzle", t("plgDash")), activeDash.length, t("plgInactiveN", inactiveDash.length)),
+        Tile(TL("plug", t("plgAgents")), activeAgents.length, t("plgInactiveN", inactiveAgents.length)),
         Tile(TL("brain", t("provider")), (hub && hub.providers && hub.providers.memory_provider) || "built-in",
           hub && hub.providers ? (hub.providers.context_engine || " ") : " ")),
       h("div", null,
@@ -3040,9 +3061,9 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
         h("div", { className: "iris-nav-label", style: { padding: "10px 0 6px" } }, t("plgOtherDash") + " (" + otherDash.length + ")"),
         h("div", { className: "iris-cards" }, otherDash.map(dashCard)),
         h("div", { className: "iris-note" }, t("plgNote"))),
-      agents.length ? h("div", null,
+      visAgents.length ? h("div", null,
         h("div", { className: "iris-nav-label", style: { padding: "10px 0 6px" } },
-          t("plgAgents") + " (" + agents.length + ")"),
+          t("plgAgents") + " (" + visAgents.length + ")"),
         h("div", { className: "iris-filterbar", style: { marginBottom: 10 } },
           h("input", { className: "iris-input", type: "search", placeholder: t("search"), value: q, onChange: function (e) { setQ(e.target.value); } }),
           Chips(catOpts, cat, setCat)),
