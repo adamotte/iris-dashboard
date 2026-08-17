@@ -51,8 +51,9 @@ mkdir -p "$HERMES_HOME/dashboard-themes"
 cp "$SRC_DIR/themes/iris-dark.yaml" "$SRC_DIR/themes/iris-light.yaml" "$HERMES_HOME/dashboard-themes/"
 
 # Since the #46435 hardening, user dashboard plugins are only served when
-# listed under plugins.enabled in config.yaml. `hermes plugins enable` does
-# not accept dashboard-only plugins (no plugin.yaml), so write the key here.
+# listed under plugins.enabled in config.yaml. Each iris plugin ships a
+# plugin.yaml, so `hermes plugins enable iris-*` also works — but the key is
+# written here for a scripted, non-interactive activation.
 echo "→ Activating the plugins (plugins.enabled in config.yaml)…"
 CFG="$HERMES_HOME/config.yaml"
 if IRIS_PLUGIN_LIST="$IRIS_PLUGINS" python3 - "$CFG" <<'PY' 2>/dev/null

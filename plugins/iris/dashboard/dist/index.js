@@ -187,7 +187,7 @@
       plgEnabled: "Enabled {0}", plgDisabled: "Disabled {0}",
       plgOverride: "overrides {0}", plgTab: "tab {0}",
       plgSlotsN: "{0} slot(s)", plgApi: "backend API", plgAuth: "auth required",
-      plgNote: "Inactive/disabled plugins stay installed but are no longer loaded — toggle an Iris page off to get the native page back.",
+      plgNote: "Inactive/disabled plugins stay installed but are no longer loaded. Iris pages follow the same enable/disable rule as agent plugins — switch one off to hand its route back to the native page.",
       plgAll: "All", plgProviders: "Providers", plgPlatforms: "Platforms",
       plgWeb: "Web search", plgBrowser: "Browser", plgOther: "Other",
       plgOtherDash: "Other dashboard plugins",
@@ -344,7 +344,7 @@
       plgEnabled: "{0} activé", plgDisabled: "{0} désactivé",
       plgOverride: "surcharge {0}", plgTab: "onglet {0}",
       plgSlotsN: "{0} slot(s)", plgApi: "API backend", plgAuth: "auth requise",
-      plgNote: "Un plugin inactif/désactivé reste installé mais n'est plus chargé — désactivez une page Iris pour retrouver la page native.",
+      plgNote: "Un plugin inactif/désactivé reste installé mais n'est plus chargé. Les pages Iris suivent la même règle d'activation que les plugins agent — désactivez-en une pour rendre sa route à la page native.",
       plgAll: "Tous", plgProviders: "Providers", plgPlatforms: "Plateformes",
       plgWeb: "Recherche web", plgBrowser: "Navigateur", plgOther: "Autres",
       plgOtherDash: "Autres plugins dashboard",
@@ -2904,8 +2904,10 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
   }
 
   /* ================= PLUGINS ================= */
-  // A dashboard plugin hidden via /visibility drops out of GET /api/dashboard/plugins
-  // but stays in the hub's orphan list: hidden = in hub, not in the loader list.
+  // Dashboard plugins are either native plugin.yaml plugins (hub.plugins rows
+  // with has_dashboard_manifest → real runtime_status, toggled via
+  // enable/disable) or dashboard-only plugins in the hub's orphan list
+  // (hidden = in the orphan list but absent from the loader list).
   function agentCat(name) {
     var n = String(name);
     if (/-provider$/.test(n)) return "providers";
@@ -2928,19 +2930,27 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
     var reload = function () { setBump(bump + 1); };
     var loadedSet = {};
     asList(loaded, []).forEach(function (p) { loadedSet[p.name] = 1; });
-    // A dashboard plugin is "enabled" when the loader serves it: hidden via
-    // /visibility, disabled, or never-opted-in all drop it from the list.
-    var dash = hub ? asList(hub.orphan_dashboard_plugins, []) : asList(loaded, []);
+    // The Iris suite ships plugin.yaml, so its pages arrive as native
+    // hub.plugins rows (runtime_status + has_dashboard_manifest). True
+    // dashboard-only plugins without plugin.yaml stay in the orphan list,
+    // where a plugin is "enabled" when the loader actually serves it.
     var agents = hub ? asList(hub.plugins, []) : [];
-    var isInactiveP = function (p) { return hub ? !loadedSet[p.name] : false; };
-    var activeDash = dash.filter(function (p) { return !isInactiveP(p); });
-    var inactiveDash = dash.filter(isInactiveP);
-    var activeAgents = agents.filter(function (p) { return p.runtime_status === "enabled"; });
-    var inactiveAgents = agents.filter(function (p) { return p.runtime_status !== "enabled"; });
+    var dash = {};
+    asList(hub ? hub.orphan_dashboard_plugins : loaded, []).forEach(function (p) { dash[p.name] = p; });
+    agents.forEach(function (p) { if (p.has_dashboard_manifest) dash[p.name] = p; });
+    var dashList = Object.keys(dash).map(function (k) { return dash[k]; });
+    var agentsGrid = agents.filter(function (p) { return !p.has_dashboard_manifest; });
+    var dashOn = function (p) {
+      return p.runtime_status !== undefined ? p.runtime_status === "enabled" : !!loadedSet[p.name];
+    };
+    var activeDash = dashList.filter(dashOn);
+    var inactiveDash = dashList.filter(function (p) { return !dashOn(p); });
+    var activeAgents = agentsGrid.filter(function (p) { return p.runtime_status === "enabled"; });
+    var inactiveAgents = agentsGrid.filter(function (p) { return p.runtime_status !== "enabled"; });
     var inactiveCount = inactiveDash.length + inactiveAgents.length;
     var activeCount = activeDash.length + activeAgents.length;
-    var visDash = showInactive ? dash : activeDash;
-    var visAgents = showInactive ? agents : activeAgents;
+    var visDash = showInactive ? dashList : activeDash;
+    var visAgents = showInactive ? agentsGrid : activeAgents;
     var irisDash = visDash.filter(function (p) { return isIris(p.name); });
     var otherDash = visDash.filter(function (p) { return !isIris(p.name); });
     function setEnabled(name, enabled) {
@@ -2960,6 +2970,22 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
           if (r) {
             toastPush(enabled ? t("plgEnabled", name) : t("plgDisabled", name));
             reload();
+          }
+        });
+    }
+    // Native plugin rows (plugin.yaml present) toggle through the agent
+    // enable/disable endpoint; orphan dashboard-only plugins use /visibility.
+    function toggleDash(p) {
+      if (p.runtime_status === undefined) { setEnabled(p.name, !dashOn(p)); return; }
+      var next = !dashOn(p);
+      act(t, "/api/dashboard/agent-plugins/" + encodeURIComponent(p.name) + (next ? "/enable" : "/disable"),
+        jinit("POST"), function (r) {
+          if (r) {
+            toastPush(t(next ? "plgEnabled" : "plgDisabled", p.name));
+            // the shell reads plugin state only at boot, so a reload is the
+            // only way to hand the route back to the native page (or restore it)
+            try { sessionStorage.removeItem("hermes:plugin-manifests"); } catch (e) { /* noop */ }
+            location.reload();
           }
         });
     }
@@ -2998,20 +3024,23 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
       });
     }
     function dashCard(p) {
-      var enabled = hub ? !!loadedSet[p.name] : true;
-      var tab = p.tab || {};
+      // hub.plugins rows nest the dashboard manifest; orphans carry it flat
+      var m = p.dashboard_manifest || p;
+      var tab = m.tab || {};
+      var enabled = dashOn(p);
       return h("div", { className: "iris-mini", key: p.name, style: enabled ? null : { opacity: 0.55 } },
-        h("div", { className: "mc-head" }, Icon("puzzle", "dim"), h("b", null, p.label || p.name),
-          Switch(enabled, function () { setEnabled(p.name, !enabled); }, p.label || p.name)),
-        h("p", null, p.description || ""),
+        h("div", { className: "mc-head" }, Icon("puzzle", "dim"), h("b", null, m.label || p.name),
+          Switch(enabled, function () { toggleDash(p); }, m.label || p.name)),
+        h("p", null, p.description || m.description || ""),
         h("div", { className: "mc-foot" },
-          h("span", { className: "num" }, p.name + (p.version ? " · v" + p.version : "")),
+          h("span", { className: "num" }, p.name + (m.version ? " · v" + m.version : "")),
           tab.override ? Badge(t("plgOverride", tab.override), "iris")
             : (tab.path ? Badge(t("plgTab", tab.path), "neutral") : null),
-          p.slots && p.slots.length ? Badge(t("plgSlotsN", p.slots.length), "neutral") : null,
-          p.has_api ? Badge(t("plgApi"), "warn") : null,
+          m.slots && m.slots.length ? Badge(t("plgSlotsN", m.slots.length), "neutral") : null,
+          m.has_api ? Badge(t("plgApi"), "warn") : null,
           !enabled ? Badge(t("plgInactive"), "neutral") : null,
-          p.source === "user" ? Btn(t("plgUpdate"), function () { updatePlugin(p.name); }, "sm", false, "refresh") : null));
+          (p.runtime_status !== undefined ? p.can_update_git : p.source === "user")
+            ? Btn(t("plgUpdate"), function () { updatePlugin(p.name); }, "sm", false, "refresh") : null));
     }
     function agentCard(p) {
       var on = p.runtime_status === "enabled";

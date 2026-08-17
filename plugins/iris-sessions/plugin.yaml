@@ -1,0 +1,9 @@
+name: iris-sessions
+version: 0.1.0
+description: "Iris redesigned page: Sessions"
+kind: standalone
+manifest_version: 2
+api_version: 1
+license: MIT
+homepage: https://github.com/adamotte/iris-dashboard
+tags: [dashboard]
