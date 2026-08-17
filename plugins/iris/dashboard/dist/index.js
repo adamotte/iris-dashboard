@@ -2925,6 +2925,7 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
     var qs = useState(""); var q = qs[0], setQ = qs[1];
     var cs = useState("all"); var cat = cs[0], setCat = cs[1];
     var shs = useState(false); var showInactive = shs[0], setShowInactive = shs[1];
+    var bsy = useState(null); var busyName = bsy[0], setBusyName = bsy[1];
     var loaded = useJSON("/api/dashboard/plugins", 60000, bump);
     var hub = useJSON("/api/dashboard/plugins/hub", 60000, bump);
     var reload = function () { setBump(bump + 1); };
@@ -2954,14 +2955,16 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
     var irisDash = visDash.filter(function (p) { return isIris(p.name); });
     var otherDash = visDash.filter(function (p) { return !isIris(p.name); });
     function setEnabled(name, enabled) {
+      setBusyName(name);
       // the shell reads plugin state only at boot, so a reload is the only
       // way to hand the route back to the native page (or restore it)
       act(t, "/api/dashboard/plugins/" + encodeURIComponent(name) + "/visibility",
         jinit("POST", { hidden: !enabled }), function (r) {
           if (r) {
+            toastPush(enabled ? t("plgEnabled", name) : t("plgDisabled", name));
             try { sessionStorage.removeItem("hermes:plugin-manifests"); } catch (e) { /* noop */ }
-            location.reload();
-          }
+            setTimeout(function () { location.reload(); }, 650);
+          } else { setBusyName(null); }
         });
     }
     function setAgentEnabled(name, enabled) {
@@ -2978,6 +2981,7 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
     function toggleDash(p) {
       if (p.runtime_status === undefined) { setEnabled(p.name, !dashOn(p)); return; }
       var next = !dashOn(p);
+      setBusyName(p.name);
       act(t, "/api/dashboard/agent-plugins/" + encodeURIComponent(p.name) + (next ? "/enable" : "/disable"),
         jinit("POST"), function (r) {
           if (r) {
@@ -2985,8 +2989,8 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
             // the shell reads plugin state only at boot, so a reload is the
             // only way to hand the route back to the native page (or restore it)
             try { sessionStorage.removeItem("hermes:plugin-manifests"); } catch (e) { /* noop */ }
-            location.reload();
-          }
+            setTimeout(function () { location.reload(); }, 650);
+          } else { setBusyName(null); }
         });
     }
     function installPlugin() {
@@ -3028,8 +3032,12 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
       var m = p.dashboard_manifest || p;
       var tab = m.tab || {};
       var enabled = dashOn(p);
-      return h("div", { className: "iris-mini", key: p.name, style: enabled ? null : { opacity: 0.55 } },
-        h("div", { className: "mc-head" }, Icon("puzzle", "dim"), h("b", null, m.label || p.name),
+      var busy = busyName === p.name;
+      return h("div", { className: "iris-mini" + (busy ? " busy" : ""), key: p.name,
+        style: busy ? { opacity: 0.4 } : (enabled ? null : { opacity: 0.55 }) },
+        h("div", { className: "mc-head" },
+          busy ? h("span", { className: "iris-spin" }) : Icon("puzzle", "dim"),
+          h("b", null, m.label || p.name),
           Switch(enabled, function () { toggleDash(p); }, m.label || p.name)),
         h("p", null, p.description || m.description || ""),
         h("div", { className: "mc-foot" },
@@ -3046,8 +3054,7 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
       var on = p.runtime_status === "enabled";
       return h("div", { className: "iris-mini", key: p.path || p.name, style: on ? null : { opacity: 0.55 } },
         h("div", { className: "mc-head" }, Icon("plug", "dim"), h("b", null, p.name),
-          Switch(on, function () { setAgentEnabled(p.name, !on); }, p.name),
-          Badge(p.runtime_status || "?", on ? "good" : "neutral")),
+          Switch(on, function () { setAgentEnabled(p.name, !on); }, p.name)),
         h("p", null, p.description || ""),
         h("div", { className: "mc-foot" },
           h("span", { className: "num" }, p.version ? "v" + p.version : ""),
