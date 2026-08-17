@@ -1,0 +1,12 @@
+{
+  "name": "iris-config",
+  "label": "Config",
+  "description": "Iris redesigned page: Config",
+  "icon": "Sparkles",
+  "version": "0.1.0",
+  "entry": "dist/index.js",
+  "tab": {
+    "path": "/config",
+    "override": "/config"
+  }
+}
