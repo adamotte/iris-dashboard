@@ -3015,7 +3015,7 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
     }
     function agentCard(p) {
       var on = p.runtime_status === "enabled";
-      return h("div", { className: "iris-mini", key: p.name, style: on ? null : { opacity: 0.55 } },
+      return h("div", { className: "iris-mini", key: p.path || p.name, style: on ? null : { opacity: 0.55 } },
         h("div", { className: "mc-head" }, Icon("plug", "dim"), h("b", null, p.name),
           Switch(on, function () { setAgentEnabled(p.name, !on); }, p.name),
           Badge(p.runtime_status || "?", on ? "good" : "neutral")),
