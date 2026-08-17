@@ -46,10 +46,12 @@ cd iris-dashboard
 ./install.sh
 ```
 
-`install.sh` copies the 16 plugins (`iris*`) into `~/.hermes/plugins/`, registers
-them under `plugins.enabled` in `config.yaml` (required for user dashboard plugins
-since the #46435 hardening), copies the two themes into
-`~/.hermes/dashboard-themes/`, and rescans the dashboard.
+`install.sh` installs the 16 plugins (`iris*`) into `~/.hermes/plugins/` as git
+checkouts of their per-plugin branches (so the « Update » button and
+`hermes plugins update` work), registers them under `plugins.enabled` in
+`config.yaml` (required for user dashboard plugins since the #46435 hardening),
+copies the two themes into `~/.hermes/dashboard-themes/`, and rescans the
+dashboard.
 
 ### 🐳 Docker (official `nousresearch/hermes-agent` image)
 

@@ -37,12 +37,19 @@ if [ ! -d "$HERMES_HOME" ]; then
 fi
 
 IRIS_PLUGINS=$(cd "$SRC_DIR/plugins" && ls -d iris*)
+# The dashboard update path (`hermes plugins update` -> git pull --ff-only
+# inside ~/.hermes/plugins/<name>) requires each installed plugin to BE a git
+# checkout whose root matches the plugin content. The monorepo nests plugins
+# under plugins/, so a plain checkout won't do: we clone one branch per
+# plugin whose root tree IS the plugin content (see tools/sync-plugin-branches.sh).
+# Override the repo with IRIS_REPO=<url> if you track a fork.
+IRIS_REPO="${IRIS_REPO:-$(git -C "$SRC_DIR" config --get remote.origin.url 2>/dev/null || echo 'https://github.com/adamotte/iris-dashboard.git')}"
 
-echo "→ Installing the Iris plugins into $HERMES_HOME/plugins/…"
+echo "→ Installing the Iris plugins (git clones) into $HERMES_HOME/plugins/…"
 mkdir -p "$HERMES_HOME/plugins"
 for p in $IRIS_PLUGINS; do
   rm -rf "$HERMES_HOME/plugins/$p"
-  cp -r "$SRC_DIR/plugins/$p" "$HERMES_HOME/plugins/"
+  git clone -q -b "$p" --depth 1 "$IRIS_REPO" "$HERMES_HOME/plugins/$p"
 done
 echo "  $(echo "$IRIS_PLUGINS" | wc -w) plugins installed."
 
@@ -106,7 +113,9 @@ cat <<'EOF'
   2. Palette icon (header) → « Iris (sombre) » or « Iris (clair) ».
   3. On mobile, a bottom navigation bar appears automatically.
 
-Update:     git pull, then run this script again.
+Update:     git pull, then run this script again (or use the per-plugin
+            « Update » button on the Plugins page — each install is a git
+            checkout of its own branch, so hermes plugins update works).
 Uninstall:
   rm -rf <hermes-home>/plugins/iris <hermes-home>/dashboard-themes/iris-*.yaml
   (and remove "iris" from plugins.enabled in <hermes-home>/config.yaml)
