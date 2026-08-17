@@ -1,0 +1,17 @@
+name: sync-plugin-branches
+on:
+  push:
+    branches: [develop]
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Sync per-plugin content branches
+        run: bash tools/sync-plugin-branches.sh

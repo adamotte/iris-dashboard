@@ -10,7 +10,9 @@
 # install.sh clones those branches; this script regenerates and pushes them
 # after a release.
 #
-# Run from the repo root after a release:  tools/sync-plugin-branches.sh
+# Run from the repo root after a release, or automatically via the GitHub
+# workflow (.github/workflows/sync-plugin-branches.yml) on every push to
+# develop. Only pushes a branch when its subdir tree actually changed.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -22,8 +24,8 @@ for dir in plugins/iris*; do
   [ -d "$dir" ] || continue
   name=$(basename "$dir")
   subtree=$(git rev-parse "$REV^{tree}:$dir") || { echo "skip $name: no tree" >&2; continue; }
-  if git show-ref -q "refs/heads/$name"; then
-    cur=$(git rev-parse "refs/heads/$name")
+  if git fetch -q origin "$name" 2>/dev/null; then
+    cur=$(git rev-parse FETCH_HEAD)
     if [ "$(git rev-parse "$cur^{tree}")" = "$subtree" ]; then
       echo "= $name (unchanged)"
       continue
@@ -34,8 +36,8 @@ for dir in plugins/iris*; do
     new=$(printf 'iris %s @ %s' "$name" "$(git rev-parse --short "$REV")" \
       | git commit-tree "$subtree")
   fi
-  git branch -f "$name" "$new"
-  git push -q origin "$name"
+  git push -q origin "$new:refs/heads/$name"
+  git branch -f "$name" "$new" 2>/dev/null || true
   echo "pushed $name @ $(git rev-parse --short "$new")"
   UPDATED=$((UPDATED + 1))
 done
