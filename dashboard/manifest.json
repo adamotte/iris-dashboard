@@ -1,0 +1,12 @@
+{
+  "name": "iris-mcp",
+  "label": "MCP",
+  "description": "Iris redesigned page: MCP",
+  "icon": "Sparkles",
+  "version": "0.1.0",
+  "entry": "dist/index.js",
+  "tab": {
+    "path": "/mcp",
+    "override": "/mcp"
+  }
+}
