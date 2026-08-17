@@ -3004,6 +3004,14 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
           }
         });
     }
+    function afterDashToggle(next, p) {
+      toastPush(t(next ? "plgEnabled" : "plgDisabled", p.name));
+      if (next && !bootLoaded(p.name)) {
+        // bundle wasn't served this session: its page only registers at boot
+        try { sessionStorage.removeItem("hermes:plugin-manifests"); } catch (e) { /* noop */ }
+        setTimeout(function () { location.reload(); }, 500);
+      } else { reload(); }
+    }
     // Native plugin rows (plugin.yaml present) toggle through the agent
     // enable/disable endpoint; orphan dashboard-only plugins use /visibility.
     function toggleDash(p) {
@@ -3014,12 +3022,16 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
         jinit("POST"), function (r) {
           setBusyName(null);
           if (r) {
-            toastPush(t(next ? "plgEnabled" : "plgDisabled", p.name));
-            if (next && !bootLoaded(p.name)) {
-              // bundle wasn't served this session: its page only registers at boot
-              try { sessionStorage.removeItem("hermes:plugin-manifests"); } catch (e) { /* noop */ }
-              setTimeout(function () { location.reload(); }, 500);
-            } else { reload(); }
+            if (next && p.user_hidden) {
+              // a stale dashboard.hidden_plugins entry (leftover from the
+              // orphan /visibility era, or the native sidebar toggle) blocks
+              // the loader from serving the bundle even when the plugin is
+              // enabled — clear it so the page actually loads
+              act(t, "/api/dashboard/plugins/" + encodeURIComponent(p.name) + "/visibility",
+                jinit("POST", { hidden: false }), function () { afterDashToggle(next, p); });
+            } else {
+              afterDashToggle(next, p);
+            }
           }
         });
     }
