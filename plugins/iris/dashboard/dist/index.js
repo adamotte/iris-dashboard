@@ -2956,15 +2956,15 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
     var otherDash = visDash.filter(function (p) { return !isIris(p.name); });
     function setEnabled(name, enabled) {
       setBusyName(name);
-      // the shell reads plugin state only at boot, so a reload is the only
-      // way to hand the route back to the native page (or restore it)
       act(t, "/api/dashboard/plugins/" + encodeURIComponent(name) + "/visibility",
         jinit("POST", { hidden: !enabled }), function (r) {
+          setBusyName(null);
           if (r) {
             toastPush(enabled ? t("plgEnabled", name) : t("plgDisabled", name));
-            try { sessionStorage.removeItem("hermes:plugin-manifests"); } catch (e) { /* noop */ }
-            setTimeout(function () { location.reload(); }, 650);
-          } else { setBusyName(null); }
+            // the hub refresh updates the card; the route change applies at
+            // the next boot (native PluginsPage behaves the same way)
+            reload();
+          }
         });
     }
     function setAgentEnabled(name, enabled) {
@@ -2984,13 +2984,13 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
       setBusyName(p.name);
       act(t, "/api/dashboard/agent-plugins/" + encodeURIComponent(p.name) + (next ? "/enable" : "/disable"),
         jinit("POST"), function (r) {
+          setBusyName(null);
           if (r) {
             toastPush(t(next ? "plgEnabled" : "plgDisabled", p.name));
-            // the shell reads plugin state only at boot, so a reload is the
-            // only way to hand the route back to the native page (or restore it)
-            try { sessionStorage.removeItem("hermes:plugin-manifests"); } catch (e) { /* noop */ }
-            setTimeout(function () { location.reload(); }, 650);
-          } else { setBusyName(null); }
+            // the hub refresh updates the card; the route change applies at
+            // the next boot (native PluginsPage behaves the same way)
+            reload();
+          }
         });
     }
     function installPlugin() {
