@@ -1,0 +1,12 @@
+{
+  "name": "iris-plugins",
+  "label": "Plugins",
+  "description": "Iris redesigned page: Plugins",
+  "icon": "Sparkles",
+  "version": "0.1.0",
+  "entry": "dist/index.js",
+  "tab": {
+    "path": "/plugins",
+    "override": "/plugins"
+  }
+}
