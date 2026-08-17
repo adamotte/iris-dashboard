@@ -2954,6 +2954,17 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
     var visAgents = showInactive ? agentsGrid : activeAgents;
     var irisDash = visDash.filter(function (p) { return isIris(p.name); });
     var otherDash = visDash.filter(function (p) { return !isIris(p.name); });
+    // The shell injects one script tag per served plugin bundle at boot and
+    // never removes it in production: its presence tells us whether this
+    // session actually loaded the plugin's page. A plugin disabled at boot
+    // has no bundle and no registered route — re-enabling it needs a reload
+    // (the shell reads manifests at mount only). A plugin that was loaded at
+    // boot keeps its route for the whole session, so re-enabling it after a
+    // same-session disable needs no reload at all.
+    var bootLoaded = function (name) {
+      try { return !!document.querySelector('script[data-hermes-plugin="' + String(name) + '"]'); }
+      catch (e) { return true; }
+    };
     function setEnabled(name, enabled) {
       setBusyName(name);
       act(t, "/api/dashboard/plugins/" + encodeURIComponent(name) + "/visibility",
@@ -2961,9 +2972,11 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
           setBusyName(null);
           if (r) {
             toastPush(enabled ? t("plgEnabled", name) : t("plgDisabled", name));
-            // the hub refresh updates the card; the route change applies at
-            // the next boot (native PluginsPage behaves the same way)
-            reload();
+            if (enabled && !bootLoaded(name)) {
+              // bundle wasn't served this session: its page only registers at boot
+              try { sessionStorage.removeItem("hermes:plugin-manifests"); } catch (e) { /* noop */ }
+              setTimeout(function () { location.reload(); }, 500);
+            } else { reload(); }
           }
         });
     }
@@ -2987,9 +3000,11 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
           setBusyName(null);
           if (r) {
             toastPush(t(next ? "plgEnabled" : "plgDisabled", p.name));
-            // the hub refresh updates the card; the route change applies at
-            // the next boot (native PluginsPage behaves the same way)
-            reload();
+            if (next && !bootLoaded(p.name)) {
+              // bundle wasn't served this session: its page only registers at boot
+              try { sessionStorage.removeItem("hermes:plugin-manifests"); } catch (e) { /* noop */ }
+              setTimeout(function () { location.reload(); }, 500);
+            } else { reload(); }
           }
         });
     }
