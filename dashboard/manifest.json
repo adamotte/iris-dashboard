@@ -1,0 +1,12 @@
+{
+  "name": "iris-analytics",
+  "label": "Analytics",
+  "description": "Iris redesigned page: Analytics",
+  "icon": "Sparkles",
+  "version": "0.1.0",
+  "entry": "dist/index.js",
+  "tab": {
+    "path": "/analytics",
+    "override": "/analytics"
+  }
+}
