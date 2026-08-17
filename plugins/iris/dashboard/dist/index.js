@@ -3015,19 +3015,19 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
     });
     return h("div", { className: "iris-page" },
       PageHead(t("plgTitle"), t("plgDesc"),
-        Btn(showHidden ? t("plgVisibleN", dash.length - hiddenCount) : t("plgHiddenN", hiddenCount),
+        [Btn(showHidden ? t("plgVisibleN", dash.length - hiddenCount) : t("plgHiddenN", hiddenCount),
           function () { setShowHidden(!showHidden); }, "", false, showHidden ? "eye" : "eyeOff"),
-        Btn(t("plgInstall"), installPlugin, "", false, "download"),
-        Btn(t("plgRescan"), function () {
-          // newly discovered plugins only load at boot: drop the manifest
-          // cache and reload the page so the rescan has a visible effect
-          act(t, "/api/dashboard/plugins/rescan", undefined, function (r) {
-            if (r) {
-              try { sessionStorage.removeItem("hermes:plugin-manifests"); } catch (e) { /* noop */ }
-              location.reload();
-            }
-          });
-        }, "primary")),
+         Btn(t("plgInstall"), installPlugin, "", false, "download"),
+         Btn(t("plgRescan"), function () {
+           // newly discovered plugins only load at boot: drop the manifest
+           // cache and reload the page so the rescan has a visible effect
+           act(t, "/api/dashboard/plugins/rescan", undefined, function (r) {
+             if (r) {
+               try { sessionStorage.removeItem("hermes:plugin-manifests"); } catch (e) { /* noop */ }
+               location.reload();
+             }
+           });
+         }, "primary")]),
       h("div", { className: "iris-tiles" },
         Tile(TL("puzzle", t("plgDash")), dash.length - hiddenCount, t("plgHiddenN", hiddenCount)),
         Tile(TL("plug", t("plgAgents")), activeAgents.length, t("plgInactiveN", agents.length - activeAgents.length)),
