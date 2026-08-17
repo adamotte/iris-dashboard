@@ -1,0 +1,12 @@
+{
+  "name": "iris-profiles",
+  "label": "Profiles",
+  "description": "Iris redesigned page: Profiles",
+  "icon": "Sparkles",
+  "version": "0.1.0",
+  "entry": "dist/index.js",
+  "tab": {
+    "path": "/profiles",
+    "override": "/profiles"
+  }
+}
