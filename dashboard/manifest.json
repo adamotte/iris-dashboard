@@ -1,0 +1,12 @@
+{
+  "name": "iris-webhooks",
+  "label": "Webhooks",
+  "description": "Iris redesigned page: Webhooks",
+  "icon": "Sparkles",
+  "version": "0.1.0",
+  "entry": "dist/index.js",
+  "tab": {
+    "path": "/webhooks",
+    "override": "/webhooks"
+  }
+}
