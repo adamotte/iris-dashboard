@@ -1,0 +1,73 @@
+# Iris — redesigned Hermes Agent dashboard (16 page plugins).
+#
+# Distribution snapshot for `hermes plugins pack install ./hermes-pack.yaml`.
+# Every entry pins to a single commit of the iris-dashboard monorepo; the ref
+# must be an exact commit SHA that already exists on the remote (branches and
+# tags are rejected).
+#
+# On each release, bump every `ref:` to the new release commit:
+#   git rev-parse <release-tag>          # same SHA for all 16 entries
+#   # or regenerate from an installed machine:  hermes plugins pack export
+#
+# Caveats:
+# - pack install does NOT enable anything — afterwards run
+#     hermes plugins enable iris iris-analytics iris-channels iris-config
+#     hermes plugins enable iris-cron iris-keys iris-logs iris-mcp
+#     hermes plugins enable iris-pairing iris-plugins iris-profiles iris-sessions
+#     hermes plugins enable iris-skills iris-system iris-toolsets iris-webhooks
+#   or edit plugins.enabled in config.yaml (what install.sh does).
+# - Themes are not part of packs: copy themes/iris-*.yaml into
+#   ~/.hermes/dashboard-themes/ (install.sh does this too).
+name: iris-dashboard
+description: Iris redesigned dashboard for Hermes Agent — control-center home, redesigned pages, themes
+author: adamotte
+version: 0.1.0
+plugins:
+  - repo: adamotte/iris-dashboard
+    ref: b5e6df8f0d7acb7af248c7f7962021c857694812
+    subdir: plugins/iris
+  - repo: adamotte/iris-dashboard
+    ref: b5e6df8f0d7acb7af248c7f7962021c857694812
+    subdir: plugins/iris-analytics
+  - repo: adamotte/iris-dashboard
+    ref: b5e6df8f0d7acb7af248c7f7962021c857694812
+    subdir: plugins/iris-channels
+  - repo: adamotte/iris-dashboard
+    ref: b5e6df8f0d7acb7af248c7f7962021c857694812
+    subdir: plugins/iris-config
+  - repo: adamotte/iris-dashboard
+    ref: b5e6df8f0d7acb7af248c7f7962021c857694812
+    subdir: plugins/iris-cron
+  - repo: adamotte/iris-dashboard
+    ref: b5e6df8f0d7acb7af248c7f7962021c857694812
+    subdir: plugins/iris-keys
+  - repo: adamotte/iris-dashboard
+    ref: b5e6df8f0d7acb7af248c7f7962021c857694812
+    subdir: plugins/iris-logs
+  - repo: adamotte/iris-dashboard
+    ref: b5e6df8f0d7acb7af248c7f7962021c857694812
+    subdir: plugins/iris-mcp
+  - repo: adamotte/iris-dashboard
+    ref: b5e6df8f0d7acb7af248c7f7962021c857694812
+    subdir: plugins/iris-pairing
+  - repo: adamotte/iris-dashboard
+    ref: b5e6df8f0d7acb7af248c7f7962021c857694812
+    subdir: plugins/iris-plugins
+  - repo: adamotte/iris-dashboard
+    ref: b5e6df8f0d7acb7af248c7f7962021c857694812
+    subdir: plugins/iris-profiles
+  - repo: adamotte/iris-dashboard
+    ref: b5e6df8f0d7acb7af248c7f7962021c857694812
+    subdir: plugins/iris-sessions
+  - repo: adamotte/iris-dashboard
+    ref: b5e6df8f0d7acb7af248c7f7962021c857694812
+    subdir: plugins/iris-skills
+  - repo: adamotte/iris-dashboard
+    ref: b5e6df8f0d7acb7af248c7f7962021c857694812
+    subdir: plugins/iris-system
+  - repo: adamotte/iris-dashboard
+    ref: b5e6df8f0d7acb7af248c7f7962021c857694812
+    subdir: plugins/iris-toolsets
+  - repo: adamotte/iris-dashboard
+    ref: b5e6df8f0d7acb7af248c7f7962021c857694812
+    subdir: plugins/iris-webhooks
