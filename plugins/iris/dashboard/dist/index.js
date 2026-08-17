@@ -131,8 +131,23 @@
       bpInstantiate: "Schedule it", bpNoFields: "No fields to configure.",
       /* webhooks */
       whTitle: "Webhooks", whDesc: "Trigger the agent from outside — CI, monitoring, forms, home automation",
-      whNew: "New webhook", whEvents: "Filter", whEnableSys: "Enable the webhook system", whUrl: "URL",
-      whSecretNote: "The signing secret is shown once at creation.",
+      whNew: "New subscription", whEnable: "Enable webhooks", whEnabling: "Enabling…",
+      whEnableNote: "Webhooks are their own gateway platform. Enable them here to accept incoming HTTP events; chat channels are only needed when a subscription delivers to Telegram, Discord, Slack or another channel.",
+      whRestarting: "Gateway restarting…", whRestartBtn: "Restart gateway",
+      whRestartNeeded: "Webhooks are enabled, but the gateway still needs a restart before the receiver can come online.",
+      whRestartFail: "Gateway restart failed ({0}) — restart manually",
+      whSubs: "Subscriptions ({0})",
+      whHotReload: "Subscription changes hot-reload once the webhook receiver is running. Disabled subscriptions reject incoming events.",
+      whNoSubs: "No webhook subscriptions yet.",
+      whEventsLbl: "Events", whEventsPh: "comma-separated, leave empty for all",
+      whDeliverLbl: "Deliver to", whDeliverOnlyLbl: "Deliver only",
+      whDeliverOnlyHint: "Skip the agent, deliver payload directly",
+      whPromptPh: "Instructions for the agent when this webhook fires (optional)",
+      whCreating: "Creating…", whNameReq: "Name required",
+      whCreatedNote: "Subscription created. Copy the secret now — it is only shown once.",
+      whSecretLbl: "Secret (shown once)", whUrlLbl: "Webhook URL", whDone: "Done",
+      whDeliverOnlyBadge: "deliver only", whAllEvents: "(all)",
+      whDeliverOnlyErr: "Direct delivery requires a real target (telegram, discord, …), not log.",
       /* skills */
       skillsTitle: "Skills", skillsDesc: "{0} installed · {1} enabled · the curator consolidates nightly",
       curator: "Skill curator", curatorRun: "Run now", categoryAll: "All", usageN: "{0} uses",
@@ -207,7 +222,7 @@
       allModels: "All models", allSources: "All sources",
       vsPrev: "vs previous period", perDayAvg: "{0} / day on average", avgPerDay: "avg {0} / day",
       share: "Share", cronSub: "{0} active jobs · {1} paused",
-      whNone: "No webhook configured", copy: "Copy", copied: "Copied ✓",
+      copy: "Copy", copied: "Copied ✓",
       created: "Created ✓", updated: "Updated ✓", deleted: "Deleted ✓", triggered: "Triggered ✓",
       timeJustNow: "just now", timeMinAgo: "{0} min ago", timeHourAgo: "{0} h ago", timeDayAgo: "{0} d ago",
       curatorNote: "Automatic consolidation of agent-created skills.",
@@ -300,8 +315,23 @@
       bpLoadError: "Impossible de charger les plans", bpSetup: "Configurer", bpScheduled: "programmé",
       bpInstantiate: "Planifier", bpNoFields: "Aucun champ à configurer.",
       whTitle: "Webhooks", whDesc: "Déclenchez l'agent depuis l'extérieur — CI, monitoring, formulaires, domotique",
-      whNew: "Nouveau webhook", whEvents: "Filtre", whEnableSys: "Activer le système de webhooks", whUrl: "URL",
-      whSecretNote: "Le secret de signature n'est montré qu'à la création.",
+      whNew: "Nouvel abonnement", whEnable: "Activer les webhooks", whEnabling: "Activation…",
+      whEnableNote: "Les webhooks forment leur propre plateforme de passerelle. Activez-les ici pour accepter des événements HTTP entrants ; les canaux de discussion ne servent que si un abonnement livre vers Telegram, Discord, Slack ou un autre canal.",
+      whRestarting: "Redémarrage de la passerelle…", whRestartBtn: "Redémarrer la passerelle",
+      whRestartNeeded: "Les webhooks sont activés, mais la passerelle doit encore redémarrer avant que le récepteur ne soit en ligne.",
+      whRestartFail: "Échec du redémarrage de la passerelle ({0}) — redémarrez manuellement",
+      whSubs: "Abonnements ({0})",
+      whHotReload: "Les changements d'abonnement sont rechargés à chaud dès que le récepteur webhook tourne. Les abonnements désactivés rejettent les événements entrants.",
+      whNoSubs: "Aucun abonnement webhook pour l'instant.",
+      whEventsLbl: "Événements", whEventsPh: "séparés par des virgules, laisser vide pour tous",
+      whDeliverLbl: "Livrer à", whDeliverOnlyLbl: "Livraison directe",
+      whDeliverOnlyHint: "Contourner l'agent, livrer directement la charge utile",
+      whPromptPh: "Instructions pour l'agent quand ce webhook se déclenche (optionnel)",
+      whCreating: "Création…", whNameReq: "Nom requis",
+      whCreatedNote: "Abonnement créé. Copiez le secret maintenant — il n'est montré qu'une fois.",
+      whSecretLbl: "Secret (montré une fois)", whUrlLbl: "URL du webhook", whDone: "Terminé",
+      whDeliverOnlyBadge: "livraison directe", whAllEvents: "(tous)",
+      whDeliverOnlyErr: "La livraison directe nécessite une vraie cible (telegram, discord, …), pas « log ».",
       skillsTitle: "Skills", skillsDesc: "{0} installées · {1} activées · le curateur consolide chaque nuit",
       curator: "Curateur de skills", curatorRun: "Exécuter", categoryAll: "Toutes", usageN: "{0} utilisations",
       mcpTitle: "Serveurs MCP", mcpDesc: "Étendez Iris avec des serveurs Model Context Protocol — sans toucher au YAML",
@@ -364,7 +394,7 @@
       allModels: "Tous les modèles", allSources: "Toutes sources",
       vsPrev: "vs période préc.", perDayAvg: "{0} / jour en moyenne", avgPerDay: "moy. {0} / jour",
       share: "Part", cronSub: "{0} jobs actifs · {1} en pause",
-      whNone: "Aucun webhook configuré", copy: "Copier", copied: "Copié ✓",
+      copy: "Copier", copied: "Copié ✓",
       created: "Créé ✓", updated: "Mis à jour ✓", deleted: "Supprimé ✓", triggered: "Déclenché ✓",
       timeJustNow: "à l'instant", timeMinAgo: "il y a {0} min", timeHourAgo: "il y a {0} h", timeDayAgo: "il y a {0} j",
       curatorNote: "Consolidation automatique des skills créées par l'agent.",
@@ -1129,39 +1159,92 @@
   }
   function WebhookForm(props) {
     var t = props.t;
-    var n = useState(""); var f = useState("");
-    return Card(t("whNew"), null, h("div", null,
-      h("div", { className: "iris-field" }, h("label", null, t("nameLbl")),
-        h("input", { className: "iris-input", value: n[0], onChange: function (e) { n[1](e.target.value); } })),
-      h("div", { className: "iris-field" }, h("label", null, t("whEvents")),
-        h("input", { className: "iris-input", value: f[0], onChange: function (e) { f[1](e.target.value); } })),
-      h("div", { className: "iris-actions" },
-        Btn(t("create"), function () {
-          if (!n[0]) return;
-          act(t, "/api/webhooks", jinit("POST", { name: n[0], event: f[0] }), function (r) {
-            if (r && (r.secret || r.signing_secret)) {
-              irisAlert(t, {
-                title: t("whNew"), subtitle: n[0], message: t("whSecretNote"),
-                mono: String(r.secret || r.signing_secret), icon: "shield", tone: "warn"
-              });
-            } else if (r !== null) {
-              toastPush(t("created"));
-            }
-            props.onClose(); props.onDone();
-          });
-        }, "primary", false, "plus"),
-        Btn(t("cancel"), props.onClose))));
+    var n = useState(""); var setName = n[1];
+    var d = useState(""); var setDesc = d[1];
+    var ev = useState(""); var setEvts = ev[1];
+    var dl = useState("log"); var setDeliver = dl[1];
+    var doo = useState(false); var setDo = doo[1];
+    var pr = useState(""); var setPrompt = pr[1];
+    var cr = useState(false); var creating = cr[0], setCreating = cr[1];
+    var res = useState(null); var created = res[0], setCreated = res[1];
+    var cu = useState(false); var copiedUrl = cu[0], setCopiedUrl = cu[1];
+    var cp = useState(false); var copied = cp[0], setCopied = cp[1];
+    var DELIVER = [["log", "Log"], ["telegram", "Telegram"], ["discord", "Discord"], ["slack", "Slack"], ["email", "Email"], ["github_comment", "GitHub comment"]];
+    function copyVal(v, setter) {
+      try {
+        navigator.clipboard.writeText(v).then(function () {
+          setter(true); setTimeout(function () { setter(false); }, 1500);
+        });
+      } catch (e) { /* noop */ }
+    }
+    function submit() {
+      if (!n[0].trim()) { toastPush(t("whNameReq"), "warn"); return; }
+      if (doo[0] && dl[0] === "log") { toastPush(t("whDeliverOnlyErr"), "warn"); return; }
+      setCreating(true);
+      act(t, "/api/webhooks", jinit("POST", {
+        name: n[0].trim().toLowerCase().replace(/\s+/g, "-"),
+        description: d[0].trim() || undefined,
+        events: ev[0].split(",").map(function (x) { return x.trim(); }).filter(Boolean),
+        deliver: dl[0],
+        deliver_only: doo[0],
+        prompt: pr[0].trim() || undefined
+      }), function (r) {
+        setCreating(false);
+        if (r !== null) {
+          if (r.secret) { setCreated(r); props.onDone(); }
+          else { toastPush(t("created")); props.onClose(); props.onDone(); }
+        }
+      });
+    }
+    return Card(t("whNew"), null,
+      created ? h("div", null,
+        h("p", { style: { fontSize: "12px", color: "var(--color-muted-foreground,#8c8a9c)", lineHeight: "1.6", margin: "0 0 12px" } }, t("whCreatedNote")),
+        h("div", { className: "iris-field" }, h("label", null, t("whUrlLbl")),
+          h("div", { className: "iris-input-row" },
+            h("span", { className: "iris-key-val", style: { flex: 1 } }, created.url || ""),
+            Btn(copiedUrl ? t("copied") : t("copy"), function () { copyVal(created.url || "", setCopiedUrl); }, "sm", false, "copy"))),
+        h("div", { className: "iris-field" }, h("label", null, t("whSecretLbl")),
+          h("div", { className: "iris-input-row", style: { border: "1px solid var(--color-warning,rgba(250,178,25,.5))" } },
+            h("span", { className: "iris-key-val", style: { flex: 1 } }, created.secret || ""),
+            Btn(copied ? t("copied") : t("copy"), function () { copyVal(created.secret || "", setCopied); }, "sm", false, "copy"))),
+        h("div", { className: "iris-actions" },
+          Btn(t("whDone"), function () { props.onClose(); props.onDone(); }, "primary")))
+        : h("div", null,
+        h("div", { className: "iris-field" }, h("label", null, t("nameLbl")),
+          h("input", { className: "iris-input", value: n[0], placeholder: "github-push", autoFocus: true, onChange: function (e) { setName(e.target.value); } })),
+        h("div", { className: "iris-field" }, h("label", null, t("description")),
+          h("input", { className: "iris-input", value: d[0], onChange: function (e) { setDesc(e.target.value); } })),
+        h("div", { className: "iris-field" }, h("label", null, t("whEventsLbl")),
+          h("input", { className: "iris-input", value: ev[0], placeholder: t("whEventsPh"), onChange: function (e) { setEvts(e.target.value); } })),
+        h("div", { className: "iris-grid-2" },
+          h("div", { className: "iris-field" }, h("label", null, t("whDeliverLbl")),
+            h("select", { className: "iris-input", value: dl[0], onChange: function (e) { setDeliver(e.target.value); } },
+              DELIVER.map(function (o, i) { return h("option", { key: i, value: o[0] }, o[1]); }))),
+          h("div", { className: "iris-field" },
+            h("label", null, t("whDeliverOnlyLbl")),
+            h("label", { className: "iris-check" },
+              h("input", { type: "checkbox", checked: doo[0], onChange: function (e) { setDo(e.target.checked); } }),
+              h("span", null, t("whDeliverOnlyHint"))))),
+        h("div", { className: "iris-field" }, h("label", null, t("promptLbl")),
+          h("textarea", { className: "iris-input iris-textarea", rows: 3, value: pr[0], placeholder: t("whPromptPh"), onChange: function (e) { setPrompt(e.target.value); } })),
+        h("div", { className: "iris-actions" },
+          Btn(creating ? t("whCreating") : t("create"), submit, "primary", creating, "plus"),
+          Btn(t("cancel"), props.onClose))));
   }
   function WebhookCard(props) {
     var t = props.t;
     var w = props.w;
     var enabled = w.enabled !== false;
     var cp = useState(false); var copied = cp[0], setCopied = cp[1];
-    var url = txt(props.baseUrl) + txt(w.path || ("/hooks/" + (w.name || "")));
+    var url = txt(w.url) || (txt(props.baseUrl) + "/webhooks/" + (w.name || ""));
+    var evts = asList(w.events, ["events"]);
+    var skills = asList(w.skills, ["skills"]);
     return h("section", { className: "iris-card", style: enabled ? undefined : { opacity: .6 } },
       h("div", { className: "iris-card-head" },
         h("h3", null, w.name || "webhook"),
-        Badge(enabled ? t("active") : t("disabled"), enabled ? "good" : "neutral"),
+        Badge(txt(w.deliver) || "log", "neutral"),
+        w.deliver_only ? Badge(t("whDeliverOnlyBadge"), "iris") : null,
+        enabled ? null : Badge(t("disabled"), "warn"),
         h("span", { className: "iris-spacer" }),
         Switch(enabled, function () { actToast(t, "/api/webhooks/" + (w.name) + "/enabled", jinit("PUT", { enabled: !enabled }), t("updated"), props.onDone); }, w.name || "webhook"),
         h("button", {
@@ -1169,21 +1252,23 @@
           onClick: function () { askDelete(t, txt(w.name), function () { actToast(t, "/api/webhooks/" + w.name, jinit("DELETE"), t("deleted"), props.onDone); }); }
         }, t("deleteS"))),
       h("div", null,
-        h("div", { style: { fontSize: "12px", color: "var(--color-muted-foreground,#8c8a9c)", marginBottom: "9px" } }, txt(w.description)),
-        enabled ? h(React.Fragment, null,
-          h("div", { className: "iris-input-row" },
-            h("span", { className: "iris-key-val", style: { flex: 1 } }, url),
-            Btn(copied ? t("copied") : t("copy"), function () {
-              try {
-                navigator.clipboard.writeText(url).then(function () {
-                  setCopied(true); setTimeout(function () { setCopied(false); }, 1500);
-                });
-              } catch (e) { /* noop */ }
-            }, "sm", false, "copy")),
-          h("div", { className: "num", style: { display: "flex", gap: "14px", marginTop: "10px", fontSize: "11px", color: "var(--color-muted-foreground,#8c8a9c)" } },
-            h("span", null, t("whEvents") + " : ", h("b", null, txt(w.event || w.filter) || "*")),
-            h("span", null, t("target") + " : ", h("b", null, txt(w.deliver || w.target) || "local")))
-        ) : null));
+        w.description ? h("div", { style: { fontSize: "12px", color: "var(--color-muted-foreground,#8c8a9c)", marginBottom: "9px" } }, txt(w.description)) : null,
+        h("div", { className: "iris-badges" },
+          evts.length ? evts.map(function (e, i) { return Badge(txt(e), "neutral"); })
+            : Badge(t("whAllEvents"), "neutral")),
+        h("div", { className: "iris-input-row", style: { marginTop: "9px" } },
+          h("span", { className: "iris-key-val", style: { flex: 1 } }, url),
+          Btn(copied ? t("copied") : t("copy"), function () {
+            try {
+              navigator.clipboard.writeText(url).then(function () {
+                setCopied(true); setTimeout(function () { setCopied(false); }, 1500);
+              });
+            } catch (e) { /* noop */ }
+          }, "sm", false, "copy")),
+        h("div", { className: "num", style: { display: "flex", gap: "14px", marginTop: "10px", fontSize: "11px", color: "var(--color-muted-foreground,#8c8a9c)" } },
+          w.created_at ? h("span", null, fmtRel(w.created_at, t, props.locale)) : null,
+          skills.length ? h("span", null, t("badgeSkills") + " : " + skills.length) : null,
+          w.prompt ? h("span", null, t("promptLbl")) : null)));
   }
   function Chips(options, value, onChange) {
     return h("div", { className: "iris-chips" }, options.map(function (o, i) {
@@ -2138,19 +2223,87 @@
     var locale = useLocale(); var t = makeT(locale);
     var bp = useState(0); var bump = bp[0], setBump = bp[1];
     var frm = useState(false); var showForm = frm[0], setShowForm = frm[1];
+    var en = useState(false); var enabling = en[0], setEnabling = en[1];
+    var rs = useState(false); var restarting = rs[0], setRestarting = rs[1];
+    var rn = useState(false); var restartNeeded = rn[0], setRestartNeeded = rn[1];
+    var rm = useState(null); var restartMsg = rm[0], setRestartMsg = rm[1];
+    var re = useState(null); var restartErr = re[0], setRestartErr = re[1];
     var data = useJSON("/api/webhooks", 30000, bump);
     var subs = asList(data && data.subscriptions, ["subscriptions"]);
     var reload = function () { setBump(bump + 1); };
+    var systemEnabled = data ? data.enabled === true : null;
+
+    function watchRestart() {
+      var tries = 0;
+      var timer = setInterval(function () {
+        tries++;
+        SDK.fetchJSON("/api/actions/status/gateway-restart?lines=5").then(function (st) {
+          if (!st || st.running) return;
+          clearInterval(timer);
+          if (st.exit_code !== 0 && st.exit_code !== null) {
+            setRestartMsg(null); setRestartNeeded(true); setRestartErr(t("whRestartFail", st.exit_code));
+          } else {
+            setRestartMsg(null); setRestartNeeded(false); setRestartErr(null);
+          }
+        }).catch(function () { /* dashboard may briefly disconnect while the gateway restarts */ });
+        if (tries >= 20) { clearInterval(timer); setRestartMsg(null); }
+      }, 1500);
+    }
+
+    function handleEnable() {
+      setEnabling(true); setRestartNeeded(false); setRestartErr(null);
+      act(t, "/api/webhooks/enable", jinit("POST", undefined), function (r) {
+        setEnabling(false);
+        if (r === null) return;
+        reload();
+        if (r.restart_started) {
+          setRestartMsg(t("whRestarting"));
+          toastPush(t("whRestarting"));
+          setTimeout(reload, 4000);
+          watchRestart();
+        } else {
+          setRestartMsg(null); setRestartNeeded(true);
+          setRestartErr(r.restart_error ? t("whRestartFail", r.restart_error) : t("whRestartNeeded"));
+        }
+      });
+    }
+
+    function handleRestart() {
+      setRestarting(true);
+      act(t, "/api/gateway/restart", jinit("POST", undefined), function (r) {
+        setRestarting(false);
+        if (r === null) return;
+        setRestartNeeded(false); setRestartErr(null); setRestartMsg(t("whRestarting"));
+        toastPush(t("whRestarting"));
+        setTimeout(reload, 4000);
+        watchRestart();
+      });
+    }
+
+    var headActions = [Btn(t("refresh"), reload, "", false, "refresh")];
+    if (systemEnabled !== null) {
+      headActions.push(Btn(t("whNew"), function () { setShowForm(!showForm); }, "primary", !systemEnabled, "plus"));
+    }
 
     return h("div", { className: "iris-page" },
-      PageHead(t("whTitle"), t("whDesc"),
-        [Btn(t("refresh"), reload, "", false, "refresh"),
-         Btn(t("whNew"), function () { setShowForm(!showForm); }, "primary", false, "plus")]),
+      PageHead(t("whTitle"), t("whDesc"), headActions),
       showForm ? h(WebhookForm, { t: t, onClose: function () { setShowForm(false); }, onDone: reload }) : null,
-      data ? Card(t("whEnableSys"), Switch(data.enabled === true, function () {
-        actToast(t, "/api/webhooks/enable", jinit("POST", { enabled: !data.enabled }), t("updated"), reload);
-      }, t("whEnableSys")), h("div", { className: "iris-note" }, t("whUrl") + " : " + (data.base_url || "—"))) : null,
-      subs.length ? subs.map(function (w, i) { return h(WebhookCard, { w: w, key: i, t: t, baseUrl: data && data.base_url, onDone: reload }); }) : Card(null, null, Empty(t("whNone"))));
+      systemEnabled === false ? Card(t("whEnable"), null,
+        h("div", null,
+          h("div", { className: "iris-note", style: { marginTop: 0 } }, t("whEnableNote")),
+          h("div", { className: "iris-actions", style: { marginTop: "12px" } },
+            Btn(enabling ? t("whEnabling") : t("whEnable"), handleEnable, "primary", enabling, "hook")))) : null,
+      systemEnabled === true && data ? Card(t("whUrl"), null,
+        h("div", { className: "iris-note", style: { marginTop: 0 } },
+          t("whHotReload") + " · " + (data.base_url || "—"))) : null,
+      restartMsg ? Card(null, null,
+        h("div", { className: "iris-note", style: { marginTop: 0, color: "var(--color-warning,#fab219)" } }, restartMsg)) : null,
+      restartNeeded ? Card(null, null, h("div", null,
+        h("div", { style: { fontSize: "12.5px", lineHeight: "1.6" } }, restartErr || t("whRestartNeeded")),
+        h("div", { className: "iris-actions", style: { marginTop: "12px" } },
+          Btn(restarting ? t("whRestarting") : t("whRestartBtn"), handleRestart, "primary", restarting, "refresh")))) : null,
+      subs.length ? subs.map(function (w, i) { return h(WebhookCard, { w: w, key: i, t: t, locale: locale, baseUrl: data && data.base_url, onDone: reload }); })
+        : Card(null, null, Empty(t("whNoSubs"))));
   }
 
   /* ================= SKILLS ================= */
