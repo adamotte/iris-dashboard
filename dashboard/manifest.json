@@ -1,0 +1,12 @@
+{
+  "name": "iris-toolsets",
+  "label": "Toolsets",
+  "description": "Iris redesigned page: Toolsets",
+  "icon": "Sparkles",
+  "version": "0.1.0",
+  "entry": "dist/index.js",
+  "tab": {
+    "path": "/toolsets",
+    "position": "after:mcp"
+  }
+}
