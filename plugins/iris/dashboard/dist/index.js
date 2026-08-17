@@ -185,6 +185,7 @@
       plgInactiveN: "{0} inactive", plgInactive: "inactive",
       plgInactiveBtn: "Inactive/Disabled ({0})", plgActiveBtn: "Enabled ({0})",
       plgEnabled: "Enabled {0}", plgDisabled: "Disabled {0}",
+      plgNotServed: "enabled but not served — reload to apply",
       plgOverride: "overrides {0}", plgTab: "tab {0}",
       plgSlotsN: "{0} slot(s)", plgApi: "backend API", plgAuth: "auth required",
       plgNote: "Inactive/disabled plugins stay installed but are no longer loaded. Iris pages follow the same enable/disable rule as agent plugins — switch one off to hand its route back to the native page.",
@@ -342,6 +343,7 @@
       plgInactiveN: "{0} inactifs", plgInactive: "inactif",
       plgInactiveBtn: "Inactifs/Désactivés ({0})", plgActiveBtn: "Actifs ({0})",
       plgEnabled: "{0} activé", plgDisabled: "{0} désactivé",
+      plgNotServed: "activé mais non servi — recharger pour appliquer",
       plgOverride: "surcharge {0}", plgTab: "onglet {0}",
       plgSlotsN: "{0} slot(s)", plgApi: "API backend", plgAuth: "auth requise",
       plgNote: "Un plugin inactif/désactivé reste installé mais n'est plus chargé. Les pages Iris suivent la même règle d'activation que les plugins agent — désactivez-en une pour rendre sa route à la page native.",
@@ -3074,6 +3076,7 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
       var m = p.dashboard_manifest || p;
       var tab = m.tab || {};
       var enabled = dashOn(p);
+      var served = !!loadedSet[p.name];
       var busy = busyName === p.name;
       return h("div", { className: "iris-mini" + (busy ? " busy" : ""), key: p.name,
         style: busy ? { opacity: 0.4 } : (enabled ? null : { opacity: 0.55 }) },
@@ -3088,6 +3091,7 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
             : (tab.path ? Badge(t("plgTab", tab.path), "neutral") : null),
           m.slots && m.slots.length ? Badge(t("plgSlotsN", m.slots.length), "neutral") : null,
           m.has_api ? Badge(t("plgApi"), "warn") : null,
+          enabled && !served ? Badge(t("plgNotServed"), "warn") : null,
           !enabled ? Badge(t("plgInactive"), "neutral") : null,
           (p.runtime_status !== undefined ? p.can_update_git : p.source === "user")
             ? Btn(t("plgUpdate"), function () { updatePlugin(p.name); }, "sm", false, "refresh") : null));
