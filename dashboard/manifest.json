@@ -1,0 +1,14 @@
+{
+  "name": "iris",
+  "label": "Iris",
+  "description": "Iris — page d'accueil « control center » : coût, automatisations, sessions, santé. Remplace la page Status native.",
+  "icon": "Sparkles",
+  "version": "0.1.0",
+  "entry": "dist/index.js",
+  "css": "dist/style.css",
+  "tab": {
+    "path": "/",
+    "override": "/"
+  },
+  "slots": ["overlay", "header-right"]
+}

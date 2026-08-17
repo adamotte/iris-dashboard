@@ -1,0 +1,502 @@
+/* Iris — plugin styles. Everything is prefixed .iris- to avoid collisions.
+   Colors come from the active theme variables (--color-*): the plugin follows
+   iris-dark / iris-light or any other theme automatically. */
+
+.iris-home,.iris-page{display:flex;flex-direction:column;gap:14px;font-size:13.5px}
+
+/* icons (mockup stroke style) */
+.iris-ic{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;
+  stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px}
+.iris-ic.sm{width:14px;height:14px}
+.iris-ic.dim{color:var(--color-muted-foreground,#8c8a9c)}
+.iris-ic.bb{width:20px;height:20px;display:block;margin:0 auto 3px}
+.iris-icbox{width:30px;height:30px;border-radius:9px;flex:none;display:grid;place-items:center;
+  background:color-mix(in srgb,var(--color-foreground,#888) 6%,transparent);
+  border:1px solid var(--color-border,rgba(128,128,128,.2));color:var(--color-muted-foreground,#8c8a9c)}
+.iris-icbox .iris-ic{width:16px;height:16px}
+.iris-icbox.good-i{background:color-mix(in srgb,var(--color-success,#22b573) 12%,transparent);
+  color:var(--color-success,#22b573);border-color:transparent}
+.iris-icbox.warn-i{background:color-mix(in srgb,var(--color-warning,#fab219) 12%,transparent);
+  color:var(--color-warning,#fab219);border-color:transparent}
+.iris-icbox.crit-i{background:color-mix(in srgb,var(--color-destructive,#e05a6b) 12%,transparent);
+  color:var(--color-destructive,#e05a6b);border-color:transparent}
+.iris-icbox.iris-i{background:color-mix(in srgb,var(--color-primary,#5b4bd4) 12%,transparent);
+  color:var(--color-primary,#5b4bd4);border-color:transparent}
+.iris-page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.iris-page-head h2{font-size:20px;font-weight:700;letter-spacing:-.015em;margin:0}
+.iris-page-head p{color:var(--color-muted-foreground,#8c8a9c);font-size:13px;margin:2px 0 0;max-width:70ch}
+.iris-actions{display:flex;gap:8px;flex-wrap:wrap}
+.iris-btn{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;
+  padding:7px 13px;border-radius:9px;text-decoration:none;cursor:pointer;
+  border:1px solid var(--color-border,rgba(128,128,128,.25));color:var(--color-secondary-foreground,#888);
+  background:none;font-family:inherit;transition:all .12s}
+.iris-btn:hover{color:var(--color-foreground,inherit);
+  background:var(--iris-hover,color-mix(in srgb,var(--color-foreground,#888) 5%,transparent))}
+.iris-btn.primary{background:var(--color-primary,#5b4bd4);color:var(--color-primary-foreground,#fff);border-color:transparent}
+.iris-btn.primary:hover{filter:brightness(1.09)}
+.iris-btn.danger{color:var(--color-destructive,#e05a6b);
+  border-color:color-mix(in srgb,var(--color-destructive,#e05a6b) 12%,transparent)}
+.iris-btn.danger:hover{background:color-mix(in srgb,var(--color-destructive,#e05a6b) 12%,transparent)}
+.iris-btn.sm{padding:4px 10px;font-size:11.5px;border-radius:7px}
+.iris-btn:disabled{opacity:.5;cursor:default}
+.iris-icon-btn{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;flex:none;
+  border:1px solid var(--color-border,rgba(128,128,128,.25));color:var(--color-secondary-foreground,#888);
+  background:none;cursor:pointer;transition:background .12s}
+.iris-icon-btn:hover{background:var(--iris-hover,color-mix(in srgb,var(--color-foreground,#888) 5%,transparent));
+  color:var(--color-foreground,inherit)}
+.iris-icon-btn.sm{width:26px;height:26px}
+
+.iris-card{background:var(--color-card,rgba(128,128,128,.06));
+  border:1px solid var(--color-border,rgba(128,128,128,.2));
+  border-radius:13px;padding:16px 18px;min-width:0;box-shadow:var(--iris-shadow,none)}
+.iris-card.tinted{border-color:var(--color-primary,#5b4bd4);
+  background:color-mix(in srgb,var(--color-primary,#5b4bd4) 11%,var(--color-card,transparent))}
+.iris-card-head{display:flex;align-items:center;gap:10px;margin-bottom:13px;flex-wrap:wrap}
+.iris-card-head h3{font-size:13px;font-weight:650;margin:0}
+.iris-spacer{flex:1}
+.iris-muted{font-size:11.5px;color:var(--color-muted-foreground,#8c8a9c)}
+.iris-link{font-size:12px;font-weight:550;color:var(--color-primary,#5b4bd4);text-decoration:none;
+  white-space:nowrap;background:none;border:none;cursor:pointer;font-family:inherit;padding:0}
+.iris-link:hover{text-decoration:underline}
+.iris-note{font-size:11.5px;color:var(--color-muted-foreground,#8c8a9c);margin-top:8px}
+.iris-sep{border:none;border-top:1px solid var(--color-border,rgba(128,128,128,.2));margin:10px 0}
+.iris-empty{font-size:12.5px;color:var(--color-muted-foreground,#8c8a9c);padding:8px 0}
+
+.iris-tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.iris-tile .iris-t-label{font-size:12px;color:var(--color-muted-foreground,#8c8a9c);font-weight:550;
+  display:flex;align-items:center;gap:7px}
+.iris-tile .iris-icbox{width:22px;height:22px;border-radius:7px}
+.iris-tile .iris-icbox .iris-ic{width:13px;height:13px}
+.iris-tile .iris-t-value{font-size:25px;font-weight:700;letter-spacing:-.02em;margin:6px 0 2px;
+  font-variant-numeric:tabular-nums;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.iris-tile .iris-t-value small{font-size:14px;color:var(--color-muted-foreground,#8c8a9c);font-weight:500}
+.iris-tile .iris-t-sub{font-size:11.5px;color:var(--color-muted-foreground,#8c8a9c);font-variant-numeric:tabular-nums}
+.iris-tile .iris-t-sub b{color:var(--color-secondary-foreground,#aaa8bb)}
+.iris-tile-link{text-decoration:none;color:inherit;display:flex;flex-direction:column;cursor:pointer}
+.iris-tile-link:hover{border-color:color-mix(in srgb,var(--color-primary,#7a6cff) 50%,transparent);transform:translateY(-1px)}
+.iris-tile-link:focus-visible{outline:2px solid var(--color-primary,#7a6cff);outline-offset:2px}
+.iris-row-link{display:block;text-decoration:none;color:inherit;border-radius:8px;margin:0 -8px;padding:0 8px}
+.iris-row-link:hover{background:color-mix(in srgb,var(--color-primary,#7a6cff) 7%,transparent)}
+.iris-row-link:focus-visible{outline:2px solid var(--color-primary,#7a6cff);outline-offset:2px}
+.iris-actions-cell{display:flex;align-items:center;justify-content:flex-end;gap:6px;white-space:nowrap}
+.iris-cron-prompt{display:block;max-width:min(60ch,40vw);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.iris-textarea{min-height:44px;resize:vertical;font:inherit;line-height:1.5}
+.iris-delta{font-weight:650}
+.iris-delta.up{color:var(--color-success,#22b573)}
+.iris-delta.down{color:var(--color-destructive,#e05a6b)}
+.iris-gauge{height:5px;border-radius:3px;background:var(--iris-grid,color-mix(in srgb,var(--color-foreground,#888) 7%,transparent));overflow:hidden;margin:8px 0 5px}
+.iris-gauge i{display:block;height:100%;border-radius:3px;background:var(--iris-series-1,var(--color-primary,#5b4bd4))}
+.iris-gauge i.warn-g{background:var(--color-warning,#fab219)}
+
+.iris-cols{display:grid;grid-template-columns:1.85fr 1fr;gap:14px;min-width:0}
+.iris-col-main,.iris-col-side{display:flex;flex-direction:column;gap:14px;min-width:0}
+.iris-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;min-width:0}
+
+.iris-row{display:flex;align-items:center;gap:11px;padding:9px 0}
+.iris-row-ic{width:9px;height:9px;border-radius:50%;flex:none;background:var(--color-muted-foreground,#888)}
+.iris-row-ic.good{background:var(--color-success,#22b573)}
+.iris-row-ic.warn{background:var(--color-warning,#fab219)}
+.iris-row-ic.crit{background:var(--color-destructive,#e05a6b)}
+.iris-row-body{flex:1;min-width:0}
+.iris-row-body b{font-size:12.5px;font-weight:600;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.iris-row-body small{font-size:11.5px;color:var(--color-muted-foreground,#8c8a9c);display:block;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.iris-row-meta{flex:none;font-size:11px;color:var(--color-muted-foreground,#8c8a9c);
+  font-variant-numeric:tabular-nums;text-align:right;display:flex;align-items:center;gap:7px}
+
+.iris-badge{font-size:10.5px;font-weight:650;padding:1.5px 8px;border-radius:99px;white-space:nowrap}
+.iris-badge.good{background:color-mix(in srgb,var(--color-success,#22b573) 12%,transparent);color:var(--color-success,#22b573)}
+.iris-badge.warn{background:color-mix(in srgb,var(--color-warning,#fab219) 12%,transparent);color:var(--color-warning,#fab219)}
+.iris-badge.crit{background:color-mix(in srgb,var(--color-destructive,#e05a6b) 12%,transparent);color:var(--color-destructive,#e05a6b)}
+.iris-badge.neutral{background:color-mix(in srgb,var(--color-foreground,#888) 8%,transparent);color:var(--color-muted-foreground,#8c8a9c)}
+.iris-badge.iris{background:color-mix(in srgb,var(--color-primary,#5b4bd4) 11%,transparent);color:var(--color-primary,#5b4bd4)}
+
+.iris-dot{width:7px;height:7px;border-radius:50%;display:inline-block;flex:none}
+.iris-dot.ok{background:var(--color-success,#22b573)}
+.iris-dot.err{background:var(--color-warning,#fab219)}
+.iris-dot.off{background:var(--color-muted-foreground,#888)}
+
+.iris-meter{display:flex;align-items:center;gap:10px;padding:5px 0;font-size:11.5px;
+  color:var(--color-muted-foreground,#8c8a9c)}
+.iris-m-label{width:78px;flex:none}
+.iris-m-bar{flex:1;height:4px;border-radius:2px;overflow:hidden;
+  background:color-mix(in srgb,var(--color-foreground,#888) 10%,transparent)}
+.iris-m-bar i{display:block;height:100%;border-radius:2px;background:var(--iris-series-1,var(--color-primary,#5b4bd4))}
+.iris-m-val{width:44px;text-align:right;font-variant-numeric:tabular-nums}
+
+.iris-chart-wrap{position:relative}
+.iris-chart{width:100%;height:auto;display:block}
+.iris-grid{stroke:color-mix(in srgb,var(--color-foreground,#888) 8%,transparent)}
+.iris-axis{font-size:10px;fill:var(--color-muted-foreground,#8c8a9c)}
+.iris-bar{fill:var(--color-primary,#5b4bd4)}
+.iris-bar.hover{filter:brightness(1.2)}
+.iris-tt{position:absolute;top:8px;right:8px;pointer-events:none;
+  background:var(--color-popover,var(--color-card,#222));border:1px solid var(--color-border,rgba(128,128,128,.3));
+  border-radius:9px;padding:8px 11px;font-size:11.5px;min-width:120px}
+.iris-tt b{display:block;font-size:12px;margin-bottom:3px}
+
+/* ---- tables ---- */
+.iris-table-card{padding:6px 14px}
+.iris-table{width:100%;border-collapse:collapse;font-size:12.5px}
+.iris-table th{font-size:10.5px;font-weight:650;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--color-muted-foreground,#8c8a9c);text-align:left;padding:8px 10px;
+  border-bottom:1px solid var(--color-border,rgba(128,128,128,.2))}
+.iris-table td{padding:9px 10px;border-bottom:1px solid var(--color-border,rgba(128,128,128,.12));vertical-align:middle}
+.iris-table tr:last-child td{border-bottom:none}
+.iris-table td.r,.iris-table th.r{text-align:right}
+.iris-table .num{font-variant-numeric:tabular-nums}
+.iris-mono{font-family:var(--theme-font-mono,ui-monospace,monospace);font-size:11px}
+
+/* ---- forms / filters ---- */
+.iris-input{padding:7.5px 11px;border-radius:9px;font-size:13px;font-family:inherit;
+  border:1px solid var(--color-border,rgba(128,128,128,.25));
+  background:var(--color-background,transparent);
+  color:var(--color-foreground,inherit);min-width:0;transition:border-color .12s}
+.iris-input:hover{border-color:color-mix(in srgb,var(--color-foreground,#888) 20%,transparent)}
+.iris-input:focus{outline:none;border-color:var(--color-primary,#5b4bd4)}
+select.iris-input{background:var(--color-input,var(--color-background,#1a1a22))}
+.iris-input-row{display:flex;gap:8px;align-items:center}
+.iris-filterbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.iris-filterbar .iris-input[type=text],.iris-filterbar .iris-input[type=search]{flex:1;max-width:340px;min-width:180px}
+.iris-filterbar select.iris-input{flex:none;width:auto;min-width:0}
+/* segmented control: shaded trough, the selected chip is a raised card segment (mockup) */
+.iris-chips{display:flex;gap:4px;border:1px solid var(--color-border,rgba(128,128,128,.25));
+  background:var(--color-background,transparent);
+  border-radius:9px;padding:3px;width:max-content;max-width:100%;overflow-x:auto}
+.iris-chip{font-size:11.5px;font-weight:550;color:var(--color-muted-foreground,#8c8a9c);
+  padding:3.5px 11px;border-radius:6px;white-space:nowrap;background:none;border:none;cursor:pointer;font-family:inherit}
+.iris-chip.on{background:var(--color-card,#fff);color:var(--color-foreground,inherit);
+  box-shadow:0 1px 3px rgba(0,0,0,.16);font-weight:600}
+.iris-switch{width:36px;height:21px;border-radius:99px;position:relative;flex:none;cursor:pointer;border:none;
+  background:color-mix(in srgb,var(--color-foreground,#888) 18%,transparent);transition:background .15s;padding:0}
+.iris-switch::after{content:"";position:absolute;top:2.5px;left:2.5px;width:16px;height:16px;border-radius:50%;
+  background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:left .15s}
+.iris-switch.on{background:var(--color-primary,#5b4bd4)}
+.iris-switch.on::after{left:17.5px}
+.iris-field{margin-bottom:13px}
+.iris-field label{display:block;font-size:12px;font-weight:600;margin-bottom:5px}
+.iris-field .iris-hint{font-size:11px;color:var(--color-muted-foreground,#8c8a9c);margin-top:4px}
+.iris-field .iris-input{width:100%}
+.iris-field-row{display:flex;gap:12px}
+.iris-field-row>.iris-field{flex:1;min-width:0}
+.iris-textarea{min-height:60px;resize:vertical;font-family:var(--theme-font-mono,ui-monospace,monospace);font-size:11.5px}
+
+/* ---- cron schedule builder ---- */
+.iris-seg{display:flex;flex-wrap:wrap;gap:4px}
+.iris-seg-btn{border:1px solid var(--color-border,rgba(128,128,128,.25));background:transparent;color:inherit;
+  border-radius:7px;padding:4px 10px;font-size:11.5px;cursor:pointer}
+.iris-seg-btn.on{background:var(--color-primary,#5b4bd4);border-color:var(--color-primary,#5b4bd4);color:#fff}
+.iris-days{display:flex;gap:4px;flex-wrap:wrap}
+.iris-day{border:1px solid var(--color-border,rgba(128,128,128,.25));background:transparent;color:inherit;
+  border-radius:7px;width:34px;height:26px;font-size:11px;cursor:pointer}
+.iris-day.on{background:var(--color-primary,#5b4bd4);border-color:var(--color-primary,#5b4bd4);color:#fff}
+.iris-sched-preview{display:flex;flex-direction:column;gap:2px}
+.iris-checklist{max-height:150px;overflow-y:auto;border:1px solid var(--color-border,rgba(128,128,128,.25));
+  border-radius:7px;padding:6px 8px;display:grid;gap:2px}
+.iris-check{display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:2px 4px;border-radius:6px}
+.iris-check:hover{background:color-mix(in srgb,var(--color-foreground,#888) 6%,transparent)}
+.iris-adv{border:1px solid var(--color-border,rgba(128,128,128,.2));border-radius:10px;margin-bottom:13px;overflow:hidden}
+.iris-adv summary{cursor:pointer;padding:9px 12px;font-size:12px;font-weight:600;list-style:none}
+.iris-adv summary::before{content:"▸";display:inline-block;margin-right:7px;color:var(--color-muted-foreground,#8c8a9c)}
+.iris-adv[open] summary::before{transform:rotate(90deg)}
+.iris-adv-body{padding:0 12px 4px;border-top:1px solid var(--color-border,rgba(128,128,128,.15))}
+
+/* ---- cron job badges / error marker ---- */
+.iris-badges{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.iris-err-dot{display:inline-block;width:8px;height:8px;border-radius:50%;
+  background:var(--color-destructive,#e05a6b);cursor:help;vertical-align:middle;margin-left:2px}
+.iris-bp-fields{border-top:1px solid var(--color-border,rgba(128,128,128,.15));padding-top:8px;margin-top:4px}
+.iris-bp-fields .iris-field{margin-bottom:9px}
+
+/* ---- mini-card grids (skills, toolsets, profiles, mcp catalog) ---- */
+.iris-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.iris-mini{background:var(--color-card,rgba(128,128,128,.06));border:1px solid var(--color-border,rgba(128,128,128,.2));
+  border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:6px;min-width:0;transition:opacity .15s}
+.iris-mini.busy{opacity:.4;pointer-events:none}
+.iris-spin{width:14px;height:14px;border-radius:50%;flex:none;
+  border:2px solid color-mix(in srgb,var(--color-foreground,#888) 25%,transparent);
+  border-top-color:var(--color-primary,#5b4bd4);animation:iris-spin .7s linear infinite}
+@keyframes iris-spin{to{transform:rotate(360deg)}}
+.iris-mini .mc-head{display:flex;align-items:center;gap:9px}
+.iris-mini .mc-head b{font-size:13px;font-weight:650;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.iris-mini p{font-size:11.5px;color:var(--color-muted-foreground,#8c8a9c);line-height:1.45;flex:1;margin:0}
+.iris-mini .mc-foot{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--color-muted-foreground,#8c8a9c);flex-wrap:wrap}
+
+/* ---- logs ---- */
+/* clickable table rows (sessions: open in chat) */
+tr.iris-rowlink{cursor:pointer}
+tr.iris-rowlink:hover td{background:color-mix(in srgb,var(--color-foreground,#888) 4%,transparent)}
+
+.iris-logbox{background:var(--color-background,color-mix(in srgb,var(--color-foreground,#000) 4%,transparent));
+  border:1px solid var(--color-border,rgba(128,128,128,.2));border-radius:10px;
+  font-family:var(--theme-font-mono,ui-monospace,monospace);font-size:11.5px;line-height:1.8;
+  padding:12px 14px;overflow:auto;white-space:pre;max-height:60vh}
+.iris-lg-t{color:var(--color-muted-foreground,#8c8a9c)}
+.iris-lg-i{color:var(--iris-series-2,var(--color-success,#22b573));font-weight:500}
+.iris-lg-w{color:var(--color-warning,#fab219);font-weight:500}
+.iris-lg-e{color:var(--color-destructive,#e05a6b);font-weight:500}
+.iris-lg-d{color:var(--color-muted-foreground,#8c8a9c)}
+.iris-lg-c{color:var(--color-primary,#5b4bd4)}
+
+/* ---- sidebar (desktop, overlay slot) ----
+   The native aside is z-50: stay above it (z-51) or clicks never reach us. */
+.iris-sidenav{position:fixed;left:0;top:0;bottom:186px;width:240px;z-index:51;
+  overflow:hidden;padding:6px 0 8px;display:flex;flex-direction:column;
+  background:var(--color-card,#16151d);border-right:1px solid var(--color-border,rgba(128,128,128,.15))}
+/* Scrolling lives on an inner wrapper inset 10px from the content boundary,
+   so the thumb stays inside the menu; it only shows while the menu is hovered.
+   The wrapper owns the 10px left gutter so the active item's spectral bar
+   (::before at left:-10px) reaches the sidebar edge without being clipped. */
+.iris-nav-scroll{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;
+  padding-left:10px;margin-right:10px;
+  scrollbar-width:thin;scrollbar-color:transparent transparent}
+.iris-sidenav:hover .iris-nav-scroll{
+  scrollbar-color:color-mix(in srgb,var(--color-foreground,#888) 25%,transparent) transparent}
+.iris-side-logo{display:flex;align-items:center;gap:11px;padding:8px 10px 14px;margin:0 10px 0 10px}
+.iris-side-logo .mark{width:30px;height:30px;border-radius:9px;flex:none;position:relative;overflow:hidden;
+  border:1px solid color-mix(in srgb,var(--color-foreground,#888) 15%,transparent);
+  background:var(--color-popover,rgba(128,128,128,.08))}
+.iris-side-logo .mark::before{content:"";position:absolute;left:-40%;right:-40%;top:52%;height:120%;
+  background:linear-gradient(90deg,#e05a6b,#e8a13c,#2fae72,#3f8fdf,#7668e8,#a75ce0);opacity:.85;
+  border-radius:50% 50% 0 0/100% 100% 0 0}
+.iris-side-logo b{font-size:16px;font-weight:700;letter-spacing:.01em;line-height:1.1}
+.iris-side-logo small{display:block;font-size:10.5px;color:var(--color-muted-foreground,#8c8a9c);font-weight:400;margin-top:-3px}
+.iris-nav-group{margin-bottom:13px}
+.iris-nav-label{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--color-muted-foreground,#8c8a9c);padding:0 10px;margin:0 0 4px}
+.iris-nav-item{position:relative;display:flex;align-items:center;gap:10px;width:100%;
+  padding:6.5px 10px;border-radius:8px;
+  color:var(--color-secondary-foreground,var(--color-muted-foreground,#8c8a9c));
+  font-weight:500;font-size:13.5px;text-align:left;background:none;border:none;cursor:pointer;
+  font-family:inherit;text-decoration:none;transition:background .12s,color .12s}
+.iris-nav-item:hover{color:var(--color-foreground,inherit);
+  background:color-mix(in srgb,var(--color-foreground,#888) 5%,transparent)}
+.iris-nav-item.active{color:var(--color-primary,#5b4bd4);font-weight:600;
+  background:color-mix(in srgb,var(--color-primary,#5b4bd4) 11%,transparent)}
+.iris-nav-item.active::before{content:"";position:absolute;left:-10px;top:20%;bottom:20%;width:3px;
+  border-radius:0 3px 3px 0;
+  background:linear-gradient(180deg,#e05a6b,#e8a13c,#2fae72,#3f8fdf,#7668e8,#a75ce0)}
+.iris-nav-badge{margin-left:auto;font-size:10.5px;font-weight:600;
+  background:color-mix(in srgb,var(--color-primary,#5b4bd4) 11%,transparent);
+  color:var(--color-primary,#5b4bd4);padding:1px 7px;border-radius:99px}
+.iris-nav-badge.warn-b{background:color-mix(in srgb,var(--color-warning,#fab219) 12%,transparent);
+  color:var(--color-warning,#fab219)}
+/* short viewports: densify so the nav fits without scrolling */
+@media (max-height:840px){
+  .iris-nav-item{padding:3.5px 10px;font-size:12.5px}
+  .iris-nav-item .iris-ic{width:14px;height:14px}
+  .iris-nav-group{margin-bottom:7px}
+  .iris-nav-label{margin-bottom:3px}
+  .iris-side-logo{padding:8px 10px 6px}
+}
+@media (max-width:860px){
+  .iris-sidenav{display:none}
+  /* Below 860px the Iris sidebar steps aside for the bottom bar — which
+     uncovers the shell's own aside (it is only *covered* on desktop, never
+     removed). Two menus would then coexist, the native one listing the native
+     page names (Status, no Home). Hide it and its trigger so the mobile
+     navigation has a single source of truth; the Iris drawer already lists
+     every page, native ones included. */
+  aside#app-sidebar,
+  [aria-controls="app-sidebar"]{display:none !important}
+}
+
+/* ---- gateway pill (header-right slot, mockup .pill) ---- */
+.iris-gwpill{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:550;
+  padding:5px 11px;border-radius:99px;white-space:nowrap;
+  border:1px solid var(--color-border,rgba(128,128,128,.25))}
+@media (max-width:860px){.iris-gwpill-txt{display:none}}
+
+/* ---- mockup primitives shared across pages ---- */
+.iris-avatar{width:28px;height:28px;border-radius:50%;flex:none;
+  background:color-mix(in srgb,var(--color-primary,#5b4bd4) 11%,transparent);color:var(--color-primary,#5b4bd4);
+  display:grid;place-items:center;font-size:11px;font-weight:700}
+.iris-avatar.good{background:color-mix(in srgb,var(--color-success,#22b573) 12%,transparent);color:var(--color-success,#22b573)}
+.iris-avatar.warn{background:color-mix(in srgb,var(--color-warning,#fab219) 12%,transparent);color:var(--color-warning,#fab219)}
+.iris-live-dot{display:inline-block;width:6px;height:6px;border-radius:50%;
+  background:var(--color-success,#22b573);margin-right:5px;animation:iris-pulse 2s infinite;vertical-align:1px}
+.iris-live-dot.stall{background:var(--color-warning,#fab219)}
+@keyframes iris-pulse{50%{opacity:.35}}
+.iris-model-badge{font-family:var(--theme-font-mono,ui-monospace,monospace);font-size:10px;
+  color:var(--color-secondary-foreground,#aaa8bb);border:1px solid var(--color-border,rgba(128,128,128,.25));
+  border-radius:5px;padding:1px 6px;white-space:nowrap}
+.iris-subhead{font-size:10.5px;font-weight:650;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--color-muted-foreground,#8c8a9c);margin:14px 0 5px}
+.iris-key-val{font-family:var(--theme-font-mono,ui-monospace,monospace);font-size:11px;
+  color:var(--color-muted-foreground,#8c8a9c);letter-spacing:.05em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.iris-tabs{display:flex;gap:2px;border-bottom:1px solid var(--color-border,rgba(128,128,128,.2));
+  margin-bottom:2px;overflow-x:auto}
+.iris-tab{font-size:12.5px;font-weight:550;color:var(--color-muted-foreground,#8c8a9c);
+  padding:8px 13px;border:none;border-bottom:2px solid transparent;white-space:nowrap;margin-bottom:-1px;
+  background:none;cursor:pointer;font-family:inherit}
+.iris-tab:hover{color:var(--color-foreground,inherit)}
+.iris-tab.on{color:var(--color-primary,#5b4bd4);border-bottom-color:var(--color-primary,#5b4bd4);font-weight:650}
+.iris-legend{display:flex;gap:16px;font-size:11.5px;color:var(--color-secondary-foreground,#aaa8bb);flex-wrap:wrap}
+.iris-sw{width:9px;height:9px;border-radius:2.5px;display:inline-block;margin-right:6px;vertical-align:-1px}
+.iris-chart-foot{display:flex;gap:18px;margin-top:10px;font-size:11.5px;
+  color:var(--color-muted-foreground,#8c8a9c);flex-wrap:wrap}
+.iris-chart-foot b{color:var(--color-secondary-foreground,#aaa8bb);font-weight:600}
+
+/* ---- modal dialogs (replaces window.prompt / confirm / alert) ----
+   Above the mobile bottom bar (z-60) and the native aside (z-50). */
+.iris-modal-scrim{position:fixed;inset:0;z-index:120;display:flex;align-items:center;justify-content:center;
+  padding:20px;background:color-mix(in srgb,#000 55%,transparent);
+  -webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);animation:iris-fade .14s ease-out}
+.iris-modal{width:min(460px,100%);max-height:calc(100vh - 40px);overflow:auto;
+  display:flex;flex-direction:column;gap:14px;font-size:13.5px;
+  background:var(--color-popover,var(--color-card,#16151d));
+  border:1px solid var(--color-border,rgba(128,128,128,.25));border-radius:16px;
+  padding:18px 20px 16px;box-shadow:0 18px 50px rgba(0,0,0,.45);
+  animation:iris-pop .16s cubic-bezier(.3,.8,.4,1)}
+@keyframes iris-fade{from{opacity:0}}
+@keyframes iris-pop{from{opacity:0;transform:translateY(8px) scale(.985)}}
+.iris-modal-head{display:flex;align-items:flex-start;gap:11px}
+.iris-modal-title{flex:1;min-width:0;padding-top:1px}
+.iris-modal-title b{display:block;font-size:14.5px;font-weight:650;letter-spacing:-.01em}
+.iris-modal-title small{display:block;margin-top:2px;font-size:11.5px;word-break:break-all;
+  color:var(--color-muted-foreground,#8c8a9c);font-family:var(--theme-font-mono,ui-monospace,monospace)}
+.iris-modal-body{font-size:13px;line-height:1.55;color:var(--color-secondary-foreground,inherit)}
+.iris-modal-body p{margin:0}
+.iris-modal-pre{margin:10px 0 0;padding:10px 12px;max-height:220px;overflow:auto;
+  background:var(--color-background,color-mix(in srgb,var(--color-foreground,#000) 5%,transparent));
+  border:1px solid var(--color-border,rgba(128,128,128,.2));border-radius:9px;
+  font-family:var(--theme-font-mono,ui-monospace,monospace);font-size:11.5px;line-height:1.7;
+  white-space:pre-wrap;word-break:break-all}
+.iris-modal-foot{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.iris-secret-wrap{display:flex;gap:8px;align-items:center}
+.iris-secret-wrap .iris-input{flex:1;font-family:var(--theme-font-mono,ui-monospace,monospace);font-size:12.5px}
+@media (max-width:480px){
+  .iris-modal-scrim{padding:12px;align-items:flex-end}
+  .iris-modal{width:100%;border-radius:16px}
+  .iris-modal-foot .iris-btn{flex:1;justify-content:center}
+}
+@media (prefers-reduced-motion:reduce){.iris-modal-scrim,.iris-modal{animation:none}}
+
+/* ---- env-var rows (keys page, channel cards) ---- */
+.iris-env-label{width:180px;flex:none}
+/* narrow screens: the key name must never be the thing that gets ellipsed —
+   let the row wrap and push value + actions onto a second line */
+@media (max-width:640px){
+  .iris-key-row{flex-wrap:wrap;gap:4px 10px;padding:11px 0}
+  .iris-key-row .iris-row-body{flex:1 0 100%}
+  .iris-key-row .iris-key-val{flex:1;min-width:0}
+  .iris-key-row .iris-row-meta{margin-left:auto;flex-wrap:wrap;justify-content:flex-end}
+  .iris-env-row{flex-wrap:wrap;gap:4px 8px}
+  .iris-env-label{width:auto;flex:1 0 100%}
+}
+
+/* ---- collapsible section header (keys page: missing keys) ---- */
+.iris-section-head{display:flex;align-items:center;gap:9px;margin:20px 0 2px;padding-top:14px;
+  border-top:1px solid var(--color-border,rgba(128,128,128,.2))}
+.iris-section-head b{font-size:12.5px;font-weight:650}
+.iris-keys-missing .iris-card{background:none}
+.iris-keys-missing .iris-row-body b{font-weight:550;color:var(--color-secondary-foreground,inherit)}
+
+/* ---- mobile bar + overflow drawer (overlay slot) ---- */
+.iris-bottombar{display:none}
+.iris-scrim{display:none}
+.iris-drawer{display:none}
+@media (max-width:860px){
+  .iris-cols,.iris-grid-2{grid-template-columns:1fr}
+  /* the bar is fixed: give every page enough room to scroll clear of it */
+  .iris-home,.iris-page{padding-bottom:calc(72px + env(safe-area-inset-bottom))}
+  body{padding-bottom:calc(56px + env(safe-area-inset-bottom))}
+  .iris-bottombar{
+    display:flex;position:fixed;left:0;right:0;bottom:0;z-index:60;
+    background:var(--color-card,#16151d);border-top:1px solid var(--color-border,rgba(128,128,128,.2));
+    padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
+  .iris-bb-item{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px;
+    font-size:10px;font-weight:600;text-decoration:none;
+    color:var(--color-muted-foreground,#8c8a9c);padding:5px 0;border-radius:8px;background:none;border:none;font-family:inherit;cursor:pointer}
+  .iris-bb-item span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .iris-bb-item .iris-ic.bb{margin:0}
+  .iris-bb-item.active{color:var(--color-primary,#5b4bd4)}
+  .iris-table .hide-m{display:none}
+  /* scrim and drawer both sit ABOVE the bottom bar (z-60): below it the bar
+     stayed lit over the dimmed page and clipped the drawer's last row */
+  .iris-scrim{display:block;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:70;
+    opacity:0;pointer-events:none;transition:opacity .2s}
+  .iris-scrim.open{opacity:1;pointer-events:auto}
+  .iris-drawer{display:block;position:fixed;left:0;right:0;bottom:0;z-index:71;
+    background:var(--color-card,#16151d);border-radius:18px 18px 0 0;
+    border:1px solid var(--color-border,rgba(128,128,128,.2));
+    padding:12px 14px calc(20px + env(safe-area-inset-bottom));
+    transform:translateY(105%);transition:transform .25s cubic-bezier(.3,.7,.3,1);
+    max-height:min(86vh,640px);overflow-y:auto;overscroll-behavior:contain;visibility:hidden}
+  .iris-drawer.open{transform:translateY(0);visibility:visible}
+  .iris-grabber{width:38px;height:4px;border-radius:2px;margin:0 auto 10px;
+    background:color-mix(in srgb,var(--color-foreground,#888) 15%,transparent)}
+  .iris-drawer-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .iris-drawer-head b{flex:1;font-size:14px;font-weight:650;letter-spacing:-.01em}
+  .iris-drawer-group{margin-bottom:14px}
+  .iris-drawer-group:last-child{margin-bottom:0}
+  .iris-drawer-group .iris-nav-label{padding:0 2px;margin-bottom:7px}
+  .iris-drawer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+  .iris-drawer-item{display:flex;flex-direction:column;align-items:center;gap:7px;
+    padding:12px 6px;border-radius:12px;border:1px solid var(--color-border,rgba(128,128,128,.2));
+    font-size:11px;font-weight:600;color:var(--color-secondary-foreground,#aaa8bb);
+    text-align:center;text-decoration:none;min-width:0}
+  .iris-drawer-item span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .iris-drawer-item:active{background:var(--iris-hover,color-mix(in srgb,var(--color-foreground,#888) 5%,transparent))}
+  .iris-drawer-item.active{background:color-mix(in srgb,var(--color-primary,#5b4bd4) 11%,transparent);
+    color:var(--color-primary,#5b4bd4);border-color:transparent}
+  /* swipeable strips: keep the scroll, drop the scrollbar drawn across the UI */
+  .iris-tabs,.iris-filterbar,.iris-chips{scrollbar-width:none;-ms-overflow-style:none}
+  .iris-tabs::-webkit-scrollbar,.iris-filterbar::-webkit-scrollbar,.iris-chips::-webkit-scrollbar{display:none}
+}
+@media (max-width:480px){
+  .iris-tiles{grid-template-columns:1fr 1fr;gap:10px}
+  .iris-cards{grid-template-columns:1fr}
+  .iris-card{padding:14px 15px}
+  .iris-tile .iris-t-value{font-size:22px}
+  /* actions wrap under the title instead of collapsing to bare icons — a
+     button with no icon rendered as an empty box */
+  .iris-page-head{align-items:flex-start}
+  .iris-actions{width:100%}
+  .iris-filterbar{overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px}
+  .iris-filterbar .iris-input{min-width:150px}
+}
+
+/* ---- connectivity banner (overlay slot): visible fetch failures ----
+   Below the modal (z-120), above the mobile bottom bar (z-60) and the
+   native aside (z-50). */
+.iris-netcnt{position:fixed;top:60px;left:50%;transform:translateX(-50%);z-index:110;
+  width:min(600px,calc(100vw - 24px))}
+.iris-netbanner{display:flex;align-items:center;gap:9px;padding:8px 8px 8px 14px;border-radius:11px;
+  background:var(--color-popover,#1d1c26);border:1px solid var(--color-warning,#fab219);
+  color:var(--color-foreground,inherit);box-shadow:0 10px 30px rgba(0,0,0,.35);
+  font-size:12.5px;animation:iris-pop .16s cubic-bezier(.3,.8,.4,1)}
+.iris-net-txt{flex:1;font-weight:550;min-width:0}
+@media (max-width:860px){.iris-netcnt{top:calc(10px + env(safe-area-inset-top,0px))}}
+
+/* ---- loading skeleton (home page) ---- */
+.iris-skel{pointer-events:none}
+.iris-skel-card{border-radius:13px;border:1px solid var(--color-border,rgba(128,128,128,.2));
+  padding:16px 18px;background:var(--color-card,rgba(128,128,128,.06))}
+.iris-skel-bar{height:14px;border-radius:6px;
+  background:color-mix(in srgb,var(--color-foreground,#888) 9%,transparent);
+  animation:iris-pulse 1.6s ease-in-out infinite}
+
+/* ---- toasts (overlay slot): transient success feedback ----
+   Above the mobile bottom bar (z-60) and the connectivity banner (z-110),
+   below the modal (z-120). */
+.iris-toastcnt{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:115;
+  display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+.iris-toast{display:flex;align-items:center;gap:9px;padding:9px 8px 9px 13px;border-radius:11px;
+  background:var(--color-popover,#1d1c26);
+  border:1px solid color-mix(in srgb,var(--color-success,#22b573) 45%,transparent);
+  color:var(--color-foreground,inherit);box-shadow:0 10px 30px rgba(0,0,0,.35);
+  font-size:12.5px;font-weight:550;animation:iris-pop .16s cubic-bezier(.3,.8,.4,1)}
+.iris-toast.err{border-color:color-mix(in srgb,var(--color-destructive,#e05a6b) 45%,transparent)}
+.iris-toast-txt{flex:1;min-width:0}
+@media (max-width:860px){.iris-toastcnt{bottom:calc(72px + env(safe-area-inset-bottom,0px));right:12px}}
+
+/* ---- keyboard focus ----
+   inputs/selects already get a primary border on :focus; every other
+   interactive element gets a visible ring. */
+.iris-btn:focus-visible,.iris-icon-btn:focus-visible,.iris-chip:focus-visible,
+.iris-tab:focus-visible,.iris-switch:focus-visible,.iris-link:focus-visible,
+.iris-nav-item:focus-visible,.iris-bb-item:focus-visible,.iris-drawer-item:focus-visible{
+  outline:2px solid var(--color-ring,#8b80f9);outline-offset:2px}
+tr.iris-rowlink:focus-visible td{background:color-mix(in srgb,var(--color-foreground,#888) 4%,transparent);
+  box-shadow:inset 0 0 0 2px var(--color-ring,#8b80f9)}
