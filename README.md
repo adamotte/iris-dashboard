@@ -31,7 +31,10 @@
 - 📱 **Mobile** — bottom navigation bar, responsive pages
 - 🌍 **EN / FR** labels, following the dashboard language
 - 🛡️ **Additive** — native pages (Chat, Files, Models, Docs) keep working;
-  hide any Iris page from the Plugins page to get the native one back
+  disable any Iris page (Plugins page toggle, or `hermes plugins disable`)
+  to get the native one back
+- 📦 **Native plugins** — each Iris page ships a standard `plugin.yaml`, so
+  `hermes plugins list` / `enable` / `disable` / `remove` work on `iris-*`
 
 ## 📦 Installation
 
@@ -43,6 +46,11 @@ cd iris-dashboard
 ./install.sh
 ```
 
+`install.sh` copies the 16 plugins (`iris*`) into `~/.hermes/plugins/`, registers
+them under `plugins.enabled` in `config.yaml` (required for user dashboard plugins
+since the #46435 hardening), copies the two themes into
+`~/.hermes/dashboard-themes/`, and rescans the dashboard.
+
 ### 🐳 Docker (official `nousresearch/hermes-agent` image)
 
 ```bash
@@ -50,25 +58,50 @@ cd iris-dashboard
 docker restart hermes
 ```
 
-Or bind-mount the clone in `docker-compose.yml` for git-pull updates:
+### 📦 Plugin pack (Hermes builds with pack support)
 
-```yaml
-    volumes:
-      - ./hermes-data:/opt/data
-      - /opt/iris-dashboard/plugins/iris:/opt/data/plugins/iris:ro
+`hermes-pack.yaml` pins all 16 plugins to a single commit of this repo:
+
+```bash
+hermes plugins pack install ./hermes-pack.yaml   # interactive review + confirm
+for p in iris iris-analytics iris-channels iris-config iris-cron iris-keys \
+         iris-logs iris-mcp iris-pairing iris-plugins iris-profiles \
+         iris-sessions iris-skills iris-system iris-toolsets iris-webhooks; do
+  hermes plugins enable "$p"
+done
+cp themes/iris-*.yaml ~/.hermes/dashboard-themes/
 ```
+
+Packs install pinned snapshots: they do not enable anything, do not cover themes,
+and drop `.git` (so `hermes plugins update` does not apply). The `ref` is a
+snapshot — bump it to the new release commit on each release
+(`git rev-parse <release-tag>` or `hermes plugins pack export`).
 
 ## 🔧 Configuration
 
 1. `install.sh` registers the plugins under `plugins.enabled` in `config.yaml`
-   (required for user dashboard plugins) and triggers a rescan.
+   and triggers a rescan.
 2. Reload the dashboard — the Iris pages replace the native ones.
 3. Pick **Iris (sombre)** or **Iris (clair)** via the palette icon in the header.
+
+Each Iris plugin ships a standard `plugin.yaml`, so the usual CLI management
+applies: `hermes plugins list`, `hermes plugins enable/disable/remove iris-*`.
 
 ## 🗑️ Uninstall
 
 ```bash
 rm -rf ~/.hermes/plugins/iris* ~/.hermes/dashboard-themes/iris-*.yaml
+```
+
+Or, since the plugins are native:
+
+```bash
+for p in iris iris-analytics iris-channels iris-config iris-cron iris-keys \
+         iris-logs iris-mcp iris-pairing iris-plugins iris-profiles \
+         iris-sessions iris-skills iris-system iris-toolsets iris-webhooks; do
+  hermes plugins remove "$p"
+done
+rm -f ~/.hermes/dashboard-themes/iris-*.yaml
 ```
 
 The native dashboard comes back immediately.
