@@ -3922,7 +3922,7 @@
       var src = txt(c.source);
       var srcIsUrl = /^https?:\/\//.test(src);
       var ds = diagFor(cname);
-      return h("div", { className: "iris-mini", key: i, style: installed && !cEnabled ? { opacity: 0.6 } : null },
+      return h("div", { className: "iris-mini wide", key: i, style: installed && !cEnabled ? { opacity: 0.6 } : null },
         h("div", { className: "mc-head" }, Icon(catalogIcon(c), "dim"), h("b", null, cname)),
         h("div", { className: "iris-badges" },
           Badge(transport === "stdio" ? t("mcpStdio") : t("mcpHttp"), transport === "stdio" ? "warn" : "good"),
@@ -4205,7 +4205,7 @@
         var on = s2.enabled !== false;
         var tools = Array.isArray(s2.tools) ? s2.tools.filter(Boolean) : [];
         var label = txt(s2.label) || txt(s2.name);
-        return h("div", { className: "iris-mini", key: i, style: on ? null : { opacity: 0.6 } },
+        return h("div", { className: "iris-mini wide", key: i, style: on ? null : { opacity: 0.6 } },
           h("div", { className: "mc-head" }, Icon(toolsetIconOf(txt(s2.name)), "dim"), h("b", null, label),
             Badge(on ? t("tsActive") : t("tsInactive"), on ? "good" : "neutral"),
             Switch(on, function () {
