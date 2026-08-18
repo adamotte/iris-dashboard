@@ -257,6 +257,8 @@
       plgTitle: "Plugins", plgDesc: "Dashboard pages, agent plugins and providers",
       plgRescan: "Rescan", plgDash: "Dashboard plugins", plgAgents: "Agent plugins",
       plgIris: "Iris pack",
+      plgSkillsToolsets: "Skills & Toolsets",
+      plgSkillsToolsetsDesc: "Iris redesigned Skills and Toolsets pages, enabled together",
       plgActive: "{0} active", plgVisible: "{0} visible",
       plgInactiveN: "{0} inactive",
       plgInactiveBtn: "Inactive/Disabled ({0})", plgActiveBtn: "Enabled ({0})",
@@ -533,6 +535,8 @@
       plgTitle: "Plugins", plgDesc: "Pages du dashboard, plugins agent et providers",
       plgRescan: "Rescanner", plgDash: "Plugins dashboard", plgAgents: "Plugins agent",
       plgIris: "Pack Iris",
+      plgSkillsToolsets: "Skills & Toolsets",
+      plgSkillsToolsetsDesc: "Pages Skills et Toolsets Iris redessinées, activées ensemble",
       plgActive: "{0} actifs", plgVisible: "{0} visibles",
       plgInactiveN: "{0} inactifs",
       plgInactiveBtn: "Inactifs/Désactivés ({0})", plgActiveBtn: "Actifs ({0})",
@@ -4846,6 +4850,18 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
   function isIris(name) {
     return /^iris(-|$)/.test(String(name));
   }
+  // Iris skills + toolsets are one logical "Capabilities" plugin split across
+  // two routes (the SDK allows one tab per manifest); group them into a single
+  // Plugins-page card that shares one enable/disable switch.
+  var IRIS_GROUPS = [
+    { members: ["iris-skills", "iris-toolsets"] }
+  ];
+  function irisGroupOf(name) {
+    for (var i = 0; i < IRIS_GROUPS.length; i++) {
+      if (IRIS_GROUPS[i].members.indexOf(name) >= 0) return IRIS_GROUPS[i];
+    }
+    return null;
+  }
   // Persist the Plugins page filter across reloads (the reload after
   // re-enabling a plugin must not lose the search/category/view state).
   var PLGFLT_KEY = "iris:plugins:filter";
@@ -4896,6 +4912,24 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
     var visAgents = showInactive ? agentsGrid : activeAgents;
     var irisDash = visDash.filter(function (p) { return isIris(p.name); });
     var otherDash = visDash.filter(function (p) { return !isIris(p.name); });
+    // Group iris plugins that share one logical capability (skills + toolsets
+    // is one native "Capabilities" view split across two SDK routes) into a
+    // single card with one toggle; standalone iris plugins stay single cards.
+    var irisCards = [];
+    var irisUsed = {};
+    irisDash.forEach(function (p) {
+      if (irisUsed[p.name]) return;
+      var grp = irisGroupOf(p.name);
+      if (grp) {
+        var members = grp.members.map(function (n) { return dash[n]; }).filter(Boolean);
+        if (members.length > 1) {
+          members.forEach(function (m) { irisUsed[m.name] = 1; });
+          irisCards.push({ g: members });
+          return;
+        }
+      }
+      irisCards.push({ p: p });
+    });
     // The shell injects one script tag per served plugin bundle at boot and
     // never removes it in production: its presence tells us whether this
     // session actually loaded the plugin's page. A plugin disabled at boot
@@ -4962,6 +4996,48 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
           }
         });
     }
+    // Group toggle: enable/disable every member to the same state, wait for
+    // all API calls, then one toast + reload (a full reload is still needed
+    // when any member's bundle wasn't served at boot).
+    function toggleGroup(ps) {
+      var allOn = ps.every(function (p) { return dashOn(p); });
+      var next = !allOn;
+      var key = "grp:" + ps.map(function (p) { return p.name; }).join("+");
+      setBusyName(key);
+      var pending = ps.length;
+      var needReload = false;
+      ps.forEach(function (p) {
+        var fin = function (r) {
+          pending -= 1;
+          if (r && next && !bootLoaded(p.name)) needReload = true;
+          if (pending === 0) {
+            setBusyName(null);
+            toastPush(t(next ? "plgEnabled" : "plgDisabled", t("plgSkillsToolsets")));
+            if (next && needReload) {
+              // bundle wasn't served this session: its page only registers at boot
+              try { sessionStorage.removeItem("hermes:plugin-manifests"); } catch (e) { /* noop */ }
+              setTimeout(function () { location.reload(); }, 500);
+            } else { reload(); }
+          }
+        };
+        if (p.runtime_status === undefined) {
+          act(t, "/api/dashboard/plugins/" + encodeURIComponent(p.name) + "/visibility",
+            jinit("POST", { hidden: !next }), fin);
+        } else {
+          act(t, "/api/dashboard/agent-plugins/" + encodeURIComponent(p.name) + (next ? "/enable" : "/disable"),
+            jinit("POST"), function (r) {
+              if (r) {
+                if (next && p.user_hidden) {
+                  // clear any stale dashboard.hidden_plugins entry so the
+                  // loader actually serves the bundle once enabled
+                  act(t, "/api/dashboard/plugins/" + encodeURIComponent(p.name) + "/visibility",
+                    jinit("POST", { hidden: false }), function () { fin(r); });
+                } else { fin(r); }
+              } else { fin(r); }
+            });
+        }
+      });
+    }
     function installPlugin() {
       irisPrompt(t, {
         icon: "download", tone: "iris", title: t("plgInstallTitle"),
@@ -5020,6 +5096,37 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
           (p.runtime_status !== undefined ? p.can_update_git : p.source === "user")
             ? Btn(t("plgUpdate"), function () { updatePlugin(p.name); }, "sm", false, "refresh") : null));
     }
+    function dashGroupCard(ps) {
+      // One card for a group of iris plugins sharing a single toggle.
+      var allOn = ps.every(function (p) { return dashOn(p); });
+      var key = "grp:" + ps.map(function (p) { return p.name; }).join("+");
+      var busy = busyName === key;
+      var label = t("plgSkillsToolsets");
+      var canUpdate = ps.some(function (p) {
+        return p.runtime_status !== undefined ? p.can_update_git : p.source === "user";
+      });
+      return h("div", { className: "iris-mini" + (busy ? " busy" : ""), key: key,
+        style: busy ? { opacity: 0.4 } : (allOn ? null : { opacity: 0.55 }) },
+        h("div", { className: "mc-head" },
+          busy ? h("span", { className: "iris-spin" }) : Icon("puzzle", "dim"),
+          h("b", null, label),
+          Switch(allOn, function () { toggleGroup(ps); }, label)),
+        h("p", null, t("plgSkillsToolsetsDesc")),
+        h("div", { className: "mc-foot" },
+          h("span", { className: "num" }, ps.map(function (p) {
+            var m = p.dashboard_manifest || p;
+            return p.name + (m.version ? " · v" + m.version : "");
+          }).join(" + ")),
+          ps.map(function (p) {
+            var m = p.dashboard_manifest || p;
+            var tab = m.tab || {};
+            return tab.override ? Badge(t("plgOverride", tab.override), "iris")
+              : (tab.path ? Badge(t("plgTab", tab.path), "neutral") : null);
+          }),
+          canUpdate ? Btn(t("plgUpdate"), function () {
+            ps.forEach(function (p) { updatePlugin(p.name); });
+          }, "sm", false, "refresh") : null));
+    }
     function agentCard(p) {
       var on = p.runtime_status === "enabled";
       return h("div", { className: "iris-mini", key: p.path || p.name, style: on ? null : { opacity: 0.55 } },
@@ -5062,8 +5169,10 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
           hub && hub.providers ? (hub.providers.context_engine || " ") : " ")),
       h("div", null,
         h("div", { className: "iris-nav-label", style: { padding: "6px 0" } }, t("plgDash")),
-        h("div", { className: "iris-nav-label", style: { padding: "10px 0 6px" } }, t("plgIris") + " (" + irisDash.length + ")"),
-        h("div", { className: "iris-cards" }, irisDash.map(dashCard)),
+        h("div", { className: "iris-nav-label", style: { padding: "10px 0 6px" } }, t("plgIris") + " (" + irisCards.length + ")"),
+        h("div", { className: "iris-cards" }, irisCards.map(function (it) {
+          return it.g ? dashGroupCard(it.g) : dashCard(it.p);
+        })),
         h("div", { className: "iris-nav-label", style: { padding: "10px 0 6px" } }, t("plgOtherDash") + " (" + otherDash.length + ")"),
         h("div", { className: "iris-cards" }, otherDash.map(dashCard)),
         h("div", { className: "iris-note" }, t("plgNote"))),
