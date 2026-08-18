@@ -2167,7 +2167,7 @@
     var sf = useState(""); var sourceFlt = sf[0], setSourceFlt = sf[1];
     var rf = useState(false); var refreshing = rf[0], setRefreshing = rf[1];
     var stats = useJSON("/api/sessions/stats", 30000, bump);
-    var data = useJSON("/api/sessions?limit=200", 15000, bump);
+    var data = useJSON("/api/sessions?limit=100", 15000, bump);
     var empt = useJSON("/api/sessions/empty/count", 30000, bump);
     var res = useState(null); var results = res[0], setResults = res[1];
     var pg = useState(1); var page = pg[0], setPage = pg[1];
