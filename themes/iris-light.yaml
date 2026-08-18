@@ -125,13 +125,43 @@ customCSS: |
     background: var(--color-card, #ffffff) !important;
     box-shadow: var(--iris-shadow-pop, 0 12px 40px rgba(26,24,44,.14)) !important;
   }
+  /* spectral accent along the terminal-window top edge */
+  [data-chat-active="true"] div:has(> .hermes-chat-xterm-host)::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    z-index: 5;
+    pointer-events: none;
+    background: linear-gradient(90deg,#c94f5e,#cf8a1e,#1f9a60,#2f7fd0,#5b4bd4,#9048c9);
+    opacity: .85;
+  }
   [data-chat-active="true"] .hermes-chat-xterm-host {
     border: 1px solid var(--color-border, rgba(26,24,44,.09));
     border-radius: calc(var(--radius, .8rem) - 2px);
+  }
+  /* floating chrome buttons (copy last response / reveal panel) */
+  [data-chat-active="true"] button.absolute.z-10 {
+    background: rgba(0,0,0,.28) !important;
+    border-color: rgba(26,24,44,.12) !important;
+    box-shadow: 0 2px 10px rgba(26,24,44,.1);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+  [data-chat-active="true"] button.absolute.z-10:hover {
+    background: rgba(0,0,0,.42) !important;
+    border-color: rgba(26,24,44,.22) !important;
   }
   [data-chat-active="true"] #chat-side-panel {
     background: var(--color-card, #ffffff);
     border: 1px solid var(--color-border, rgba(26,24,44,.09));
     border-radius: var(--radius, .8rem);
     padding: 10px;
+  }
+  /* rail header separator (collapse row) */
+  [data-chat-active="true"] #chat-side-panel > div:first-child {
+    border-bottom: 1px solid var(--color-border, rgba(26,24,44,.09));
+    margin-bottom: 4px;
   }
