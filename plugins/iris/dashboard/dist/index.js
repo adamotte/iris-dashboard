@@ -258,7 +258,7 @@
       plgRescan: "Rescan", plgDash: "Dashboard plugins", plgAgents: "Agent plugins",
       plgIris: "Iris pack",
       plgActive: "{0} active", plgVisible: "{0} visible",
-      plgInactiveN: "{0} inactive", plgInactive: "inactive",
+      plgInactiveN: "{0} inactive",
       plgInactiveBtn: "Inactive/Disabled ({0})", plgActiveBtn: "Enabled ({0})",
       plgEnabled: "Enabled {0}", plgDisabled: "Disabled {0}",
       plgNotServed: "enabled but not served — reload to apply",
@@ -534,7 +534,7 @@
       plgRescan: "Rescanner", plgDash: "Plugins dashboard", plgAgents: "Plugins agent",
       plgIris: "Pack Iris",
       plgActive: "{0} actifs", plgVisible: "{0} visibles",
-      plgInactiveN: "{0} inactifs", plgInactive: "inactif",
+      plgInactiveN: "{0} inactifs",
       plgInactiveBtn: "Inactifs/Désactivés ({0})", plgActiveBtn: "Actifs ({0})",
       plgEnabled: "{0} activé", plgDisabled: "{0} désactivé",
       plgNotServed: "activé mais non servi — recharger pour appliquer",
@@ -5017,7 +5017,6 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
           m.slots && m.slots.length ? Badge(t("plgSlotsN", m.slots.length), "neutral") : null,
           m.has_api ? Badge(t("plgApi"), "warn") : null,
           enabled && !served ? Badge(t("plgNotServed"), "warn") : null,
-          !enabled ? Badge(t("plgInactive"), "neutral") : null,
           (p.runtime_status !== undefined ? p.can_update_git : p.source === "user")
             ? Btn(t("plgUpdate"), function () { updatePlugin(p.name); }, "sm", false, "refresh") : null));
     }
