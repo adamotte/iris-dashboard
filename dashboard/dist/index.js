@@ -3435,7 +3435,7 @@
 
     return h("div", { className: "iris-page" },
       PageHead(t("cronTitle"), sub, [
-        h("div", { className: "iris-field", style: { minWidth: "190px", margin: 0 } },
+        h("div", { className: "iris-field-inline" },
           h("label", null, t("profileFilter")),
           h("select", { className: "iris-input", value: fltProfile,
             onChange: function (e) { setFltProfile(e.target.value); } },
