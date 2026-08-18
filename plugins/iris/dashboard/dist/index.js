@@ -164,6 +164,7 @@
       /* skills */
       skillsTitle: "Skills", skillsDesc: "{0} installed · {1} enabled · the curator consolidates nightly",
       curator: "Skill curator", curatorRun: "Run now", categoryAll: "All", usageN: "{0} uses",
+      skActiveBtn: "Active ({0})", skInactiveBtn: "Inactive ({0})",
       /* mcp */
       mcpTitle: "MCP servers", mcpDesc: "Extend Iris with Model Context Protocol servers — no YAML editing",
       mcpAdd: "Add server", mcpTest: "Test", mcpCatalog: "Nous catalog — one-click install",
@@ -203,10 +204,11 @@
       /* toolsets */
       tsTitle: "Toolsets", tsDesc: "Built-in tool groups — enable only what the agent needs",
       toolsN: "{0} tools", notConfigured: "missing key",
-      tsActive: "Active", tsInactive: "Inactive", tsSetupNeeded: "Setup needed",
+      tsSetupNeeded: "Setup needed",
       tsEnabledFor: "Enabled for {0}", tsDisabledFor: "Disabled for {0}", tsDisabledForCli: "Disabled for CLI",
       tsToolsetLabel: "{0} toolset", tsNoMatch: "No toolsets match the search.",
       tsSearch: "Search toolsets…", tsConfigure: "Configure",
+      tsActiveBtn: "Active ({0})", tsInactiveBtn: "Inactive ({0})",
       tsProvider: "Provider", tsSelected: "Selected", tsSelect: "Select",
       tsNousPortal: "Nous Portal",
       tsNoConfigurable: "This toolset has no configurable backends — toggle it on or off above. It works with no provider selection or API keys.",
@@ -452,6 +454,7 @@
       whDeliverOnlyErr: "La livraison directe nécessite une vraie cible (telegram, discord, …), pas « log ».",
       skillsTitle: "Skills", skillsDesc: "{0} installées · {1} activées · le curateur consolide chaque nuit",
       curator: "Curateur de skills", curatorRun: "Exécuter", categoryAll: "Toutes", usageN: "{0} utilisations",
+      skActiveBtn: "Actifs ({0})", skInactiveBtn: "Inactifs ({0})",
       mcpTitle: "Serveurs MCP", mcpDesc: "Étendez Iris avec des serveurs Model Context Protocol — sans toucher au YAML",
       mcpAdd: "Ajouter un serveur", mcpTest: "Tester", mcpCatalog: "Catalogue Nous — installation en un clic",
       mcpInstall: "Installer", mcpNone: "Aucun serveur MCP configuré", verified: "vérifié",
@@ -489,10 +492,11 @@
       mcpConnFail: "Échec de connexion",
       tsTitle: "Toolsets", tsDesc: "Groupes d'outils intégrés — activez uniquement ce dont l'agent a besoin",
       toolsN: "{0} outils", notConfigured: "clé manquante",
-      tsActive: "Actif", tsInactive: "Inactif", tsSetupNeeded: "Configuration requise",
+      tsSetupNeeded: "Configuration requise",
       tsEnabledFor: "Activé pour {0}", tsDisabledFor: "Désactivé pour {0}", tsDisabledForCli: "Désactivé pour CLI",
       tsToolsetLabel: "toolset {0}", tsNoMatch: "Aucun toolset ne correspond à la recherche.",
       tsSearch: "Rechercher des toolsets…", tsConfigure: "Configurer",
+      tsActiveBtn: "Actifs ({0})", tsInactiveBtn: "Inactifs ({0})",
       tsProvider: "Provider", tsSelected: "Sélectionné", tsSelect: "Sélectionner",
       tsNousPortal: "Portail Nous",
       tsNoConfigurable: "Ce toolset n'a pas de backends configurables — activez-le ou désactivez-le ci-dessus. Il fonctionne sans sélection de provider ni clés API.",
@@ -3608,6 +3612,7 @@
     var bp = useState(0); var bump = bp[0], setBump = bp[1];
     var qs = useState(""); var q = qs[0], setQ = qs[1];
     var cs = useState("all"); var cat = cs[0], setCat = cs[1];
+    var si = useState(false); var showInactive = si[0], setShowInactive = si[1];
     var data = useJSON("/api/skills", 60000, bump);
     var curator = useJSON("/api/curator", 60000, bump);
     var reload = function () { setBump(bump + 1); };
@@ -3616,6 +3621,7 @@
     skills.forEach(function (s) { if (s.category) cats[s.category] = 1; });
     var enabledCount = skills.filter(function (s) { return s.enabled !== false; }).length;
     var shown = skills.filter(function (s) {
+      if (!showInactive && s.enabled === false) return false;
       if (cat !== "all" && s.category !== cat) return false;
       if (q && (s.name + " " + (s.description || "")).toLowerCase().indexOf(q.toLowerCase()) < 0) return false;
       return true;
@@ -3632,7 +3638,9 @@
     };
     // header actions ("Parcourir le hub" / "Tout mettre à jour") have no backing API — intentionally omitted
     return h("div", { className: "iris-page" },
-      PageHead(t("skillsTitle"), t("skillsDesc", skills.length, enabledCount), null),
+      PageHead(t("skillsTitle"), t("skillsDesc", skills.length, enabledCount),
+        [Btn(showInactive ? t("skActiveBtn", enabledCount) : t("skInactiveBtn", skills.length - enabledCount),
+          function () { setShowInactive(!showInactive); }, "", false, showInactive ? "eye" : "eyeOff")]),
       curator ? Card(
         h(React.Fragment, null, Icon("spark", "sm dim"), " ", t("curator")),
         Badge(curator.paused ? t("paused") : t("active"), curator.paused ? "neutral" : "iris"),
@@ -4183,19 +4191,24 @@
     var bp = useState(0); var bump = bp[0], setBump = bp[1];
     var flt = useState("all"); var fltProfile = flt[0], setFltProfile = flt[1];
     var qs = useState(""); var q = qs[0], setQ = qs[1];
+    var si = useState(false); var showInactive = si[0], setShowInactive = si[1];
     var cs = useState(null); var configTS = cs[0], setConfigTS = cs[1];
     var data = useJSON("/api/tools/toolsets" + profileQuery(fltProfile), 60000, bump);
     var profiles = asList(useJSON("/api/profiles", 0), ["profiles"]);
     var reload = function () { setBump(bump + 1); };
     var selProfile = fltProfile !== "all" && fltProfile !== "default" ? fltProfile : undefined;
     var sets = asList(data, ["toolsets", "items"]);
+    var activeCount = sets.filter(function (s2) { return s2.enabled !== false; }).length;
     var needle = q.trim().toLowerCase();
     var shown = sets.filter(function (s2) {
+      if (!showInactive && s2.enabled === false) return false;
       if (!needle) return true;
       return ((txt(s2.name) + " " + txt(s2.label) + " " + txt(s2.description)).toLowerCase().indexOf(needle) >= 0);
     });
     return h("div", { className: "iris-page" },
       PageHead(t("tsTitle"), t("tsDesc"), [
+        Btn(showInactive ? t("tsActiveBtn", activeCount) : t("tsInactiveBtn", sets.length - activeCount),
+          function () { setShowInactive(!showInactive); }, "", false, showInactive ? "eye" : "eyeOff"),
         h("div", { className: "iris-field", style: { minWidth: "180px", margin: 0 } },
           h("label", null, t("profileFilter")),
           h("select", { className: "iris-input", value: fltProfile,
@@ -4211,7 +4224,6 @@
         var label = txt(s2.label) || txt(s2.name);
         return h("div", { className: "iris-mini wide", key: i, style: on ? null : { opacity: 0.6 } },
           h("div", { className: "mc-head" }, Icon(toolsetIconOf(txt(s2.name)), "dim"), h("b", null, label),
-            Badge(on ? t("tsActive") : t("tsInactive"), on ? "good" : "neutral"),
             Switch(on, function () {
               actToast(t, "/api/tools/toolsets/" + encProfile(txt(s2.name)), jinit("PUT", { enabled: !on, profile: selProfile }), t("updated"), reload);
             }, label)),
