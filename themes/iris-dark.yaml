@@ -168,3 +168,32 @@ customCSS: |
     border-bottom: 1px solid var(--color-border, rgba(255,255,255,.07));
     margin-bottom: 4px;
   }
+  /* rail content — Iris section labels ("model", sessions) */
+  [data-chat-active="true"] #chat-side-panel .text-display {
+    font-size: 10.5px !important;
+    font-weight: 650 !important;
+    letter-spacing: .09em !important;
+    text-transform: uppercase !important;
+    color: var(--color-primary, #8b80f9) !important;
+  }
+  /* rail cards (model picker) lift off the panel background */
+  [data-chat-active="true"] #chat-side-panel div[class*="bg-card"] {
+    background: var(--color-popover, #1d1c26) !important;
+    border: 1px solid var(--color-border, rgba(255,255,255,.07)) !important;
+    border-radius: calc(var(--radius, .8rem) - 3px) !important;
+  }
+  /* new chat button — Iris outline */
+  [data-chat-active="true"] #chat-side-panel button[class*="justify-center"] {
+    border-color: var(--color-primary, #8b80f9) !important;
+    color: var(--color-primary, #8b80f9) !important;
+    background: transparent !important;
+    border-radius: calc(var(--radius, .8rem) - 4px) !important;
+  }
+  [data-chat-active="true"] #chat-side-panel button[class*="justify-center"]:hover {
+    background: color-mix(in srgb, var(--color-primary, #8b80f9) 12%, transparent) !important;
+  }
+  /* active session row — iris accent tint */
+  [data-chat-active="true"] #chat-side-panel [aria-current="true"] {
+    background: color-mix(in srgb, var(--color-primary, #8b80f9) 14%, transparent) !important;
+    border-left-color: var(--color-primary, #8b80f9) !important;
+  }
