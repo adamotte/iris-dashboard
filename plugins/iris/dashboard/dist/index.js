@@ -155,6 +155,38 @@
       mcpTitle: "MCP servers", mcpDesc: "Extend Iris with Model Context Protocol servers — no YAML editing",
       mcpAdd: "Add server", mcpTest: "Test", mcpCatalog: "Nous catalog — one-click install",
       mcpInstall: "Install", mcpNone: "No MCP server configured", verified: "verified",
+      mcpServersN: "Your MCP servers ({0})",
+      mcpCatalogN: "Catalog ({0})",
+      mcpCatalogSub: "Browse Nous-approved MCP servers and install them with one click.",
+      mcpCatalogNone: "No catalog entries available.",
+      mcpAddTitle: "Add MCP server", mcpAddName: "Name", mcpAddTransport: "Transport",
+      mcpHttp: "HTTP/SSE", mcpStdio: "stdio",
+      mcpUrlLbl: "URL", mcpUrlPh: "https://example.com/mcp",
+      mcpAuthLbl: "Authentication", mcpAuthNone: "None", mcpAuthBearer: "Bearer token", mcpAuthOauth: "OAuth",
+      mcpBearerLbl: "Bearer token", mcpBearerPh: "Token or Bearer token",
+      mcpBearerNote: "Stored in this profile's .env; config.yaml keeps only an environment-variable reference.",
+      mcpOauthNote: "Add the server, then use Authenticate. Hermes opens the OAuth browser on the machine running the Dashboard backend.",
+      mcpCmdLbl: "Command", mcpCmdPh: "npx", mcpArgsLbl: "Args",
+      mcpArgsPh: "-y @modelcontextprotocol/server-foo",
+      mcpEnvLbl: "Environment (KEY=VALUE per line)", mcpEnvPh: "API_KEY=secret",
+      mcpAdding: "Adding…", mcpAddedOk: "Added", mcpAddedOauth: "Added — authenticate with OAuth",
+      mcpNameReq: "Name required", mcpUrlReq: "URL required", mcpBearerReq: "Bearer token required", mcpCmdReq: "Command required",
+      mcpAuthBadge: "auth: {0}", mcpDisabled: "disabled",
+      mcpEnvVarsN: "{0} env var", mcpEnvVarsN2: "{0} env vars",
+      mcpConnectedNoTools: "Connected — no tools", mcpToolsList: "Tools: {0}",
+      mcpAuthBtn: "Authenticate", mcpAuthing: "Authenticating…",
+      mcpAuthDone: "OAuth authentication complete", mcpAuthErr: "OAuth error",
+      mcpEnabledNote: "Enable/disable takes effect on the next gateway restart.",
+      mcpTestToolsN: "{0}: {1} tool(s)", mcpTestErr: "{0}: {1}",
+      mcpInstallTitle: "Install {0}", mcpInstallEnvNote: "This MCP requires the following values to be configured.",
+      mcpEnvReq: "{0} required", mcpInstalling: "Installing…",
+      mcpInstalled: "Installed", mcpInstalledBg: "Installing in the background…",
+      mcpSource: "source", mcpEndpointLbl: "Endpoint:", mcpRunsLbl: "Runs:",
+      mcpInstallsFrom: "Installs from:", mcpBootstrapN: "Bootstrap commands ({0})", mcpSetupNotes: "Setup notes",
+      mcpOauthBlocked: "OAuth popup was blocked — allow popups for this dashboard and retry",
+      mcpOauthClosed: "OAuth authorization window was closed before completion",
+      mcpOauthNoUrl: "OAuth server did not provide an authorization URL",
+      mcpConnFail: "Connection failed",
       /* toolsets */
       tsTitle: "Toolsets", tsDesc: "Built-in tool groups — enable only what the agent needs",
       toolsN: "{0} tools", notConfigured: "missing key",
@@ -337,8 +369,56 @@
       mcpTitle: "Serveurs MCP", mcpDesc: "Étendez Iris avec des serveurs Model Context Protocol — sans toucher au YAML",
       mcpAdd: "Ajouter un serveur", mcpTest: "Tester", mcpCatalog: "Catalogue Nous — installation en un clic",
       mcpInstall: "Installer", mcpNone: "Aucun serveur MCP configuré", verified: "vérifié",
+      mcpServersN: "Vos serveurs MCP ({0})",
+      mcpCatalogN: "Catalogue ({0})",
+      mcpCatalogSub: "Parcourez les serveurs MCP approuvés par Nous et installez-les en un clic.",
+      mcpCatalogNone: "Aucune entrée de catalogue disponible.",
+      mcpAddTitle: "Ajouter un serveur MCP", mcpAddName: "Nom", mcpAddTransport: "Transport",
+      mcpHttp: "HTTP/SSE", mcpStdio: "stdio",
+      mcpUrlLbl: "URL", mcpUrlPh: "https://example.com/mcp",
+      mcpAuthLbl: "Authentification", mcpAuthNone: "Aucune", mcpAuthBearer: "Jeton Bearer", mcpAuthOauth: "OAuth",
+      mcpBearerLbl: "Jeton Bearer", mcpBearerPh: "Jeton ou Bearer token",
+      mcpBearerNote: "Stocké dans le fichier .env de ce profil ; config.yaml ne conserve qu'une référence de variable d'environnement.",
+      mcpOauthNote: "Ajoutez le serveur, puis utilisez Authentifier. Hermes ouvre le navigateur OAuth sur la machine qui exécute le backend du dashboard.",
+      mcpCmdLbl: "Commande", mcpCmdPh: "npx", mcpArgsLbl: "Arguments",
+      mcpArgsPh: "-y @modelcontextprotocol/server-foo",
+      mcpEnvLbl: "Environnement (KEY=VALUE par ligne)", mcpEnvPh: "API_KEY=secret",
+      mcpAdding: "Ajout…", mcpAddedOk: "Ajouté", mcpAddedOauth: "Ajouté — authentifiez-vous avec OAuth",
+      mcpNameReq: "Nom requis", mcpUrlReq: "URL requise", mcpBearerReq: "Jeton Bearer requis", mcpCmdReq: "Commande requise",
+      mcpAuthBadge: "auth : {0}", mcpDisabled: "désactivé",
+      mcpEnvVarsN: "{0} variable d'env", mcpEnvVarsN2: "{0} variables d'env",
+      mcpConnectedNoTools: "Connecté — aucun outil", mcpToolsList: "Outils : {0}",
+      mcpAuthBtn: "S'authentifier", mcpAuthing: "Authentification…",
+      mcpAuthDone: "Authentification OAuth terminée", mcpAuthErr: "Erreur OAuth",
+      mcpEnabledNote: "L'activation/désactivation prend effet au prochain redémarrage de la passerelle.",
+      mcpTestToolsN: "{0} : {1} outil(s)", mcpTestErr: "{0} : {1}",
+      mcpInstallTitle: "Installer {0}", mcpInstallEnvNote: "Ce MCP nécessite la configuration des valeurs suivantes.",
+      mcpEnvReq: "{0} requis", mcpInstalling: "Installation…",
+      mcpInstalled: "Installé", mcpInstalledBg: "Installation en arrière-plan…",
+      mcpSource: "source", mcpEndpointLbl: "Point d'accès :", mcpRunsLbl: "Exécute :",
+      mcpInstallsFrom: "Installe depuis :", mcpBootstrapN: "Commandes d'amorçage ({0})", mcpSetupNotes: "Notes de configuration",
+      mcpOauthBlocked: "Popup OAuth bloquée — autorisez les popups pour ce dashboard et réessayez",
+      mcpOauthClosed: "La fenêtre d'autorisation OAuth a été fermée avant la fin",
+      mcpOauthNoUrl: "Le serveur OAuth n'a pas fourni d'URL d'autorisation",
+      mcpConnFail: "Échec de connexion",
       tsTitle: "Toolsets", tsDesc: "Groupes d'outils intégrés — activez uniquement ce dont l'agent a besoin",
       toolsN: "{0} outils", notConfigured: "clé manquante",
+      tsActive: "Actif", tsInactive: "Inactif", tsSetupNeeded: "Configuration requise",
+      tsEnabledFor: "Activé pour {0}", tsDisabledFor: "Désactivé pour {0}", tsDisabledForCli: "Désactivé pour CLI",
+      tsToolsetLabel: "toolset {0}", tsNoMatch: "Aucun toolset ne correspond à la recherche.",
+      tsSearch: "Rechercher des toolsets…", tsConfigure: "Configurer",
+      tsProvider: "Provider", tsSelected: "Sélectionné", tsSelect: "Sélectionner",
+      tsNousPortal: "Portail Nous",
+      tsNoConfigurable: "Ce toolset n'a pas de backends configurables — activez-le ou désactivez-le ci-dessus. Il fonctionne sans sélection de provider ni clés API.",
+      tsNoProviders: "Aucun provider n'est disponible pour ce toolset dans cette installation.",
+      tsSavedKey: "Enregistrée", tsSaveKeys: "Enregistrer les clés", tsGetKey: "Obtenir une clé",
+      tsKeySavedPh: "•••••••• (enregistrée — laisser vide pour conserver)",
+      tsEnterValue: "Saisissez au moins une valeur à enregistrer", tsKeySavedN: "{0} clé(s) enregistrée(s)",
+      tsSetupTitle: "post-setup : {0}", tsSetupRun: "Lancer l'installation", tsInstalling: "Installation…",
+      tsSetupNeedInstall: "Ce backend nécessite une installation unique ({0}). S'exécute sur cet hôte — cela peut prendre quelques minutes.",
+      tsSetupRunning: "en cours", tsSetupDone: "terminé", tsSetupComplete: "Post-setup terminé",
+      tsSetupErrors: "Post-setup terminé avec des erreurs", tsSetupLost: "Perdu la trace du processus post-setup",
+      tsStarting: "Démarrage…",
       chTitle: "Canaux de messagerie", chDesc: "Une seule Iris, tous vos canaux — même mémoire, même contexte partout",
       chRestart: "Redémarrer la passerelle", chStart: "Démarrer la passerelle", chStop: "Arrêter la passerelle", chTest: "Tester",
       connected: "connecté", configured: "configuré", notSetUp: "non configuré",
@@ -2366,6 +2446,140 @@
   }
 
   /* ================= MCP ================= */
+  function McpAddDialog(props) {
+    var t = props.t;
+    var f = useState({ name: "", transport: "http", url: "", httpAuth: "none", bearerToken: "", command: "", args: "", env: "" });
+    var form = f[0], setForm = f[1];
+    var busy = useState(false); var setBusy = busy[1];
+    var e = useState(null); var err = e[0], setErr = e[1];
+    function set(patch) { setForm(Object.assign({}, form, patch)); }
+    function submit() {
+      var name = String(form.name || "").trim();
+      if (!name) { setErr(t("mcpNameReq")); return; }
+      var payload = { name: name };
+      if (form.transport === "http") {
+        var url = String(form.url || "").trim();
+        if (!url) { setErr(t("mcpUrlReq")); return; }
+        payload.url = url;
+        if (form.httpAuth !== "none") {
+          payload.auth = form.httpAuth;
+          if (form.httpAuth === "header") {
+            if (!String(form.bearerToken || "").trim()) { setErr(t("mcpBearerReq")); return; }
+            payload.bearer_token = form.bearerToken;
+          }
+        }
+      } else {
+        var cmd = String(form.command || "").trim();
+        if (!cmd) { setErr(t("mcpCmdReq")); return; }
+        payload.command = cmd;
+        var args = String(form.args || "").split(/[\s,]+/).map(function (x) { return x.trim(); }).filter(Boolean);
+        if (args.length) payload.args = args;
+        var env = {};
+        String(form.env || "").split(/\r?\n/).forEach(function (line) {
+          var l = line.trim(); if (!l) return;
+          var idx = l.indexOf("="); if (idx < 0) return;
+          var k = l.slice(0, idx).trim(), v = l.slice(idx + 1).trim();
+          if (k) env[k] = v;
+        });
+        if (Object.keys(env).length) payload.env = env;
+      }
+      setErr(null); setBusy(true);
+      SDK.fetchJSON("/api/mcp/servers", jinit("POST", payload)).then(function () {
+        toastPush(form.httpAuth === "oauth" ? t("mcpAddedOauth") : t("mcpAddedOk"));
+        props.onClose(true);
+      }).catch(function (ex) {
+        setBusy(false);
+        setErr(String((ex && (ex.message || ex.error)) || ex));
+      });
+    }
+    return h("div", {
+      className: "iris-modal-scrim",
+      onMouseDown: function (ev) { if (ev.target === ev.currentTarget) props.onClose(false); }
+    },
+      h("div", { className: "iris-modal", role: "dialog", "aria-modal": "true", "aria-label": t("mcpAddTitle") },
+        h("div", { className: "iris-modal-head" },
+          h("span", { className: "iris-icbox iris-i" }, Icon("plug")),
+          h("div", { className: "iris-modal-title" }, h("b", null, t("mcpAddTitle")), h("small", null, t("mcpDesc"))),
+          IconBtn("x", function () { props.onClose(false); }, t("cancel"))),
+        h("div", { className: "iris-modal-body" },
+          h("div", { className: "iris-field" }, h("label", null, t("mcpAddName")),
+            h("input", { className: "iris-input", value: form.name, placeholder: "my-server", autoFocus: true, onChange: function (ev) { set({ name: ev.target.value }); } })),
+          h("div", { className: "iris-field" }, h("label", null, t("mcpAddTransport")),
+            h("div", { className: "iris-seg" },
+              [["http", t("mcpHttp")], ["stdio", t("mcpStdio")]].map(function (o, i) {
+                return h("button", { key: i, type: "button", className: "iris-seg-btn" + (form.transport === o[0] ? " on" : ""), onClick: function () { set({ transport: o[0] }); } }, o[1]);
+              }))),
+          form.transport === "http" ? h(React.Fragment, null,
+            h("div", { className: "iris-field" }, h("label", null, t("mcpUrlLbl")),
+              h("input", { className: "iris-input", type: "url", value: form.url, placeholder: t("mcpUrlPh"), onChange: function (ev) { set({ url: ev.target.value }); } })),
+            h("div", { className: "iris-field" }, h("label", null, t("mcpAuthLbl")),
+              h("div", { className: "iris-seg" },
+                [["none", t("mcpAuthNone")], ["header", t("mcpAuthBearer")], ["oauth", t("mcpAuthOauth")]].map(function (o, i) {
+                  return h("button", { key: i, type: "button", className: "iris-seg-btn" + (form.httpAuth === o[0] ? " on" : ""), onClick: function () { set({ httpAuth: o[0] }); } }, o[1]);
+                })),
+              form.httpAuth === "header" ? h("div", { className: "iris-field", style: { marginTop: "10px" } },
+                h("label", null, t("mcpBearerLbl")),
+                h("input", { className: "iris-input", type: "password", autoComplete: "new-password", value: form.bearerToken, placeholder: t("mcpBearerPh"), onChange: function (ev) { set({ bearerToken: ev.target.value }); } }),
+                h("div", { className: "iris-hint" }, t("mcpBearerNote"))) : null,
+              form.httpAuth === "oauth" ? h("div", { className: "iris-hint", style: { marginTop: "8px" } }, t("mcpOauthNote")) : null))
+            : h(React.Fragment, null,
+            h("div", { className: "iris-field" }, h("label", null, t("mcpCmdLbl")),
+              h("input", { className: "iris-input", value: form.command, placeholder: t("mcpCmdPh"), onChange: function (ev) { set({ command: ev.target.value }); } })),
+            h("div", { className: "iris-field" }, h("label", null, t("mcpArgsLbl")),
+              h("input", { className: "iris-input", value: form.args, placeholder: t("mcpArgsPh"), onChange: function (ev) { set({ args: ev.target.value }); } })),
+            h("div", { className: "iris-field" }, h("label", null, t("mcpEnvLbl")),
+              h("textarea", { className: "iris-input iris-textarea", rows: 4, value: form.env, placeholder: t("mcpEnvPh"), onChange: function (ev) { set({ env: ev.target.value }); } }))),
+          err ? h("div", { className: "iris-note", style: { color: "var(--color-destructive)", marginTop: 0 } }, err) : null),
+        h("div", { className: "iris-modal-foot" },
+          Btn(t("cancel"), function () { props.onClose(false); }),
+          Btn(busy[0] ? t("mcpAdding") : t("mcpAdd"), submit, "primary", busy[0], "plus"))));
+  }
+  function McpInstallDialog(props) {
+    var t = props.t;
+    var entry = props.entry;
+    var env = useState({}); var setEnv = env[1];
+    var busy = useState(false); var setBusy = busy[1];
+    var e = useState(null); var err = e[0], setErr = e[1];
+    var reqEnv = Array.isArray(entry.required_env) ? entry.required_env : [];
+    function submit() {
+      for (var i = 0; i < reqEnv.length; i++) {
+        if (reqEnv[i].required !== false && !String(env[0][reqEnv[i].name] || "").trim()) {
+          setErr(t("mcpEnvReq", reqEnv[i].prompt || reqEnv[i].name)); return;
+        }
+      }
+      setErr(null); setBusy(true);
+      SDK.fetchJSON("/api/mcp/catalog/install", jinit("POST", { name: entry.name || entry.id, env: env[0] })).then(function (r) {
+        if (r && r.background) toastPush(t("mcpInstalledBg"));
+        else toastPush(t("mcpInstalled"));
+        props.onClose(true);
+      }).catch(function (ex) {
+        setBusy(false);
+        setErr(String((ex && (ex.message || ex.error)) || ex));
+      });
+    }
+    return h("div", {
+      className: "iris-modal-scrim",
+      onMouseDown: function (ev) { if (ev.target === ev.currentTarget) props.onClose(false); }
+    },
+      h("div", { className: "iris-modal", role: "dialog", "aria-modal": "true" },
+        h("div", { className: "iris-modal-head" },
+          h("span", { className: "iris-icbox iris-i" }, Icon("download")),
+          h("div", { className: "iris-modal-title" }, h("b", null, t("mcpInstallTitle", txt(entry.name || entry.id))), h("small", null, entry.description || "")),
+          IconBtn("x", function () { props.onClose(false); }, t("cancel"))),
+        h("div", { className: "iris-modal-body" },
+          h("div", { className: "iris-note", style: { marginTop: 0 } }, t("mcpInstallEnvNote")),
+          reqEnv.map(function (r, i) {
+            return h("div", { key: i, className: "iris-field", style: { marginBottom: "12px" } },
+              h("label", null, (r.prompt || r.name) + (r.required !== false ? " *" : "")),
+              h("input", { className: "iris-input", type: "password", autoComplete: "new-password", placeholder: r.name, value: env[0][r.name] || "", onChange: function (ev) {
+                var o = Object.assign({}, env[0]); o[r.name] = ev.target.value; setEnv(o);
+              } }));
+          }),
+          err ? h("div", { className: "iris-note", style: { color: "var(--color-destructive)", marginTop: 0 } }, err) : null),
+        h("div", { className: "iris-modal-foot" },
+          Btn(t("cancel"), function () { props.onClose(false); }),
+          Btn(busy[0] ? t("mcpInstalling") : t("mcpInstall"), submit, "primary", busy[0], "download"))));
+  }
   function McpPage() {
     var locale = useLocale(); var t = makeT(locale);
     var bp = useState(0); var bump = bp[0], setBump = bp[1];
@@ -2374,6 +2588,12 @@
     var reload = function () { setBump(bump + 1); };
     var servers = asList(data, ["servers", "items"]);
     var cat = asList(catalog, ["catalog", "entries", "items"]);
+    var diags = asList(catalog && catalog.diagnostics, ["diagnostics"]);
+    var addOpen = useState(false); var setAddOpen = addOpen[1];
+    var install = useState(null); var setInstall = install[1];
+    var tests = useState({}); var setTests = tests[1];
+    var testing = useState({}); var setTesting = testing[1];
+    var authing = useState({}); var setAuthing = authing[1];
     var catalogIcon = function (c) {
       var k = ((c.name || c.id || "") + "").toLowerCase();
       if (k.indexOf("search") >= 0 || k.indexOf("brave") >= 0 || k.indexOf("web") >= 0) return "globe";
@@ -2382,52 +2602,161 @@
       if (k.indexOf("db") >= 0 || k.indexOf("postgres") >= 0 || k.indexOf("sql") >= 0) return "server";
       return "plug";
     };
-    // header actions ("Catalogue" / "Ajouter un serveur") have no backing API — intentionally omitted
+    var encM = function (s) { try { return encodeURIComponent(s); } catch (e) { return s; } };
+    var flagFor = function (setter) { return function (name, on) {
+      setter(function (cur) { var o = Object.assign({}, cur); if (on) o[name] = true; else { delete o[name]; } return o; });
+    }; };
+    var setTestingFor = flagFor(setTesting);
+    var setAuthingFor = flagFor(setAuthing);
+    var diagFor = function (cname) { return diags.filter(function (d) { return txt(d.name) === cname; }); };
+    function runTest(s2) {
+      setTestingFor(s2.name, true);
+      SDK.fetchJSON("/api/mcp/servers/" + encM(s2.name) + "/test", jinit("POST")).then(function (r) {
+        if (r && r.ok) {
+          var tools = Array.isArray(r.tools) ? r.tools : [];
+          setTests(function (cur) { var o = Object.assign({}, cur); o[s2.name] = { ok: true, tools: tools }; return o; });
+          toastPush(t("mcpTestToolsN", s2.name, tools.length));
+        } else {
+          var msg = txt((r && (r.error || r.message)) || t("mcpConnFail"));
+          setTests(function (cur) { var o = Object.assign({}, cur); o[s2.name] = { ok: false, error: msg }; return o; });
+          toastPush(t("mcpTestErr", s2.name, msg), "err");
+        }
+      }).catch(function (ex) {
+        var msg = String((ex && ex.message) || ex);
+        setTests(function (cur) { var o = Object.assign({}, cur); o[s2.name] = { ok: false, error: msg }; return o; });
+        toastPush(t("mcpTestErr", s2.name, msg), "err");
+      }).then(function () { setTestingFor(s2.name, false); });
+    }
+    function startOAuth(s2) {
+      setAuthingFor(s2.name, true);
+      var win = null;
+      try { win = window.open("about:blank", "_blank"); } catch (e) { /* noop */ }
+      if (!win) {
+        setAuthingFor(s2.name, false);
+        toastPush(t("mcpOauthBlocked"), "err");
+        return;
+      }
+      SDK.fetchJSON("/api/mcp/servers/" + encM(s2.name) + "/auth", jinit("POST")).then(function (o) {
+        if (!o || o.status === "error") throw Error(txt((o && o.error) || t("mcpAuthErr")));
+        if (!o.authorization_url) throw Error(t("mcpOauthNoUrl"));
+        try { win.location.href = o.authorization_url; } catch (e) { throw Error(t("mcpOauthBlocked")); }
+        return o.flow_id;
+      }).then(function (flowId) {
+        return new Promise(function (resolve, reject) {
+          var timer = setInterval(function () {
+            if (win.closed) { clearInterval(timer); reject(Error(t("mcpOauthClosed"))); return; }
+            SDK.fetchJSON("/api/mcp/oauth/flows/" + encM(flowId)).then(function (r) {
+              var st = r && r.status;
+              if (st === "approved") { clearInterval(timer); resolve(r); }
+              else if (st === "error") { clearInterval(timer); reject(Error(txt((r && r.error) || t("mcpAuthErr")))); }
+            }).catch(function () { /* transient poll failure — keep polling */ });
+          }, 1000);
+        });
+      }).then(function () {
+        toastPush(t("mcpAuthDone"));
+        reload();
+      }).catch(function (ex) {
+        toastPush(String((ex && ex.message) || ex), "err");
+      }).then(function () { setAuthingFor(s2.name, false); });
+    }
+    function toggleEnable(s2, enabled) {
+      actToast(t, "/api/mcp/servers/" + encM(s2.name) + "/enabled", jinit("PUT", { enabled: !enabled }), t("mcpEnabledNote"), reload);
+    }
+    function openInstall(c) {
+      var reqEnv = Array.isArray(c.required_env) ? c.required_env : [];
+      if (!reqEnv.length) {
+        actToast(t, "/api/mcp/catalog/install", jinit("POST", { name: c.name || c.id }), t("mcpInstalled"), reload);
+      } else {
+        setInstall(c);
+      }
+    }
+    function serverCard(s2, i) {
+      var name = txt(s2.name) || "?";
+      var enabled = s2.enabled !== false;
+      var transport = s2.transport || (s2.url ? "http" : (s2.command ? "stdio" : "unknown"));
+      var auth = s2.auth;
+      var envCount = s2.env && typeof s2.env === "object" ? Object.keys(s2.env).length : 0;
+      var runLine = transport === "http" ? (txt(s2.url) || "—")
+        : ((txt(s2.command) || "") + " " + (Array.isArray(s2.args) ? s2.args.join(" ") : "")).trim() || "—";
+      var res = tests[0][name];
+      var toolsLine = res && res.ok && res.tools && res.tools.length
+        ? t("mcpToolsList", res.tools.slice(0, 4).map(function (x) { return txt(x.name || x); }).join(", ") + (res.tools.length > 4 ? " …" : "")) : null;
+      return Card(name,
+        h("span", { style: { display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" } },
+          transport === "stdio" ? Badge(t("mcpStdio"), "warn") : Badge(t("mcpHttp"), "good"),
+          auth ? Badge(t("mcpAuthBadge", auth === "header" ? "bearer" : auth), "neutral") : null,
+          enabled ? null : Badge(t("mcpDisabled"), "warn"),
+          h("span", { className: "iris-spacer" }),
+          auth === "oauth" ? Btn(authing[0][name] ? t("mcpAuthing") : t("mcpAuthBtn"), function () { startOAuth(s2); }, "sm", !!authing[0][name], "key") : null,
+          Btn(t("mcpTest"), function () { runTest(s2); }, "sm", !!testing[0][name], "play"),
+          Switch(enabled, function () { toggleEnable(s2, enabled); }, name),
+          h("button", {
+            className: "iris-link", style: { color: "var(--color-destructive)" },
+            onClick: function () { askDelete(t, name, function () { actToast(t, "/api/mcp/servers/" + encM(name), jinit("DELETE"), t("deleted"), reload); }); }
+          }, t("deleteS"))),
+        h("div", null,
+          h("div", { className: "iris-input-row", style: { marginTop: "9px" } },
+            h("span", { className: "iris-key-val", style: { flex: 1 } }, runLine)),
+          envCount ? h("span", { className: "iris-note" }, t(envCount === 1 ? "mcpEnvVarsN" : "mcpEnvVarsN2", envCount)) : null,
+          res && res.ok ? h("div", { className: "iris-note", style: { color: "var(--color-success,#22b573)" } }, toolsLine || t("mcpConnectedNoTools"))
+            : (res && !res.ok ? h("div", { className: "iris-note", style: { color: "var(--color-destructive)" } }, res.error || t("mcpConnFail")) : null)));
+    }
+    function catalogCard(c, i) {
+      var cname = txt(c.name || c.id) || "?";
+      var installed = c.installed === true;
+      var cEnabled = c.enabled !== false;
+      var transport = c.transport || (c.url ? "http" : "stdio");
+      var authT = c.auth_type;
+      var src = txt(c.source);
+      var srcIsUrl = /^https?:\/\//.test(src);
+      var ds = diagFor(cname);
+      return h("div", { className: "iris-mini", key: i, style: installed && !cEnabled ? { opacity: 0.6 } : null },
+        h("div", { className: "mc-head" }, Icon(catalogIcon(c), "dim"), h("b", null, cname)),
+        h("div", { className: "iris-badges" },
+          Badge(transport === "stdio" ? t("mcpStdio") : t("mcpHttp"), transport === "stdio" ? "warn" : "good"),
+          authT ? Badge(t("mcpAuthBadge", authT === "api_key" ? "api key" : authT), "neutral") : null,
+          srcIsUrl ? h("a", { href: src, target: "_blank", rel: "noopener noreferrer", className: "iris-badge neutral" }, t("mcpSource") + " ↗")
+            : (src ? Badge(src, "neutral") : null)),
+        h("p", null, c.description || ""),
+        c.url || c.command ? h("div", { className: "iris-key-val", style: { display: "block", marginTop: "8px", whiteSpace: "normal", wordBreak: "break-all" } },
+          (c.url ? t("mcpEndpointLbl") : t("mcpRunsLbl")) + " " + (c.url || (txt(c.command) + " " + (Array.isArray(c.args) ? c.args.join(" ") : "")).trim())) : null,
+        c.install_url ? h("div", { className: "iris-note", style: { marginTop: "6px" } },
+          t("mcpInstallsFrom") + " ",
+          /^https?:\/\//.test(txt(c.install_url)) ? h("a", { href: txt(c.install_url), target: "_blank", rel: "noopener noreferrer" }, txt(c.install_ref) || txt(c.install_url)) : (txt(c.install_ref) || txt(c.install_url)),
+          txt(c.install_ref) ? null : null) : null,
+        Array.isArray(c.bootstrap) && c.bootstrap.length ? h("details", { className: "iris-adv", style: { marginTop: "10px" } },
+          h("summary", null, t("mcpBootstrapN", c.bootstrap.length)),
+          h("div", { className: "iris-adv-body" }, c.bootstrap.map(function (b, j) {
+            return h("div", { key: j, className: "iris-key-val", style: { display: "block", padding: "6px 0", borderBottom: "1px solid var(--color-border,rgba(128,128,128,.12))" } }, b);
+          }))) : null,
+        c.post_install ? h("details", { className: "iris-adv", style: { marginTop: "10px" } },
+          h("summary", null, t("mcpSetupNotes")),
+          h("div", { className: "iris-adv-body", style: { padding: "9px 12px 11px", whiteSpace: "pre-wrap", fontSize: "11.5px", color: "var(--color-muted-foreground,#8c8a9c)", lineHeight: "1.6" } }, c.post_install)) : null,
+        ds.map(function (d, j) {
+          return h("div", { key: "d" + j, className: "iris-note", style: { color: "var(--color-warning,#fab219)", marginTop: "6px" } }, txt(d.message || d));
+        }),
+        h("div", { className: "mc-foot", style: { marginTop: "10px" } },
+          installed ? Badge(installed && !cEnabled ? t("mcpInstalled") + " · " + t("mcpDisabled") : t("mcpInstalled"), installed && !cEnabled ? "warn" : "good")
+            : Btn(t("mcpInstall"), function () { openInstall(c); }, "sm primary", false, "plus")));
+    }
     return h("div", { className: "iris-page" },
-      PageHead(t("mcpTitle"), t("mcpDesc"), null),
-      servers.length ? servers.map(function (s2, i) {
-        var enabled = s2.enabled !== false;
-        var connected = s2.status === "connected" || s2.state === "connected" || s2.connected === true;
-        var errored = s2.status === "error" || s2.state === "error" || !!s2.error;
-        var statusBadge = connected ? Badge(t("connected"), "good") : (errored ? Badge(t("mcpError"), "crit") : null);
-        var toolCount = (s2.tools && s2.tools.length) || s2.tool_count;
-        var errMsg = s2.error || s2.last_error;
-        return Card(s2.name,
-          h("span", { style: { display: "flex", gap: "8px", alignItems: "center" } },
-            statusBadge,
-            h("span", { className: "iris-badge neutral iris-mono", style: { fontSize: "9.5px" } }, s2.url ? "HTTP" : "STDIO"),
-            h("span", { className: "iris-spacer" }),
-            Btn(t("mcpTest"), function () {
-              act(t, "/api/mcp/servers/" + s2.name + "/test", jinit("POST"), function (r) {
-                if (r === null) return;
-                irisAlert(t, {
-                  title: t("mcpTest"), subtitle: s2.name, icon: "plug",
-                  mono: JSON.stringify(r, null, 2).slice(0, 1200)
-                });
-              });
-            }, "sm"),
-            Switch(enabled, function () { actToast(t, "/api/mcp/servers/" + s2.name + "/enabled", jinit("PUT", { enabled: !enabled }), t("updated"), reload); }, s2.name),
-            h("button", {
-              className: "iris-link", style: { color: "var(--color-destructive)" },
-              onClick: function () { askDelete(t, txt(s2.name), function () { actToast(t, "/api/mcp/servers/" + s2.name, jinit("DELETE"), t("deleted"), reload); }); }
-            }, t("deleteS"))),
-          h("div", null,
-            h("div", { className: "iris-key-val" }, s2.url || s2.command || ""),
-            toolCount ? h("span", { className: "iris-note" }, t("toolsN", toolCount)) : null,
-            errMsg ? h("div", { className: "iris-note", style: { color: "var(--color-destructive)" } }, txt(errMsg)) : null));
-      }) : Card(null, null, Empty(t("mcpNone"))),
+      PageHead(t("mcpTitle"), t("mcpDesc"),
+        [Btn(t("refresh"), reload, "", false, "refresh"),
+         Btn(t("mcpAdd"), function () { setAddOpen(true); }, "primary", false, "plus")]),
+      addOpen[0] ? h(McpAddDialog, { t: t, onClose: function (added) { setAddOpen(false); if (added) reload(); } }) : null,
+      install[0] ? h(McpInstallDialog, { t: t, entry: install[0], onClose: function (done) { setInstall(null); if (done) reload(); } }) : null,
+      servers.length ? h("div", null,
+        Subhead(t("mcpServersN", servers.length)),
+        h("div", null, servers.map(function (s2, i) { return h(React.Fragment, { key: i }, serverCard(s2, i)); })))
+        : Card(null, null, Empty(t("mcpNone"))),
       cat.length ? h("div", null,
-        Subhead(t("mcpCatalog")),
-        h("div", { className: "iris-cards" }, cat.slice(0, 12).map(function (c, i) {
-          return h("div", { className: "iris-mini", key: i },
-            h("div", { className: "mc-head" }, Icon(catalogIcon(c), "dim"), h("b", null, c.name || c.id)),
-            h("p", null, c.description || ""),
-            h("div", { className: "mc-foot" },
-              Btn(t("mcpInstall"), function () {
-                actToast(t, "/api/mcp/catalog/install", jinit("POST", { name: c.name || c.id }), t("created"), reload);
-              }, "sm primary"),
-              h("span", null, t("verifiedNous"))));
-        }))) : null);
+        Subhead(t("mcpCatalogN", cat.length)),
+        h("div", { className: "iris-note", style: { marginTop: 0 } }, t("mcpCatalogSub")),
+        h("div", { className: "iris-cards" }, cat.map(catalogCard)))
+        : (catalog ? h("div", null,
+          Subhead(t("mcpCatalogN", 0)),
+          h("div", { className: "iris-note", style: { marginTop: 0 } }, t("mcpCatalogSub")),
+          Card(null, null, Empty(t("mcpCatalogNone")))) : null));
   }
 
   /* ================= TOOLSETS ================= */
