@@ -221,6 +221,8 @@ select.iris-input{background:var(--color-input,var(--color-background,#1a1a22))}
 .iris-mini .mc-head b{font-size:13px;font-weight:650;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .iris-mini p{font-size:11.5px;color:var(--color-muted-foreground,#8c8a9c);line-height:1.45;flex:1;margin:0}
 .iris-mini .mc-foot{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--color-muted-foreground,#8c8a9c);flex-wrap:wrap}
+/* dense cards (mcp catalog, toolsets) span two grid tracks on desktop */
+@media (min-width:481px){.iris-mini.wide{grid-column:span 2}}
 
 /* ---- logs ---- */
 /* clickable table rows (sessions: open in chat) */
