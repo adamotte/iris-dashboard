@@ -21,6 +21,7 @@
   var useState = hooks.useState;
   var useEffect = hooks.useEffect;
   var useMemo = hooks.useMemo;
+  var useRef = hooks.useRef || React.useRef;
 
   /* ================= cronstrue (cron → human) ================= */
   // Vendored UMD (MIT) at dist/cronstrue-i18n.min.js, served next to this
@@ -88,8 +89,20 @@
       sessionsTitle: "Sessions", sessionsDesc: "Full-text search across every conversation",
       chats: "Chats", automation: "Automation", archived: "Archived", messages: "Messages",
       model: "Model", lastActivity: "Last activity", source: "Source", export: "Export",
-      deleteS: "Delete", pruneOld: "Prune > 90 d", confirmPrune: "Delete ended sessions older than 90 days?",
-      noSessions: "No sessions yet", searchResults: "Search results", resumeChat: "Resume in chat",
+      deleteS: "Delete", noSessions: "No sessions yet", searchResults: "Search results", resumeChat: "Resume in chat",
+      statMessages: "{0} messages", statActive: "Active", tools: "Tool calls", bySource: "By source",
+      pruneOld: "Prune old sessions", pruneDaysLbl: "Delete sessions older than", pruneDesc: "Removes ended sessions not touched for that many days.",
+      pruneBtn: "Prune", pruneInvalid: "Enter a whole number of days", pruned: "Pruned ✓",
+      deleteEmpty: "Delete empty sessions", deleteEmptyN: "{0} empty", confirmDeleteEmpty: "Delete sessions that hold no messages?",
+      emptyDeleted: "Empty sessions deleted ✓",
+      selectSession: "Select", selectedCount: "{0} selected", selectAllOnPage: "Select all on this page", clearSelection: "Clear selection",
+      deleteSelected: "Delete selected", confirmDeleteSelected: "Delete {0} session(s)?", selectedDeleted: "Sessions deleted ✓",
+      rename: "Rename", renameTitle: "Session name", saveTitle: "Save", renamed: "Renamed ✓",
+      expand: "Expand", collapse: "Collapse", expandMsgs: "Show messages", collapseMsgs: "Hide messages",
+      loadMessages: "Loading…", noMessages: "No messages", messagesErr: "Unable to load messages",
+      roleUser: "You", roleAssistant: "Assistant", roleSystem: "System", roleTool: "Tool",
+      contextHandoff: "Context handoff", toolCalls: "{0} tool call(s)", liveBadge: "LIVE",
+      match: "Match", page: "Page", of: "of", prevPage: "Previous", nextPage: "Next", clear: "Clear", noResults: "No results",
       /* analytics */
       analyticsTitle: "Analytics", analyticsDesc: "Usage, cost and cache computed from session history",
       period: "{0} d", cacheTitle: "Cache rate", sessionsCount: "Sessions", perModel: "By model",
@@ -190,6 +203,22 @@
       /* toolsets */
       tsTitle: "Toolsets", tsDesc: "Built-in tool groups — enable only what the agent needs",
       toolsN: "{0} tools", notConfigured: "missing key",
+      tsActive: "Active", tsInactive: "Inactive", tsSetupNeeded: "Setup needed",
+      tsEnabledFor: "Enabled for {0}", tsDisabledFor: "Disabled for {0}", tsDisabledForCli: "Disabled for CLI",
+      tsToolsetLabel: "{0} toolset", tsNoMatch: "No toolsets match the search.",
+      tsSearch: "Search toolsets…", tsConfigure: "Configure",
+      tsProvider: "Provider", tsSelected: "Selected", tsSelect: "Select",
+      tsNousPortal: "Nous Portal",
+      tsNoConfigurable: "This toolset has no configurable backends — toggle it on or off above. It works with no provider selection or API keys.",
+      tsNoProviders: "No providers are available for this toolset in this install.",
+      tsSavedKey: "Saved", tsSaveKeys: "Save keys", tsGetKey: "Get a key",
+      tsKeySavedPh: "•••••••• (saved — leave blank to keep)",
+      tsEnterValue: "Enter at least one value to save", tsKeySavedN: "Saved {0} key(s)",
+      tsSetupTitle: "post-setup: {0}", tsSetupRun: "Run setup", tsInstalling: "Installing…",
+      tsSetupNeedInstall: "This backend needs a one-time install ({0}). Runs on this host — may take a few minutes.",
+      tsSetupRunning: "running", tsSetupDone: "done", tsSetupComplete: "Post-setup complete",
+      tsSetupErrors: "Post-setup finished with errors", tsSetupLost: "Lost track of the post-setup process",
+      tsStarting: "Starting…",
       /* channels */
       chTitle: "Messaging channels", chDesc: "One Iris, all your channels — same memory and context everywhere",
       chRestart: "Restart gateway", chStart: "Start gateway", chStop: "Stop gateway", chTest: "Test",
@@ -274,7 +303,50 @@
       gwRestart: "Restart", gwStop: "Stop", gwStart: "Start",
       navMore: "More", menuTitle: "Navigation", online: "online", offline: "stopped",
       catProvider: "LLM providers", catTool: "Tools", catMessaging: "Messaging", catSetting: "Settings",
-      cronGwDown: "The gateway is stopped — triggered and scheduled jobs will not run until it starts."
+      cronGwDown: "The gateway is stopped — triggered and scheduled jobs will not run until it starts.",
+      /* models */
+      moDesc: "Configure the main chat model, auxiliary task models and Mixture of Agents presets, and see usage per model.",
+      moSettings: "Model settings", moAppliesNew: "Applies to new sessions",
+      moMain: "Main model", moAux: "Auxiliary tasks", moMoa: "Mixture of Agents",
+      moChange: "Change", moConfigure: "Configure", moUnset: "not set", moAuto: "Auto",
+      moOverrideN: "{0} override(s)", moAutoN: "{0} auto", moTasksAllAuto: "All tasks auto",
+      moNotLoaded: "not loaded", moRefsN: "{0} reference(s)",
+      moModelsUsed: "Models used", moTotalTokens: "Total tokens", moInput: "Input", moOutput: "Output",
+      moEstCost: "Est. cost", moSessions: "Sessions", moAvgSession: "Avg / session", moApiCalls: "API calls",
+      moCtx: "ctx", moOutCap: "out cap", moCacheRead: "Cache read", moReasoning: "Reasoning",
+      moTokensHidden: "Token and cost details are hidden — enable “Show token analytics” in Config → Display.",
+      moNoData: "No model usage yet", moStartSession: "Send a message to see per-model usage.",
+      moUseAs: "Use as", moMainModel: "Main model", moAllAux: "All auxiliary tasks",
+      moCurrent: "Current: {0}", moUpdated: "Updated ✓",
+      moResetTitle: "Reset auxiliary models?",
+      moResetMsg: "All auxiliary tasks will use the main model again.",
+      moResetAll: "Reset all to auto", moResetDone: "Auxiliary models reset",
+      moAuxIntro: "Override the model used by each auxiliary task; “Auto” follows the main model.",
+      moSetMain: "Set main model", moSetAux: "Set model — {0}",
+      moSavesNew: "Saves new chat sessions only", moRefreshModels: "Refresh models",
+      moFilter: "Filter providers & models…", moPickProvider: "Pick a provider",
+      moNoModels: "No models", moNoMatch: "No match for “{0}”", moLoading: "Loading…",
+      moSwitch: "Switch", moExpensive: "Expensive model",
+      moExpensiveMsg: "“{0}” may be more expensive. Switch anyway?", moSwitchAnyway: "Switch anyway",
+      moReloadTitle: "Model changed", moReloadMsg: "The dashboard needs to reload to apply “{0}”.",
+      moReload: "Reload now",
+      moMoaTitle: "Mixture of Agents", moMoaIntro: "Presets group reference models plus an aggregator for the MoA pipeline.",
+      moMoaSetDefault: "Set default", moMoaDelete: "Delete", moMoaNewName: "New preset name…",
+      moMoaAdd: "Add", moMoaRefs: "Reference models", moMoaAgg: "Aggregator",
+      moMoaAddRef: "Add reference", moMoaRemove: "Remove", moMoaSave: "Save preset", moMoaSaving: "Saving…",
+      moMoaNoRecurse: "“moa” cannot be a reference or aggregator.",
+      moLastUsed: "last used", moToks: "tokens", moProviderModels: "model(s)",
+      moTools: "Tools", moVision: "Vision",
+      auxVision: "Vision", auxWebExtract: "Web extract", auxCompression: "Compression",
+      auxSkillsHub: "Skills hub", auxApproval: "Approval", auxMcp: "MCP",
+      auxTitleGeneration: "Title generation", auxTriageSpecifier: "Triage specifier",
+      auxKanbanDecomposer: "Kanban decomposer", auxProfileDescriber: "Profile describer", auxCurator: "Curator",
+      auxHintVision: "image understanding", auxHintWebExtract: "web page extraction",
+      auxHintCompression: "message summarization", auxHintSkillsHub: "skill commands",
+      auxHintApproval: "approval decisions", auxHintMcp: "MCP tools",
+      auxHintTitleGeneration: "chat titles", auxHintTriageSpecifier: "task triage",
+      auxHintKanbanDecomposer: "kanban breakdown", auxHintProfileDescriber: "user profiles",
+      auxHintCurator: "memory curation"
     },
     fr: {
       overview: "Vue d'ensemble", gatewayOnline: "Passerelle en ligne", gatewayDown: "Passerelle arrêtée",
@@ -307,8 +379,20 @@
       sessionsTitle: "Sessions", sessionsDesc: "Recherche plein-texte dans tout l'historique",
       chats: "Chats", automation: "Automations", archived: "Archivées", messages: "Messages",
       model: "Modèle", lastActivity: "Dernière activité", source: "Source", export: "Exporter",
-      deleteS: "Supprimer", pruneOld: "Purger > 90 j", confirmPrune: "Supprimer les sessions terminées de plus de 90 jours ?",
-      noSessions: "Aucune session pour l'instant", searchResults: "Résultats de recherche", resumeChat: "Reprendre dans le chat",
+      deleteS: "Supprimer", noSessions: "Aucune session pour l'instant", searchResults: "Résultats de recherche", resumeChat: "Reprendre dans le chat",
+      statMessages: "{0} messages", statActive: "Actives", tools: "Appels d'outil", bySource: "Par source",
+      pruneOld: "Purger les anciennes sessions", pruneDaysLbl: "Supprimer les sessions plus anciennes que", pruneDesc: "Supprime les sessions terminées, inutilisées depuis ce nombre de jours.",
+      pruneBtn: "Purger", pruneInvalid: "Saisissez un nombre de jours entier", pruned: "Sessions purgées ✓",
+      deleteEmpty: "Supprimer les sessions vides", deleteEmptyN: "{0} vides", confirmDeleteEmpty: "Supprimer les sessions qui ne contiennent aucun message ?",
+      emptyDeleted: "Sessions vides supprimées ✓",
+      selectSession: "Sélectionner", selectedCount: "{0} sélectionnée(s)", selectAllOnPage: "Tout sélectionner sur cette page", clearSelection: "Effacer la sélection",
+      deleteSelected: "Supprimer la sélection", confirmDeleteSelected: "Supprimer {0} session(s) ?", selectedDeleted: "Sessions supprimées ✓",
+      rename: "Renommer", renameTitle: "Nom de la session", saveTitle: "Enregistrer", renamed: "Renommée ✓",
+      expand: "Déplier", collapse: "Replier", expandMsgs: "Voir les messages", collapseMsgs: "Masquer les messages",
+      loadMessages: "Chargement…", noMessages: "Aucun message", messagesErr: "Impossible de charger les messages",
+      roleUser: "Vous", roleAssistant: "Assistant", roleSystem: "Système", roleTool: "Outil",
+      contextHandoff: "Transfert de contexte", toolCalls: "{0} appel(s) d'outil", liveBadge: "LIVE",
+      match: "Correspondance", page: "Page", of: "sur", prevPage: "Précédente", nextPage: "Suivante", clear: "Effacer", noResults: "Aucun résultat",
       analyticsTitle: "Analytics", analyticsDesc: "Consommation, coûts et taux de cache calculés depuis l'historique des sessions",
       period: "{0} j", cacheTitle: "Taux de cache", sessionsCount: "Sessions", perModel: "Par modèle",
       estCost: "Coût estimé", dailyDetail: "Détail journalier", date: "Date", cache: "Cache", noUsage: "Aucune utilisation enregistrée",
@@ -494,7 +578,50 @@
       gwRestart: "Redémarrer", gwStop: "Arrêter", gwStart: "Démarrer",
       navMore: "Plus", menuTitle: "Navigation", online: "en ligne", offline: "arrêtée",
       catProvider: "Fournisseurs LLM", catTool: "Outils", catMessaging: "Messagerie", catSetting: "Réglages",
-      cronGwDown: "La passerelle est arrêtée — les jobs déclenchés ou planifiés ne s'exécuteront pas tant qu'elle n'est pas démarrée."
+      cronGwDown: "La passerelle est arrêtée — les jobs déclenchés ou planifiés ne s'exécuteront pas tant qu'elle n'est pas démarrée.",
+      /* models */
+      moDesc: "Configurez le modèle de chat principal, les modèles des tâches auxiliaires et les presets Mixture of Agents, et consultez l'usage par modèle.",
+      moSettings: "Réglages des modèles", moAppliesNew: "S'applique aux nouvelles sessions",
+      moMain: "Modèle principal", moAux: "Tâches auxiliaires", moMoa: "Mixture of Agents",
+      moChange: "Changer", moConfigure: "Configurer", moUnset: "non défini", moAuto: "Auto",
+      moOverrideN: "{0} remplacement(s)", moAutoN: "{0} auto", moTasksAllAuto: "Toutes les tâches en auto",
+      moNotLoaded: "non chargé", moRefsN: "{0} référence(s)",
+      moModelsUsed: "Modèles utilisés", moTotalTokens: "Total de tokens", moInput: "Entrée", moOutput: "Sortie",
+      moEstCost: "Coût estimé", moSessions: "Sessions", moAvgSession: "Moy. / session", moApiCalls: "Appels API",
+      moCtx: "ctx", moOutCap: "limite sortie", moCacheRead: "Lecture cache", moReasoning: "Raisonnement",
+      moTokensHidden: "Les détails de tokens et coûts sont masqués — activez « Afficher les analytics de tokens » dans Config → Affichage.",
+      moNoData: "Aucun usage de modèle", moStartSession: "Envoyez un message pour voir l'usage par modèle.",
+      moUseAs: "Utiliser comme", moMainModel: "Modèle principal", moAllAux: "Toutes les tâches auxiliaires",
+      moCurrent: "Actuel : {0}", moUpdated: "Mis à jour ✓",
+      moResetTitle: "Réinitialiser les modèles auxiliaires ?",
+      moResetMsg: "Toutes les tâches auxiliaires utiliseront à nouveau le modèle principal.",
+      moResetAll: "Tout réinitialiser en auto", moResetDone: "Modèles auxiliaires réinitialisés",
+      moAuxIntro: "Remplacez le modèle utilisé par chaque tâche auxiliaire ; « Auto » suit le modèle principal.",
+      moSetMain: "Définir le modèle principal", moSetAux: "Définir le modèle — {0}",
+      moSavesNew: "N'affecte que les nouvelles sessions", moRefreshModels: "Actualiser les modèles",
+      moFilter: "Filtrer fournisseurs & modèles…", moPickProvider: "Choisissez un fournisseur",
+      moNoModels: "Aucun modèle", moNoMatch: "Aucun résultat pour « {0} »", moLoading: "Chargement…",
+      moSwitch: "Changer", moExpensive: "Modèle coûteux",
+      moExpensiveMsg: "« {0} » peut être plus coûteux. Changer quand même ?", moSwitchAnyway: "Changer quand même",
+      moReloadTitle: "Modèle changé", moReloadMsg: "Le tableau de bord doit se recharger pour appliquer « {0} ».",
+      moReload: "Recharger maintenant",
+      moMoaTitle: "Mixture of Agents", moMoaIntro: "Les presets regroupent des modèles de référence et un agrégateur pour le pipeline MoA.",
+      moMoaSetDefault: "Définir par défaut", moMoaDelete: "Supprimer", moMoaNewName: "Nom du nouveau preset…",
+      moMoaAdd: "Ajouter", moMoaRefs: "Modèles de référence", moMoaAgg: "Agrégateur",
+      moMoaAddRef: "Ajouter une référence", moMoaRemove: "Retirer", moMoaSave: "Enregistrer le preset", moMoaSaving: "Enregistrement…",
+      moMoaNoRecurse: "« moa » ne peut pas être une référence ni un agrégateur.",
+      moLastUsed: "dernier usage", moToks: "tokens", moProviderModels: "modèle(s)",
+      moTools: "Outils", moVision: "Vision",
+      auxVision: "Vision", auxWebExtract: "Extraction web", auxCompression: "Compression",
+      auxSkillsHub: "Hub de skills", auxApproval: "Approbations", auxMcp: "MCP",
+      auxTitleGeneration: "Titres de chat", auxTriageSpecifier: "Triage des tâches",
+      auxKanbanDecomposer: "Décomposition kanban", auxProfileDescriber: "Profils utilisateur", auxCurator: "Curateur",
+      auxHintVision: "compréhension d'images", auxHintWebExtract: "extraction de pages web",
+      auxHintCompression: "résumé des messages", auxHintSkillsHub: "commandes de skills",
+      auxHintApproval: "décisions d'approbation", auxHintMcp: "outils MCP",
+      auxHintTitleGeneration: "titres de chat", auxHintTriageSpecifier: "triage des tâches",
+      auxHintKanbanDecomposer: "décomposition kanban", auxHintProfileDescriber: "profils utilisateur",
+      auxHintCurator: "curation mémoire"
     }
   };
 
@@ -792,7 +919,14 @@
     dots: [C(5, 12, 1.6), C(12, 12, 1.6), C(19, 12, 1.6)],
     copy: [RC(9, 9, 12, 12, 2), P("M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1")],
     mic: [RC(9, 3, 6, 11, 3), P("M5 11a7 7 0 0 0 14 0"), P("M12 18v3")],
-    caret: [P("m8 10 4 4 4-4")]
+    caret: [P("m8 10 4 4 4-4")],
+    star: [P("m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.9L12 17.8 5.8 21l1.2-6.9-5-4.9 6.9-1L12 2Z")],
+    cpu: [RC(4, 4, 16, 16, 2), RC(9, 9, 6, 6, 1), P("M15 2v2M15 20v2M2 15h2M2 9h2M20 15h2M20 9h2M9 2v2M9 20v2")],
+    search: [C(11, 11, 7), P("m21 21-4.3-4.3")],
+    eraser: [P("m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21H7Z"), P("M22 21H7"), P("m5 11 9 9")],
+    archive: [P("M4 8v12h16V8"), P("M2 8V4h20v4"), P("M10 13h4")],
+    chevLeft: [P("m15 6-6 6 6 6")],
+    chevRight: [P("m9 6 6 6-6 6")]
   };
   function Icon(name, cls) {
     return h("svg", { className: "iris-ic " + (cls || ""), viewBox: "0 0 24 24", "aria-hidden": "true" },
@@ -1952,6 +2086,78 @@
   }
 
   /* ================= SESSIONS ================= */
+  var PAGE_SIZE = 20;
+  var SRC_ICONS = { cli: "term", terminal: "term", telegram: "chat", discord: "chat", slack: "chat",
+    whatsapp: "globe", cron: "clock", webhook: "hook", api: "plug", acp: "plug", http: "plug",
+    tool: "tool", local: "hist" };
+  function srcIcon(src) {
+    var s = String(src || "").toLowerCase();
+    for (var k in SRC_ICONS) if (s.indexOf(k) >= 0) return SRC_ICONS[k];
+    return "globe";
+  }
+  function msgRole(r) {
+    var role = String(r || "").toLowerCase();
+    if (role === "user" || role === "human" || role === "client") return "user";
+    if (role === "system") return "system";
+    if (role === "tool" || role === "tool_call" || role === "function") return "tool";
+    return "assistant";
+  }
+  // FTS snippets wrap matches in >>>…<<<; render those as <mark>
+  function SnippetHL(snippet) {
+    var parts = String(snippet || "").split(/(>>>.*?<<<)/);
+    return h("span", { className: "iris-snip" }, parts.map(function (p, i) {
+      if (p.length > 6 && p.indexOf(">>>") === 0 && p.lastIndexOf("<<<") === p.length - 3) {
+        return h("mark", { key: i }, txt(p.slice(3, -3)));
+      }
+      return txt(p);
+    }));
+  }
+  // wrap every occurrence of any search term in <mark>
+  function hlTerms(body, terms) {
+    var out = [];
+    var str = String(body || "");
+    var lo = str.toLowerCase();
+    var ts = (terms || []).map(function (x) { return String(x).trim().toLowerCase(); }).filter(function (x) { return x; });
+    if (!ts.length) return txt(str);
+    var cursor = 0, key = 0;
+    while (cursor < str.length) {
+      var best = -1, blen = 0;
+      ts.forEach(function (tm) {
+        var i = lo.indexOf(tm, cursor);
+        if (i >= 0 && (best < 0 || i < best)) { best = i; blen = tm.length; }
+      });
+      if (best < 0) { out.push(txt(str.slice(cursor))); break; }
+      if (best > cursor) out.push(txt(str.slice(cursor, best)));
+      out.push(h("mark", { key: key++ }, str.slice(best, best + blen)));
+      cursor = best + blen;
+    }
+    return h("span", null, out);
+  }
+  function ToolCallBlock(tc, i) {
+    var name = txt(tc.name || tc.function_name || tc.tool_name || tc.tool || "tool");
+    var args = tc.arguments || tc.args || tc.input;
+    var argsTxt = args == null ? "" : (typeof args === "object" ? txt(JSON.stringify(args)) : txt(args));
+    return h("div", { className: "iris-tc", key: "tc" + i },
+      h("span", { className: "iris-tc-n" }, Icon("tool", "dim")),
+      h("span", null, h("b", null, name), argsTxt ? " " + argsTxt : null));
+  }
+  function MessageBubble(m, terms, t, extraCls) {
+    var role = msgRole(m.role);
+    var content = txt(m.content || m.text || "");
+    var isCompaction = /^\[CONTEXT (COMPACTION|SUMMARY)/.test(content);
+    var lbl = isCompaction ? t("contextHandoff")
+      : ({ user: t("roleUser"), assistant: t("roleAssistant"), system: t("roleSystem"), tool: t("roleTool") })[role] || role;
+    var kids = [h("div", { className: "iris-msg-h", key: "h" },
+      h("b", null, lbl),
+      m.timestamp ? h("span", { className: "iris-msg-t" }, txt(m.timestamp)) : null)];
+    (m.tool_calls || []).forEach(function (tc, i) { kids.push(ToolCallBlock(tc, i)); });
+    if (content) {
+      kids.push(isCompaction
+        ? h("pre", { key: "c" }, content)
+        : h("div", { className: "iris-body", key: "c" }, hlTerms(content, terms)));
+    }
+    return h("div", { className: "iris-msg " + role + (isCompaction ? " compaction" : "") + (extraCls ? " " + extraCls : "") }, kids);
+  }
   function SessionsPage() {
     var locale = useLocale(); var t = makeT(locale);
     var bp = useState(0); var bump = bp[0], setBump = bp[1];
@@ -1961,8 +2167,16 @@
     var sf = useState(""); var sourceFlt = sf[0], setSourceFlt = sf[1];
     var rf = useState(false); var refreshing = rf[0], setRefreshing = rf[1];
     var stats = useJSON("/api/sessions/stats", 30000, bump);
-    var data = useJSON("/api/sessions?limit=50", 15000, bump);
+    var data = useJSON("/api/sessions?limit=200", 15000, bump);
+    var empt = useJSON("/api/sessions/empty/count", 30000, bump);
     var res = useState(null); var results = res[0], setResults = res[1];
+    var pg = useState(1); var page = pg[0], setPage = pg[1];
+    var ss = useState({}); var sel = ss[0], setSel = ss[1];
+    var op = useState(null); var openId = op[0], setOpenId = op[1];
+    var mc = useState({}); var msgs = mc[0], setMsgs = mc[1];
+    var ec = useState({}); var errs = ec[0], setErrs = ec[1];
+    var rn = useState(null); var ren = rn[0], setRen = rn[1];
+    var anchorRef = useRef(null);
 
     function distinctVals(arr, key) {
       var seen = {}, out = [];
@@ -1995,24 +2209,231 @@
       return parts[parts.length - 1] || sv;
     }
 
-    function doSearch() {
+    // debounced full-text search; hits replace the table while q is non-empty
+    useEffect(function () {
+      var alive = true;
+      setPage(1);
       if (!q) { setResults(null); return; }
-      SDK.fetchJSON("/api/sessions/search?q=" + encodeURIComponent(q))
-        .then(function (d) { setResults(asList(d, ["results", "sessions", "matches"])); })
-        .catch(function () { setResults([]); });
+      var h = setTimeout(function () {
+        SDK.fetchJSON("/api/sessions/search?q=" + encodeURIComponent(q))
+          .then(function (d) {
+            if (alive) setResults(asList(d, ["results", "sessions", "matches"]));
+          })
+          .catch(function () { if (alive) setResults([]); });
+      }, 300);
+      return function () { alive = false; clearTimeout(h); };
+    }, [q]);
+
+    // changing filters/query restarts pagination and clears the selection
+    useEffect(function () {
+      setPage(1);
+      setSel({});
+    }, [flt, modelFlt, sourceFlt]);
+
+    // lazy-load a session's messages on first expansion
+    useEffect(function () {
+      if (!openId || msgs[openId] || errs[openId]) return;
+      var alive = true;
+      SDK.fetchJSON("/api/sessions/" + encodeURIComponent(openId) + "/messages")
+        .then(function (d) {
+          if (!alive) return;
+          setMsgs(function (m) { var c = {}; c[openId] = asList(d, ["messages", "items"]); return Object.assign({}, m, c); });
+        })
+        .catch(function () {
+          if (!alive) return;
+          setErrs(function (e) { var c = {}; c[openId] = true; return Object.assign({}, e, c); });
+        });
+      return function () { alive = false; };
+    }, [openId]);
+
+    // after a search-driven expansion lands, bring the first hit into view
+    useEffect(function () {
+      if (!openId || !msgs[openId] || !q) return;
+      var el = document.querySelector(".iris-msg-hit");
+      if (el && el.scrollIntoView) el.scrollIntoView({ block: "center", behavior: "smooth" });
+    }, [openId, msgs, q]);
+
+    function toggleSel(id, shift) {
+      setSel(function (prev) {
+        var next = Object.assign({}, prev);
+        if (next[id]) { delete next[id]; return next; }
+        if (shift && anchorRef.current && list.length) {
+          var a = list.findIndex(function (s) { return (s.id || s.session_id) === anchorRef.current; });
+          var b = list.findIndex(function (s) { return (s.id || s.session_id) === id; });
+          if (a >= 0 && b >= 0) {
+            var lo = Math.min(a, b), hi = Math.max(a, b);
+            for (var i = lo; i <= hi; i++) next[list[i].id || list[i].session_id] = true;
+            return next;
+          }
+        }
+        anchorRef.current = id;
+        next[id] = true;
+        return next;
+      });
     }
+    function selectAllPage() {
+      setSel(function (prev) {
+        var next = Object.assign({}, prev);
+        visible.forEach(function (s) { next[s.id || s.session_id] = true; });
+        return next;
+      });
+    }
+    function deleteSelected() {
+      var ids = Object.keys(sel);
+      if (!ids.length) return;
+      irisConfirm(t, { title: t("deleteSelected"), message: t("confirmDeleteSelected", ids.length), tone: "danger", icon: "trash", ok: t("deleteS") })
+        .then(function (ok) {
+          if (!ok) return;
+          actToast(t, "/api/sessions/bulk-delete", jinit("POST", { ids: ids }), t("selectedDeleted"), function () {
+            setSel({}); setOpenId(null); setBump(bump + 1);
+          });
+        });
+    }
+    function prune() {
+      irisPrompt(t, { title: t("pruneOld"), subtitle: t("pruneDesc"), label: t("pruneDaysLbl"), value: "90", ok: t("pruneBtn"), icon: "trash" })
+        .then(function (v) {
+          if (v == null) return;
+          var days = Math.floor(Number(v));
+          if (!isFinite(days) || days < 1) {
+            irisAlert(t, { title: t("pruneInvalid"), message: t("pruneDesc"), tone: "warn", icon: "alert", ok: t("dlgClose") });
+            return;
+          }
+          actToast(t, "/api/sessions/prune", jinit("POST", { older_than_days: days }), t("pruned"), function () { setBump(bump + 1); });
+        });
+    }
+    function deleteEmpty() {
+      irisConfirm(t, { title: t("deleteEmpty"), message: t("confirmDeleteEmpty"), tone: "danger", icon: "archive", ok: t("deleteS") })
+        .then(function (ok) {
+          if (ok) actToast(t, "/api/sessions/empty", jinit("DELETE"), t("emptyDeleted"), function () { setBump(bump + 1); });
+        });
+    }
+    function doRename(id) {
+      if (!ren || ren.id !== id) return;
+      var val = String(ren.val || "").trim();
+      setRen(null);
+      if (!val) return;
+      actToast(t, "/api/sessions/" + encodeURIComponent(id), jinit("PATCH", { title: val }), t("renamed"), function () { setBump(bump + 1); });
+    }
+
     var s = stats || {};
+    var emptyCount = (empt && typeof empt.count === "number") ? empt.count : null;
+    var selCount = Object.keys(sel).length;
+    var pageCount = Math.max(1, Math.ceil(list.length / PAGE_SIZE));
+    var curPage = Math.min(Math.max(1, page), pageCount);
+    var visible = list.slice((curPage - 1) * PAGE_SIZE, curPage * PAGE_SIZE);
+    var terms = q ? q.split(/\s+/).filter(function (x) { return x; }) : [];
+
+    function SessionDetailRow(sx, id, isOpen, t) {
+      if (!isOpen) return null;
+      var mlist = msgs[id];
+      if (mlist == null) {
+        return h("tr", { className: "iris-expand-row", key: "d" },
+          h("td", { colSpan: 9 }, h("p", { className: "iris-muted" }, errs[id] ? t("messagesErr") : t("loadMessages"))));
+      }
+      if (!mlist.length) {
+        return h("tr", { className: "iris-expand-row", key: "d" },
+          h("td", { colSpan: 9 }, h("p", { className: "iris-muted" }, t("noMessages"))));
+      }
+      var hitSeen = false;
+      return h("tr", { className: "iris-expand-row", key: "d" },
+        h("td", { colSpan: 9 },
+          h("div", { className: "iris-timeline" }, mlist.map(function (m, i) {
+            var hitCls = null;
+            if (terms.length) {
+              var c = String(m.content || "").toLowerCase();
+              if (!hitSeen && terms.some(function (tm) { return c.indexOf(tm) >= 0; })) {
+                hitSeen = true; hitCls = "iris-msg-hit";
+              }
+            }
+            return MessageBubble(m, terms, t, hitCls);
+          }))));
+    }
+
+    function sessRow(sx, i, t) {
+      var id = sx.id || sx.session_id || "";
+      var isOpen = openId === id;
+      var isSel = !!sel[id];
+      var toolN = firstNum(sx.tool_calls, sx.tool_call_count, sx.num_tool_calls);
+      return h(React.Fragment, { key: i },
+        h("tr", null,
+          h("td", null, id ? h("button", {
+            className: "iris-checkbox" + (isSel ? " on" : ""), role: "checkbox", "aria-checked": isSel,
+            "aria-label": t("selectSession"), title: t("selectSession"), type: "button",
+            onClick: function (e) { e.stopPropagation(); toggleSel(id, e.shiftKey); }
+          }, Icon("check", "tiny")) : null),
+          h("td", null,
+            h("div", null,
+              id ? h("button", {
+                className: "iris-caret" + (isOpen ? " on" : ""), type: "button",
+                "aria-label": isOpen ? t("collapseMsgs") : t("expandMsgs"),
+                title: isOpen ? t("collapseMsgs") : t("expandMsgs"),
+                onClick: function () { setOpenId(isOpen ? null : id); }
+              }, Icon("chevRight", "sm")) : null,
+              (ren && ren.id === id)
+                ? h("input", { className: "iris-input", style: { width: 230 }, value: ren.val, autoFocus: true,
+                    spellCheck: false,
+                    onChange: function (e) { setRen({ id: id, val: e.target.value }); },
+                    onClick: function (e) { e.stopPropagation(); },
+                    onKeyDown: function (e) {
+                      if (e.key === "Enter") { e.preventDefault(); doRename(id); }
+                      if (e.key === "Escape") { e.preventDefault(); setRen(null); }
+                    } })
+                : h("a", {
+                    className: "iris-link", href: "/chat?resume=" + encodeURIComponent(id), title: t("resumeChat"),
+                    onClick: function (e) { e.preventDefault(); navTo("/chat?resume=" + encodeURIComponent(id)); }
+                  }, h("b", null, sx.is_active ? LiveDot() : null, " ", txt(sx.name || sx.title) || id || "session"),
+                    terms.length && sx.role ? Badge(({ user: t("roleUser"), assistant: t("roleAssistant"), system: t("roleSystem"), tool: t("roleTool") })[msgRole(sx.role)] || txt(sx.role), "neutral") : null),
+              sx.is_active ? Badge(t("liveBadge"), "good") : null),
+            h("small", { className: "iris-muted" },
+              terms.length
+                ? SnippetHL(sx.snippet || sx.preview || "")
+                : txt(sx.preview).slice(0, 120))),
+          h("td", { className: "hide-m" },
+            h("span", { className: "iris-src" }, Icon(srcIcon(sx.source), "dim"), " ", txt(sx.source) || "—")),
+          h("td", { className: "hide-m" }, sx.model ? ModelBadge(modelShort(sx.model)) : "—"),
+          h("td", { className: "r num hide-m" }, fmtTokens(firstNum(sx.tokens, sx.total_tokens), locale)),
+          h("td", { className: "r num hide-m" }, firstNum(sx.message_count, sx.messages) != null ? String(firstNum(sx.message_count, sx.messages)) : "—"),
+          h("td", { className: "r num hide-m", title: t("toolCalls", toolN) }, toolN != null ? String(toolN) : "—"),
+          h("td", { className: "r num" }, fmtRel(sx.updated_at || sx.last_activity || sx.created_at || sx.session_started, t, locale) || "—"),
+          h("td", { className: "r" }, h("div", { className: "iris-tbl-actions" },
+            id ? h("button", { className: "iris-link", onClick: function () { setRen({ id: id, val: txt(sx.name || sx.title) || id }); } }, t("rename")) : null,
+            id ? h("a", { className: "iris-link", href: "/api/sessions/" + encodeURIComponent(id) + "/export" }, t("export")) : null,
+            id ? h("button", {
+              className: "iris-link", style: { color: "var(--color-destructive)" },
+              onClick: function () {
+                askDelete(t, txt(sx.name) || id, function () {
+                  actToast(t, "/api/sessions/" + encodeURIComponent(id), jinit("DELETE"), t("deleted"), function () { setBump(bump + 1); });
+                });
+              }
+            }, t("deleteS")) : null))),
+        SessionDetailRow(sx, id, isOpen, t));
+    }
+
+    var colSpecs = [
+      { l: "" },
+      { l: t("sessionsTitle") },
+      { l: t("source"), m: 1 },
+      { l: t("model"), m: 1 },
+      { l: t("tokens"), r: 1, m: 1 },
+      { l: t("messages"), r: 1, m: 1 },
+      { l: t("tools"), r: 1, m: 1 },
+      { l: t("lastActivity"), r: 1 },
+      { l: "", r: 1 }
+    ];
+    var srcKeys = Object.keys(s.by_source || {});
     return h("div", { className: "iris-page" },
-      PageHead(t("sessionsTitle"),
-        (s.total != null ? s.total + " " + t("sessionsTitle").toLowerCase() + " · " : "") +
-        (s.active_store != null ? t("sessActive", s.active_store) + " · " : "") +
-        (s.archived != null ? s.archived + " " + t("archived").toLowerCase() + " · " : "") + t("sessionsDesc"),
-        Btn(t("pruneOld"), function () {
-          irisConfirm(t, { title: t("pruneOld"), message: t("confirmPrune"), tone: "danger", icon: "trash", ok: t("deleteS") })
-            .then(function (ok) {
-              if (ok) actToast(t, "/api/sessions/prune", jinit("POST", { days: 90 }), t("deleted"), function () { setBump(bump + 1); });
-            });
-        })),
+      PageHead(t("sessionsTitle"), t("sessionsDesc"),
+        Btn(t("pruneOld"), prune, "", false, "trash")),
+      h("div", { className: "iris-statbar" },
+        h("div", { className: "iris-stat" }, h("b", null, s.total != null ? s.total : "—"), h("span", null, t("sessionsTitle"))),
+        h("div", { className: "iris-stat" }, h("b", null, s.active_store != null ? s.active_store : "—"), h("span", null, t("statActive"))),
+        h("div", { className: "iris-stat" }, h("b", null, s.archived != null ? s.archived : "—"), h("span", null, t("archived"))),
+        h("div", { className: "iris-stat" }, h("b", null, s.messages != null ? s.messages : "—"), h("span", null, t("messages")))),
+      srcKeys.length ? h("div", { className: "iris-srcbar" },
+        h("span", { className: "iris-muted" }, t("bySource") + " : "),
+        srcKeys.map(function (k, i) {
+          return h("span", { className: "iris-srcchip", key: i }, Icon(srcIcon(k), "dim"), h("b", null, String(s.by_source[k])), " ", txt(k));
+        })) : null,
       h("div", { className: "iris-tabs" },
         [{ v: "all", l: t("all") }, { v: "chats", l: t("chats") }, { v: "auto", l: t("automation") }, { v: "archived", l: t("archived") }]
           .map(function (o, i) {
@@ -2022,11 +2443,15 @@
             }, o.l);
           })),
       h("div", { className: "iris-filterbar" },
-        h("input", {
-          className: "iris-input", type: "search", placeholder: t("searchFTS"), value: q,
-          onChange: function (e) { setQ(e.target.value); },
-          onKeyDown: function (e) { if (e.key === "Enter") doSearch(); }
-        }),
+        h("div", { className: "iris-search-wrap" },
+          h("input", {
+            className: "iris-input", type: "search", placeholder: t("searchFTS"), value: q,
+            onChange: function (e) { setQ(e.target.value); }
+          }),
+          q ? h("button", {
+            className: "iris-search-clear", "aria-label": t("clear"), title: t("clear"), type: "button",
+            onClick: function () { setQ(""); }
+          }, Icon("x", "sm")) : null),
         h("select", {
           className: "iris-input", value: modelFlt,
           onChange: function (e) { setModelFlt(e.target.value); }
@@ -2037,50 +2462,38 @@
           onChange: function (e) { setSourceFlt(e.target.value); }
         }, [h("option", { key: "_all", value: "" }, t("allSources"))].concat(
           sourceOpts.map(function (m, i) { return h("option", { key: i, value: m }, m); }))),
+        emptyCount ? Btn(t("deleteEmptyN", emptyCount), deleteEmpty, "sm", false, "archive") : null,
         Btn(refreshing ? "…" : t("refresh"), function () {
           setRefreshing(true); setBump(bump + 1);
           setTimeout(function () { setRefreshing(false); }, 700);
         }, "sm", refreshing)),
-      results ? Card(t("searchResults") + " (" + results.length + ")", null,
-        results.length ? results.slice(0, 20).map(function (r, i) {
-          return h(React.Fragment, { key: i },
-            Row("", r.name || r.title || r.id || "session", r.snippet || r.preview || "", null));
-        }) : Empty(t("noSessions"))) : null,
-      Table(
-        [{ l: t("sessionsTitle") }, { l: t("source"), m: 1 }, { l: t("model"), m: 1 },
-         { l: t("tokens"), r: 1 }, { l: t("messages"), r: 1, m: 1 }, { l: t("lastActivity"), r: 1 }, { l: "", r: 1 }],
-        list.length ? list.map(function (sx, i) {
-          var id = sx.id || sx.session_id || "";
-          return h("tr", {
-            key: i, className: id ? "iris-rowlink" : null,
-            title: id ? t("resumeChat") : null,
-            tabIndex: id ? 0 : null, role: id ? "link" : null,
-            onClick: id ? function () { navTo("/chat?resume=" + encodeURIComponent(id)); } : null,
-            onKeyDown: id ? function (e) {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                navTo("/chat?resume=" + encodeURIComponent(id));
-              }
-            } : null
-          },
-            h("td", null, h("b", null, sx.is_active ? LiveDot() : null, txt(sx.name || sx.title) || id || "session"),
-              h("br"), h("small", { className: "iris-muted" }, txt(sx.preview).slice(0, 80))),
-            h("td", { className: "hide-m" }, txt(sx.source) || "—"),
-            h("td", { className: "hide-m" }, sx.model ? ModelBadge(modelShort(sx.model)) : "—"),
-            h("td", { className: "r num" }, fmtTokens(firstNum(sx.tokens, sx.total_tokens))),
-            h("td", { className: "r num hide-m" }, firstNum(sx.message_count, sx.messages) != null ? String(firstNum(sx.message_count, sx.messages)) : "—"),
-            h("td", { className: "r num" }, fmtRel(sx.updated_at || sx.last_activity || sx.created_at, t, locale) || "—"),
-            h("td", { className: "r", onClick: function (e) { e.stopPropagation(); } },
-              id ? h("a", { className: "iris-link", href: "/api/sessions/" + id + "/export" }, t("export")) : null, " ",
-              id ? h("button", {
-                className: "iris-link", style: { color: "var(--color-destructive)" },
-                onClick: function () {
-                  askDelete(t, txt(sx.name) || id, function () {
-                    actToast(t, "/api/sessions/" + id, jinit("DELETE"), t("deleted"), function () { setBump(bump + 1); });
-                  });
-                }
-              }, t("deleteS")) : null));
-        }) : h("tr", null, h("td", { colSpan: 7 }, Empty(t("noSessions"))))));
+      selCount ? h("div", { className: "iris-bulkbar" },
+        h("b", null, t("selectedCount", selCount)),
+        h("span", { className: "iris-spacer" }),
+        Btn(t("selectAllOnPage"), selectAllPage, "sm"),
+        Btn(t("clearSelection"), function () { setSel({}); }, "sm"),
+        Btn(t("deleteSelected"), deleteSelected, "sm danger", false, "trash")) : null,
+      results
+        ? h(React.Fragment, null,
+            Card(t("searchResults") + " (" + results.length + ")", null, null),
+            Table(colSpecs, results.length
+              ? results.map(function (r, i) { return sessRow(r, i, t); })
+              : h("tr", null, h("td", { colSpan: 9 }, Empty(t("noResults"))))))
+        : h(React.Fragment, null,
+            Table(colSpecs, list.length
+              ? visible.map(function (sx, i) { return sessRow(sx, i, t); })
+              : h("tr", null, h("td", { colSpan: 9 }, Empty(t("noSessions"))))),
+            pageCount > 1 ? h("div", { className: "iris-pager" },
+              h("button", {
+                className: "iris-icon-btn", type: "button", "aria-label": t("prevPage"), title: t("prevPage"),
+                onClick: function () { setPage(Math.max(1, curPage - 1)); }
+              }, Icon("chevLeft", "sm")),
+              h("span", null, t("page"), " ", h("b", { className: "num" }, String(curPage)), " ", t("of"), " ",
+                h("b", { className: "num" }, String(pageCount))),
+              h("button", {
+                className: "iris-icon-btn", type: "button", "aria-label": t("nextPage"), title: t("nextPage"),
+                onClick: function () { setPage(Math.min(pageCount, curPage + 1)); }
+              }, Icon("chevRight", "sm"))) : null));
   }
 
   /* ================= ANALYTICS ================= */
@@ -2149,6 +2562,805 @@
               h("td", { className: "r num hide-m" }, d.cache != null ? Math.round(d.cache) + " %" : "—"),
               h("td", { className: "r num" }, fmtCost(d.cost, locale)));
           }) : h("tr", null, h("td", { colSpan: 5 }, Empty(t("noUsage")))))));
+  }
+
+  /* ================= MODELS =================
+     Reproduction pass of the native Models page: main model + auxiliary
+     tasks + Mixture of Agents presets in the settings panel, per-model
+     usage cards below, token/cost UI gated on dashboard.show_token_analytics.
+     Endpoints are the documented GETs plus the two assignment POST/PUTs. */
+  function shortModelName(id) {
+    var s = txt(id);
+    var i = s.indexOf("/");
+    return i > 0 ? s.slice(i + 1) : s;
+  }
+  function modelVendor(id, fallback) {
+    var s = txt(id);
+    var i = s.indexOf("/");
+    return i > 0 ? s.slice(0, i) : (fallback || "");
+  }
+  // model-card cost keeps the native precision (down to 4 decimals) instead of
+  // the 2-decimal fmtCost used on the analytics tiles
+  function fmtUsd(n, locale) {
+    if (n == null) return "—";
+    var v = Number(n);
+    var s = v >= 1 ? v.toFixed(2) : v >= 0.01 ? v.toFixed(3) : v > 0 ? v.toFixed(4) : "0";
+    return (locale === "fr" ? s.replace(".", ",") : s) + " $";
+  }
+  // must match hermes_cli/web_server.py _AUX_TASK_SLOTS
+  var AUX_TASKS = [
+    { key: "vision", icon: "eye", lk: "auxVision", hk: "auxHintVision" },
+    { key: "web_extract", icon: "globe", lk: "auxWebExtract", hk: "auxHintWebExtract" },
+    { key: "compression", icon: "zap", lk: "auxCompression", hk: "auxHintCompression" },
+    { key: "skills_hub", icon: "spark", lk: "auxSkillsHub", hk: "auxHintSkillsHub" },
+    { key: "approval", icon: "shield", lk: "auxApproval", hk: "auxHintApproval" },
+    { key: "mcp", icon: "plug", lk: "auxMcp", hk: "auxHintMcp" },
+    { key: "title_generation", icon: "pencil", lk: "auxTitleGeneration", hk: "auxHintTitleGeneration" },
+    { key: "triage_specifier", icon: "caret", lk: "auxTriageSpecifier", hk: "auxHintTriageSpecifier" },
+    { key: "kanban_decomposer", icon: "grid", lk: "auxKanbanDecomposer", hk: "auxHintKanbanDecomposer" },
+    { key: "profile_describer", icon: "users", lk: "auxProfileDescriber", hk: "auxHintProfileDescriber" },
+    { key: "curator", icon: "brain", lk: "auxCurator", hk: "auxHintCurator" }
+  ];
+  function auxEntry(task) {
+    for (var i = 0; i < AUX_TASKS.length; i++) if (AUX_TASKS[i].key === task) return AUX_TASKS[i];
+    return null;
+  }
+  // GET /api/model/options providers: array of {name, slug, models} (also
+  // tolerates the legacy {slug: {label, models}} dict shape)
+  function normProviders(data) {
+    var out = [];
+    var p = data && data.providers;
+    if (Array.isArray(p)) {
+      p.forEach(function (pr, i) {
+        var nm = txt(pr.slug) || txt(pr.name) || ("p" + i);
+        out.push({ slug: nm, name: txt(pr.name) || nm, models: asList(pr, ["models", "items"]),
+          is_current: !!pr.is_current, warning: txt(pr.warning) });
+      });
+    } else if (p && typeof p === "object") {
+      Object.keys(p).forEach(function (k) {
+        var v = p[k];
+        out.push({ slug: k, name: txt(v && (v.label || v.title)) || k, models: asList(v, ["models", "items"]),
+          is_current: !!(v && v.is_current), warning: txt(v && v.warning) });
+      });
+    }
+    return out;
+  }
+  // The shell's page column is a `relative z-2` stacking context that traps
+  // fixed descendants below the app sidebar — modals must reach body.
+  function portal(node) {
+    try {
+      if (SDK.React && SDK.React.createPortal) return SDK.React.createPortal(node, document.body);
+      if (SDK.ReactDOM && SDK.ReactDOM.createPortal) return SDK.ReactDOM.createPortal(node, document.body);
+      if (window.ReactDOM && window.ReactDOM.createPortal) return window.ReactDOM.createPortal(node, document.body);
+    } catch (e) { /* noop */ }
+    return node;
+  }
+  // Portal'd modal shell shared by the picker / aux / MoA dialogs. Nested
+  // modals (picker inside aux/MoA) each register in MODAL_DEPTH: Escape only
+  // closes the top-most one.
+  var MODAL_DEPTH = 0;
+  function ModalShell(props) {
+    var t = makeT(useLocale());
+    var onClose = props.onClose;
+    var mref = { current: null };
+    var token = { v: 0 };
+    useEffect(function () {
+      token.v = ++MODAL_DEPTH;
+      var prev = document.activeElement;
+      function onKey(e) {
+        if (e.key === "Escape") {
+          if (token.v !== MODAL_DEPTH) return;
+          e.preventDefault(); e.stopPropagation();
+          onClose(); return;
+        }
+        if (e.key === "Tab" && mref.current) {
+          if (token.v !== MODAL_DEPTH) return;
+          var nodes = mref.current.querySelectorAll(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+          var list = Array.prototype.filter.call(nodes, function (n) {
+            return !n.disabled && n.offsetParent !== null;
+          });
+          if (!list.length) return;
+          var first = list[0], last = list[list.length - 1], cur = document.activeElement;
+          if (e.shiftKey) {
+            if (cur === first || !mref.current.contains(cur)) { e.preventDefault(); last.focus(); }
+          } else if (cur === last || !mref.current.contains(cur)) {
+            e.preventDefault(); first.focus();
+          }
+        }
+      }
+      document.addEventListener("keydown", onKey, true);
+      return function () {
+        MODAL_DEPTH -= 1;
+        document.removeEventListener("keydown", onKey, true);
+        try { if (prev && prev.focus) prev.focus(); } catch (e) { /* noop */ }
+      };
+    }, []);
+    var node = h("div", {
+      className: "iris-modal-scrim",
+      onMouseDown: function (e) { if (e.target === e.currentTarget) onClose(); }
+    },
+      h("div", { className: "iris-modal" + (props.wide ? " wide" : ""), ref: mref, role: "dialog", "aria-modal": "true", "aria-label": props.title },
+        h("div", { className: "iris-modal-head" },
+          h("span", { className: "iris-icbox iris-i" }, Icon(props.icon || "cog")),
+          h("div", { className: "iris-modal-title" },
+            h("b", null, props.title),
+            props.subtitle ? h("small", null, props.subtitle) : null),
+          IconBtn("x", onClose, t("cancel"))),
+        h("div", { className: "iris-modal-body" }, props.children),
+        props.foot ? h("div", { className: "iris-modal-foot" }, props.foot) : null));
+    return portal(node);
+  }
+  // stacked token bar (input/output/cache/reasoning) + legend
+  function TokenBar(props) {
+    var locale = useLocale(); var t = makeT(locale);
+    var input = firstNum(props.input, 0) || 0;
+    var output = firstNum(props.output, 0) || 0;
+    var cacheRead = firstNum(props.cacheRead, 0) || 0;
+    var reasoning = firstNum(props.reasoning, 0) || 0;
+    var total = input + output + cacheRead + reasoning;
+    if (!total) return null;
+    var segs = [
+      { v: cacheRead, c: "#60a5fa", l: t("moCacheRead") },
+      { v: reasoning, c: "#c084fc", l: t("moReasoning") },
+      { v: input, c: "var(--iris-series-1, var(--color-primary,#5b4bd4))", l: t("moInput") },
+      { v: output, c: "var(--iris-series-2, var(--color-success,#22b573))", l: t("moOutput") }
+    ].filter(function (s) { return s.v > 0; });
+    return h("div", { className: "iris-tbar" },
+      h("div", { className: "iris-tbar-bar" },
+        segs.map(function (s, i) {
+          return h("i", { key: i, style: { width: (s.v / total * 100) + "%", background: "color-mix(in srgb, " + s.c + " 70%, transparent)" } });
+        })),
+      h("div", { className: "iris-tbar-legend" },
+        segs.map(function (s, i) {
+          return h("span", { key: i, className: "iris-tbar-item" },
+            h("i", { className: "iris-tbar-dot", style: { background: s.c } }),
+            " " + s.l + " " + fmtTokens(s.v, locale));
+        })));
+  }
+  function CapBadges(props) {
+    var t = makeT(useLocale());
+    var caps = props.caps || {};
+    if (!caps.supports_tools && !caps.supports_vision && !caps.supports_reasoning && !caps.model_family) return null;
+    return h("div", { className: "iris-badges" },
+      caps.supports_tools ? h("span", { className: "iris-badge good" }, Icon("tool", "tiny"), " ", t("moTools")) : null,
+      caps.supports_vision ? h("span", { className: "iris-badge vis" }, Icon("eye", "tiny"), " ", t("moVision")) : null,
+      caps.supports_reasoning ? h("span", { className: "iris-badge reas" }, Icon("brain", "tiny"), " ", t("moReasoning")) : null,
+      caps.model_family ? h("span", { className: "iris-badge neutral" }, txt(caps.model_family)) : null);
+  }
+  // per-card "Use as" dropdown (main / all aux / per-task)
+  function UseAsMenu(props) {
+    var t = makeT(useLocale());
+    var st = useState(false); var open = st[0], setOpen = st[1];
+    var bs = useState(false); var busy = bs[0], setBusy = bs[1];
+    var cf = useState(null); var confirm = cf[0], setConfirm = cf[1];
+    useEffect(function () {
+      if (!open) return undefined;
+      function onDown(e) {
+        var tgt = e.target;
+        if (!tgt || !tgt.closest || !tgt.closest("[data-use-as]")) setOpen(false);
+      }
+      window.addEventListener("mousedown", onDown);
+      return function () { window.removeEventListener("mousedown", onDown); };
+    }, [open]);
+    useEffect(function () {
+      if (!confirm) return undefined;
+      irisConfirm(t, {
+        title: t("moExpensive"), message: confirm.message, tone: "warn", icon: "coin", ok: t("moSwitchAnyway")
+      }).then(function (ok) {
+        var c = confirm;
+        setConfirm(null);
+        if (ok && c) assign(c.scope, c.task, true);
+      });
+      return undefined;
+    }, [confirm]);
+    function assign(scope, task, confirmExpensive) {
+      if (!props.provider || !props.model) return;
+      setBusy(true);
+      SDK.fetchJSON("/api/model/set", jinit("POST", {
+        confirm_expensive_model: !!confirmExpensive,
+        scope: scope, provider: props.provider, model: props.model, task: task || ""
+      })).then(function (r) {
+        if (r && r.confirm_required) {
+          setConfirm({ scope: scope, task: task || "", message: txt(r.confirm_message) || t("moExpensiveMsg", props.model) });
+          return;
+        }
+        if (props.onAssigned) props.onAssigned();
+        setOpen(false);
+      }).catch(function (e) {
+        irisAlert(t, { title: t("errTitle"), message: String((e && e.message) || e), tone: "danger", icon: "alert" });
+      }).then(function () { setBusy(false); });
+    }
+    return h("div", { className: "iris-usemenu", "data-use-as": "", style: open ? { zIndex: 20 } : null },
+      Btn(t("moUseAs"), function () { setOpen(!open); }, "sm", busy, "caret"),
+      open ? h("div", { className: "iris-usemenu-pop" },
+        h("button", { type: "button", className: "iris-usemenu-item", disabled: busy, onClick: function () { assign("main", ""); } },
+          h("span", { className: "iris-usemenu-lbl" }, Icon("star", "tiny"), " ", t("moMainModel")),
+          props.isMain ? h("em", null, t("moCurrent")) : null),
+        h("div", { className: "iris-usemenu-label" }, t("moAux")),
+        h("button", { type: "button", className: "iris-usemenu-item", disabled: busy, onClick: function () { assign("auxiliary", ""); } },
+          h("span", { className: "iris-usemenu-lbl" }, t("moAllAux"))),
+        AUX_TASKS.map(function (at, i) {
+          return h("button", { key: i, type: "button", className: "iris-usemenu-item", disabled: busy, onClick: function () { assign("auxiliary", at.key); } },
+            h("span", { className: "iris-usemenu-lbl" }, t(at.lk)),
+            props.mainAuxTask === at.key ? h("em", null, t("moCurrent")) : null);
+        })) : null);
+  }
+  function ModelCard(props) {
+    var locale = useLocale(); var t = makeT(locale);
+    var e = props.entry || {};
+    var modelStr = txt(e.model) || "?";
+    var provider = txt(e.provider) || modelVendor(modelStr);
+    var caps = e.capabilities || {};
+    var totalTokens = (firstNum(e.input_tokens, 0) || 0) + (firstNum(e.output_tokens, 0) || 0);
+    var isMain = !!(props.main && txt(props.main.provider) === provider && txt(props.main.model) === modelStr);
+    var mainAuxTask = null;
+    (props.aux || []).some(function (a) {
+      if (txt(a.provider) === provider && txt(a.model) === modelStr) { mainAuxTask = a.task; return true; }
+      return false;
+    });
+    var side = props.showTokens
+      ? h("div", { className: "iris-mcard-stat" },
+          h("b", null, fmtTokens(totalTokens, locale)), h("small", null, t("moToks")))
+      : (firstNum(e.sessions) > 0
+        ? h("div", { className: "iris-mcard-stat" },
+            h("b", null, String(firstNum(e.sessions))), h("small", null, t("moSessions")))
+        : null);
+    return h("section", { className: "iris-card iris-mcard" + (isMain ? " tinted" : "") },
+      h("div", { className: "iris-mcard-head" },
+        h("div", { className: "iris-mcard-titles" },
+          h("div", { className: "iris-mcard-name" },
+            h("span", { className: "iris-mcard-rank" }, "#" + (props.rank || 1)),
+            h("b", null, shortModelName(modelStr)),
+            isMain ? h("span", { className: "iris-badge iris" }, Icon("star", "tiny"), " main") : null,
+            mainAuxTask ? h("span", { className: "iris-badge aux" }, "aux · " + mainAuxTask) : null),
+          h("div", { className: "iris-mcard-meta" },
+            provider ? Badge(provider, "neutral") : null,
+            firstNum(caps.context_window) > 0 ? h("span", { className: "iris-muted" }, fmtTokens(caps.context_window, locale) + " " + t("moCtx")) : null,
+            firstNum(caps.max_output_tokens) > 0 ? h("span", { className: "iris-muted" }, fmtTokens(caps.max_output_tokens, locale) + " " + t("moOutCap")) : null)),
+        h("div", { className: "iris-mcard-side" },
+          side,
+          h(UseAsMenu, { provider: provider, model: modelStr, isMain: isMain, mainAuxTask: mainAuxTask, onAssigned: props.onAssigned }))),
+      h("div", { className: "iris-mcard-body" },
+        props.showTokens ? h(React.Fragment, null,
+          h(TokenBar, { input: e.input_tokens, output: e.output_tokens, cacheRead: e.cache_read_tokens, reasoning: e.reasoning_tokens }),
+          h("div", { className: "iris-mcard-stats" },
+            h("div", null, h("b", null, firstNum(e.sessions) != null ? String(firstNum(e.sessions)) : "—"), h("small", null, t("moSessions"))),
+            h("div", null, h("b", null, firstNum(e.avg_tokens_per_session) != null ? fmtTokens(e.avg_tokens_per_session, locale) : "—"), h("small", null, t("moAvgSession"))),
+            h("div", null, h("b", null, firstNum(e.api_calls) > 0 ? String(firstNum(e.api_calls)) : "—"), h("small", null, t("moApiCalls"))))) : null,
+        h("div", { className: "iris-mcard-foot" },
+          h("div", { className: "iris-mcard-foot-left" },
+            props.showTokens && firstNum(e.estimated_cost) > 0 ? h("span", { className: "iris-mcard-cost" }, Icon("coin", "tiny"), " ", fmtUsd(e.estimated_cost, locale)) : null,
+            props.showTokens && firstNum(e.tool_calls) > 0 ? h("span", null, Icon("zap", "tiny"), " ", String(firstNum(e.tool_calls)), " ", t("moToolCalls")) : null),
+          firstNum(e.last_used_at) > 0 ? h("span", { className: "iris-muted" }, t("moLastUsed") + " " + fmtRel(e.last_used_at, t, locale)) : null),
+        h(CapBadges, { caps: caps })));
+  }
+  // two-stage model picker: provider column → model column. Standalone mode
+  // POSTs /api/model/set itself and surfaces the expensive-model confirm;
+  // applyOnly mode (MoA presets) just calls onApply(provider, model).
+  function ModelPickerModal(props) {
+    var locale = useLocale(); var t = makeT(locale);
+    var cur = props.current || {};
+    var curModel = txt(cur.model) || "";
+    var curProvider = txt(cur.provider) || "";
+    var ld = useState(true); var loading = ld[0], setLoading = ld[1];
+    var er = useState(null); var error = er[0], setError = er[1];
+    var pv = useState([]); var provs = pv[0], setProvs = pv[1];
+    var sl = useState(""); var slug = sl[0], setSlug = sl[1];
+    var md = useState(""); var model = md[0], setModel = md[1];
+    var qr = useState(""); var q = qr[0], setQ = qr[1];
+    var ap = useState(false); var applying = ap[0], setApplying = ap[1];
+    var cf = useState(null); var confirm = cf[0], setConfirm = cf[1];
+    var alive = { current: true };
+    useEffect(function () {
+      alive.current = true;
+      loadOptions(false);
+      return function () { alive.current = false; };
+    }, []);
+    function loadOptions(refresh) {
+      setError(null);
+      setLoading(true);
+      SDK.fetchJSON("/api/model/options?include_unconfigured=1" + (refresh ? "&refresh=1" : ""))
+        .then(function (r) {
+          if (!alive.current) return;
+          var next = normProviders(r);
+          setProvs(next);
+          var chosen = null;
+          next.some(function (p) { if (p.slug === curProvider) { chosen = p; return true; } return false; });
+          if (!chosen) next.some(function (p) { if (p.models.length) { chosen = p; return true; } return false; });
+          if (!chosen) chosen = next[0] || null;
+          setSlug(chosen ? chosen.slug : "");
+          setModel("");
+        })
+        .catch(function (e) {
+          if (!alive.current) return;
+          setError(String((e && e.message) || e));
+        })
+        .then(function () { if (alive.current) setLoading(false); });
+    }
+    function refresh() { loadOptions(true); }
+    var selProv = null;
+    provs.some(function (p) { if (p.slug === slug) { selProv = p; return true; } return false; });
+    var models = selProv ? selProv.models : [];
+    var trimmed = q.trim().toLowerCase();
+    var provsFiltered = trimmed
+      ? provs.filter(function (p) { return (p.name + " " + p.slug + " " + p.models.join(" ")).toLowerCase().indexOf(trimmed) >= 0; })
+      : provs.slice().sort(function (a, b) { return (b.models.length ? 1 : 0) - (a.models.length ? 1 : 0); });
+    var provOnly = !!selProv && trimmed && (selProv.name + " " + selProv.slug).toLowerCase().indexOf(trimmed) >= 0 &&
+      !models.some(function (m) { return txt(m).toLowerCase().indexOf(trimmed) >= 0; });
+    var shownModels = provOnly ? models : models.filter(function (m) {
+      return !trimmed || txt(m).toLowerCase().indexOf(trimmed) >= 0;
+    });
+    var canConfirm = !!selProv && !!model && !applying;
+    function applySelection(confirmExpensive, forced) {
+      var prov = forced ? forced.provider : (selProv ? selProv.slug : "");
+      var mod = forced ? forced.model : model;
+      if (!prov || !mod || applying) return;
+      if (props.applyOnly) {
+        if (props.onApply) props.onApply(prov, mod);
+        props.onClose();
+        return;
+      }
+      setApplying(true);
+      SDK.fetchJSON("/api/model/set", jinit("POST", {
+        confirm_expensive_model: !!confirmExpensive,
+        scope: props.scope || "main", task: props.task || "", provider: prov, model: mod
+      })).then(function (r) {
+        if (r && r.confirm_required) {
+          setConfirm({ provider: prov, model: mod, message: txt(r.confirm_message) || t("moExpensiveMsg", mod) });
+          return;
+        }
+        if (props.onApply) props.onApply(prov, mod);
+        props.onClose();
+      }).catch(function (e) {
+        setError(String((e && e.message) || e));
+      }).then(function () { setApplying(false); });
+    }
+    useEffect(function () {
+      if (!confirm) return undefined;
+      irisConfirm(t, {
+        title: t("moExpensive"), message: confirm.message, tone: "warn", icon: "coin", ok: t("moSwitchAnyway")
+      }).then(function (ok) {
+        var c = confirm;
+        setConfirm(null);
+        if (ok && c) applySelection(true, c);
+      });
+      return undefined;
+    }, [confirm]);
+    var body = h("div", { className: "iris-pick" },
+      h("div", { className: "iris-pick-filter" },
+        h("div", { className: "iris-input-row", style: { flex: 1 } },
+          Icon("search", "dim"),
+          h("input", { className: "iris-input", type: "text", placeholder: t("moFilter"), value: q, autoFocus: true,
+            spellCheck: false, onChange: function (e) { setQ(e.target.value); } })),
+        IconBtn("refresh", refresh, t("moRefreshModels"))),
+      h("div", { className: "iris-pick-cols" },
+        h("div", { className: "iris-pick-prov" },
+          loading ? h("p", { className: "iris-pick-empty" }, t("moLoading"))
+          : error ? h("p", { className: "iris-pick-empty crit" }, error)
+          : !provsFiltered.length ? h("p", { className: "iris-pick-empty" }, t("moNoMatch", q))
+          : provsFiltered.map(function (p, i) {
+              var on = p.slug === slug;
+              return h("button", { key: i, type: "button", className: "iris-pick-prov-item" + (on ? " on" : ""),
+                onClick: function () { setSlug(p.slug); setModel(""); } },
+                h("span", { className: "iris-pick-prov-name" }, p.name, p.is_current ? h("em", null, t("moCurrent")) : null),
+                h("small", null, p.slug + " · " + (p.models.length || 0) + " " + t("moProviderModels")));
+            })),
+        h("div", { className: "iris-pick-models" },
+          !selProv ? h("p", { className: "iris-pick-empty" }, t("moPickProvider"))
+          : selProv.warning ? h("p", { className: "iris-pick-warn" }, selProv.warning)
+          : !shownModels.length ? h("p", { className: "iris-pick-empty" }, models.length ? t("moNoMatch", q) : t("moNoModels"))
+          : shownModels.map(function (m, i) {
+              var mid = txt(m);
+              var on = mid === model;
+              var isCur = mid === curModel && selProv.slug === curProvider;
+              return h("button", { key: i, type: "button", className: "iris-pick-model-item" + (on ? " on" : ""),
+                onClick: function () { setModel(mid); },
+                onDoubleClick: function () { applySelection(false, { provider: selProv.slug, model: mid }); } },
+                h("span", { className: "iris-pick-model-check" }, on ? Icon("check", "tiny") : null),
+                h("span", { className: "iris-pick-model-name" }, mid),
+                isCur ? h("em", null, t("moCurrent")) : null);
+            }))));
+    var foot = h(React.Fragment, null,
+      h("span", { className: "iris-muted", style: { flex: 1, alignSelf: "center" } }, t("moSavesNew")),
+      Btn(t("moRefreshModels"), refresh, "sm", applying || loading, "refresh"),
+      Btn(t("cancel"), props.onClose, "sm", applying),
+      Btn(t("moSwitch"), function () { applySelection(false); }, "primary sm", !canConfirm, "check"));
+    return h(ModalShell, {
+      title: props.title || t("moSwitch"), icon: "cpu", wide: true,
+      subtitle: t("moCurrent", curModel || "—") + (curProvider ? " · " + curProvider : ""),
+      onClose: props.onClose, foot: foot
+    }, body);
+  }
+  // auxiliary tasks modal: per-task override via the picker, reset all to auto
+  function AuxTasksModal(props) {
+    var locale = useLocale(); var t = makeT(locale);
+    var pk = useState(null); var pick = pk[0], setPick = pk[1];
+    var tasks = (props.aux && props.aux.tasks) || [];
+    function curOf(task) {
+      var found = null;
+      tasks.some(function (a) { if (a.task === task) { found = a; return true; } return false; });
+      return found;
+    }
+    function isAuto(a) { return !a || !txt(a.provider) || txt(a.provider) === "auto"; }
+    function resetAll() {
+      irisConfirm(t, { title: t("moResetTitle"), message: t("moResetMsg"), tone: "warn", icon: "refresh", ok: t("moResetAll") })
+        .then(function (ok) {
+          if (!ok) return;
+          SDK.fetchJSON("/api/model/set", jinit("POST", { scope: "auxiliary", task: "__reset__", provider: "", model: "" }))
+            .then(function () {
+              toastPush(t("moResetDone"));
+              if (props.onSaved) props.onSaved();
+              props.onClose();
+            })
+            .catch(function (e) {
+              irisAlert(t, { title: t("errTitle"), message: String((e && e.message) || e), tone: "danger", icon: "alert" });
+            });
+        });
+    }
+    var rows = AUX_TASKS.map(function (at, i) {
+      var a = curOf(at.key);
+      var auto = isAuto(a);
+      var curTxt = auto
+        ? t("moAuto") + " (" + t("moMainModel").toLowerCase() + ")"
+        : txt(a.provider) + " · " + (txt(a.model) || t("moUnset"));
+      return h("div", { key: i, className: "iris-row iris-auxrow" },
+        h("span", { className: "iris-icbox" }, Icon(at.icon)),
+        h("div", { className: "iris-row-body" },
+          h("b", null, t(at.lk), " ", h("span", { className: "iris-muted" }, t(at.hk))),
+          h("small", null, curTxt)),
+        Btn(t("moChange"), function () { setPick(at.key); }, "sm", false, "caret"));
+    });
+    var foot = h(React.Fragment, null,
+      h("span", { className: "iris-spacer" }),
+      Btn(t("moResetAll"), resetAll, "sm", false, "refresh"),
+      Btn(t("dlgClose"), props.onClose, "sm"));
+    return h(ModalShell, { title: t("moAux"), subtitle: t("moAuxIntro"), icon: "tool", wide: true, onClose: props.onClose, foot: foot },
+      rows,
+      pick ? h(ModelPickerModal, {
+        title: t("moSetAux", (auxEntry(pick) ? t(auxEntry(pick).lk) : pick)),
+        scope: "auxiliary", task: pick, current: curOf(pick) || {},
+        onApply: function () { if (props.onSaved) props.onSaved(); },
+        onClose: function () { setPick(null); }
+      }) : null);
+  }
+  // MoA preset editor: references + aggregator via nested pickers, PUT on save
+  function MoaModal(props) {
+    var locale = useLocale(); var t = makeT(locale);
+    var cfg = props.config || {};
+    var df = useState(null); var draft = df[0], setDraft = df[1];
+    var sd = useState(""); var selected = sd[0], setSelected = sd[1];
+    var nn = useState(""); var name = nn[0], setName = nn[1];
+    var bs = useState(false); var busy = bs[0], setBusy = bs[1];
+    var er = useState(null); var error = er[0], setError = er[1];
+    var pk = useState(null); var pick = pk[0], setPick = pk[1];
+    useEffect(function () {
+      if (draft) return;
+      var names = Object.keys((cfg && cfg.presets) || {});
+      setDraft(JSON.parse(JSON.stringify(cfg || {})));
+      setSelected((cfg && txt(cfg.default_preset)) || names[0] || "");
+    }, [cfg]);
+    var presets = (draft && draft.presets) || {};
+    var presetNames = Object.keys(presets);
+    var sel = selected || presetNames[0] || "";
+    var preset = presets[sel] || presets[presetNames[0]];
+    function slotLabel(slot) {
+      slot = slot || {};
+      return (txt(slot.provider) || "(provider)") + " · " + (txt(slot.model) || "(model)");
+    }
+    function updateSel(fn) {
+      setDraft(function (prev) {
+        var next = JSON.parse(JSON.stringify(prev));
+        if (!next.presets[sel]) next.presets[sel] = {};
+        next.presets[sel] = fn(next.presets[sel]);
+        return next;
+      });
+    }
+    function setDefault() {
+      setDraft(function (prev) {
+        var next = JSON.parse(JSON.stringify(prev));
+        next.default_preset = sel;
+        return next;
+      });
+    }
+    function addPreset() {
+      var nm = name.trim();
+      if (!nm || presets[nm]) return;
+      var seed = preset || { reference_models: [], aggregator: {}, enabled: true };
+      setDraft(function (prev) {
+        var next = JSON.parse(JSON.stringify(prev));
+        if (!next.presets[nm]) next.presets[nm] = JSON.parse(JSON.stringify(seed));
+        if (!next.default_preset) next.default_preset = nm;
+        return next;
+      });
+      setSelected(nm);
+      setName("");
+    }
+    function deletePreset() {
+      if (presetNames.length <= 1) return;
+      var remaining = presetNames.filter(function (n) { return n !== sel; });
+      setDraft(function (prev) {
+        var next = JSON.parse(JSON.stringify(prev));
+        delete next.presets[sel];
+        if (next.default_preset === sel) next.default_preset = remaining[0];
+        if (next.active_preset === sel) next.active_preset = "";
+        return next;
+      });
+      setSelected(remaining[0]);
+    }
+    function addReference() {
+      var cur = (preset && preset.reference_models) || [];
+      updateSel(function (p) {
+        p.reference_models = cur.concat([{ provider: "", model: "", enabled: true }]);
+        return p;
+      });
+      setPick({ kind: "reference", index: cur.length });
+    }
+    function removeReference(i) {
+      if (!preset || (preset.reference_models || []).length <= 1) return;
+      updateSel(function (p) {
+        p.reference_models = p.reference_models.filter(function (s, j) { return j !== i; });
+        return p;
+      });
+    }
+    function toggleRef(i, on) {
+      updateSel(function (p) {
+        var refs = (p.reference_models || []).slice();
+        if (refs[i]) refs[i] = Object.assign({}, refs[i], { enabled: on });
+        p.reference_models = refs;
+        return p;
+      });
+    }
+    function onPickModel(prov, mod) {
+      if (prov.toLowerCase() === "moa") { setError(t("moMoaNoRecurse")); return; }
+      setError(null);
+      if (pick.kind === "aggregator") {
+        updateSel(function (p) { p.aggregator = { provider: prov, model: mod }; return p; });
+      } else {
+        updateSel(function (p) {
+          var refs = (p.reference_models || []).slice();
+          if (!refs[pick.index]) refs[pick.index] = {};
+          refs[pick.index].provider = prov;
+          refs[pick.index].model = mod;
+          if (refs[pick.index].enabled === undefined) refs[pick.index].enabled = true;
+          p.reference_models = refs;
+          return p;
+        });
+      }
+      setPick(null);
+    }
+    function save() {
+      setBusy(true); setError(null);
+      SDK.fetchJSON("/api/model/moa", jinit("PUT", draft))
+        .then(function (r) {
+          toastPush(t("saved"));
+          if (props.onSaved) props.onSaved(r);
+          props.onClose();
+        })
+        .catch(function (e) { setError(String((e && e.message) || e)); })
+        .then(function () { setBusy(false); });
+    }
+    var bodyKids = [];
+    bodyKids.push(h("p", null, t("moMoaIntro")));
+    bodyKids.push(h("div", { className: "iris-actions", style: { flexWrap: "wrap" } },
+      h("select", { className: "iris-input", value: sel, onChange: function (e) { setSelected(e.target.value); }, style: { flex: "1 1 140px" } },
+        presetNames.map(function (nm, i) { return h("option", { key: i, value: nm }, nm); })),
+      Btn(t("moMoaSetDefault"), setDefault, "sm", false, "star"),
+      Btn(t("moMoaDelete"), deletePreset, "sm danger", presetNames.length <= 1, "trash"),
+      h("input", { className: "iris-input", type: "text", placeholder: t("moMoaNewName"), value: name,
+        onChange: function (e) { setName(e.target.value); }, style: { flex: "1 1 150px" } }),
+      Btn(t("moMoaAdd"), addPreset, "sm", !name.trim() || !!presets[name.trim()], "plus")));
+    bodyKids.push(h("div", { className: "iris-muted" }, t("moMoaDefault") + ": ",
+      h("b", null, draft ? (txt(draft.default_preset) || "—") : "—")));
+    if (preset) {
+      var refs = preset.reference_models || [];
+      bodyKids.push(h("div", { className: "iris-moa-sec" }, h("b", null, t("moMoaRefs")),
+        refs.map(function (slot, i) {
+          return h("div", { key: i, className: "iris-moa-slot" + (slot.enabled === false ? " off" : "") },
+            h(Switch(slot.enabled !== false, function () { toggleRef(i, slot.enabled === false); }, slotLabel(slot))),
+            h("span", { className: "iris-moa-slot-lbl iris-mono" }, slotLabel(slot)),
+            Btn(t("moChange"), function () { setPick({ kind: "reference", index: i }); }, "sm", false, "caret"),
+            Btn(t("moMoaRemove"), function () { removeReference(i); }, "sm", refs.length <= 1, "trash"));
+        }),
+        Btn(t("moMoaAddRef"), addReference, "sm", false, "plus")));
+      bodyKids.push(h("div", { className: "iris-moa-sec" }, h("b", null, t("moMoaAgg")),
+        h("div", { className: "iris-moa-slot" },
+          h("span", { className: "iris-moa-slot-lbl iris-mono" }, slotLabel(preset.aggregator)),
+          Btn(t("moChange"), function () { setPick({ kind: "aggregator" }); }, "sm", false, "caret"))));
+    } else {
+      bodyKids.push(Empty(t("moNoData")));
+    }
+    if (error) bodyKids.push(h("p", { className: "iris-moa-err" }, error));
+    var foot = h(React.Fragment, null,
+      h("span", { className: "iris-spacer" }),
+      Btn(t("cancel"), props.onClose, "sm", busy),
+      Btn(busy ? t("moMoaSaving") : t("moMoaSave"), save, "primary sm", busy));
+    return h(ModalShell, { title: t("moMoaTitle"), subtitle: t("moMoaIntro"), icon: "cpu", wide: true, onClose: props.onClose, foot: foot },
+      bodyKids,
+      pick ? h(ModelPickerModal, {
+        title: pick.kind === "aggregator" ? t("moMoaAgg") : t("moMoaRefs"),
+        applyOnly: true, scope: "main", task: "", current: {},
+        onApply: onPickModel, onClose: function () { setPick(null); }
+      }) : null);
+  }
+  // full-page reload confirm after a main-model switch (native ModelReloadConfirm)
+  function ReloadConfirm(props) {
+    var t = makeT(useLocale());
+    useEffect(function () {
+      if (!props.model) return;
+      irisConfirm(t, {
+        title: t("moReloadTitle"), message: t("moReloadMsg", props.model),
+        icon: "refresh", tone: "iris", ok: t("moReload")
+      }).then(function (ok) {
+        if (props.onClose) props.onClose();
+        if (ok) window.location.reload();
+      });
+    }, [props.model]);
+    return null;
+  }
+  function ModelsStats(props) {
+    var t = props.t, locale = props.locale;
+    var tot = props.totals || {};
+    var distinct = firstNum(tot.distinct_models);
+    var totalIn = firstNum(tot.total_input, 0) || 0;
+    var totalOut = firstNum(tot.total_output, 0) || 0;
+    var cost = firstNum(tot.total_estimated_cost);
+    var sessions = firstNum(tot.total_sessions);
+    var items = props.showTokens
+      ? [
+          [t("moModelsUsed"), distinct != null ? String(distinct) : "—"],
+          [t("moTotalTokens"), fmtTokens(totalIn + totalOut, locale)],
+          [t("moInput"), fmtTokens(totalIn, locale)],
+          [t("moOutput"), fmtTokens(totalOut, locale)],
+          [t("moEstCost"), fmtUsd(cost, locale)],
+          [t("moSessions"), sessions != null ? String(sessions) : "—"]
+        ]
+      : [
+          [t("moModelsUsed"), distinct != null ? String(distinct) : "—"],
+          [t("moSessions"), sessions != null ? String(sessions) : "—"]
+        ];
+    return h("section", { className: "iris-card" },
+      h("div", { className: "iris-mstats" },
+        items.map(function (it, i) {
+          return h("div", { key: i, className: "iris-mstat" },
+            h("small", null, it[0]),
+            h("b", null, it[1]));
+        })),
+      props.showTokens ? null : h("p", { className: "iris-note" }, t("moTokensHidden"), " ", LinkTo("/config", t("navConfig"))));
+  }
+  function ModelSettingsPanel(props) {
+    var locale = useLocale(); var t = makeT(locale);
+    var aux = props.aux;
+    var am = useState(false); var auxOpen = am[0], setAuxOpen = am[1];
+    var mm = useState(false); var moaOpen = mm[0], setMoaOpen = mm[1];
+    var md = useState(null); var moa = md[0], setMoa = md[1];
+    var pk = useState(null); var picking = pk[0], setPicking = pk[1];
+    var rl = useState(null); var reloadModel = rl[0], setReloadModel = rl[1];
+    var mainProv = (aux && aux.main) ? txt(aux.main.provider) : "";
+    var mainModel = (aux && aux.main) ? txt(aux.main.model) : "";
+    useEffect(function () {
+      SDK.fetchJSON("/api/model/moa").then(function (r) { setMoa(r); }).catch(function () { setMoa(null); });
+    }, [props.refreshKey]);
+    var auxOverrideCount = 0;
+    ((aux && aux.tasks) || []).forEach(function (a) { if (txt(a.provider) && txt(a.provider) !== "auto") auxOverrideCount++; });
+    function onSaved() { if (props.onSaved) props.onSaved(); }
+    function applyMainPick(prov, mod) {
+      toastPush(t("updated"));
+      setReloadModel(shortModelName(mod));
+      onSaved();
+    }
+    var moaRefCount = 0;
+    var moaAgg = "";
+    if (moa) {
+      var moaPresets = (moa.presets || {});
+      var moaDef = txt(moa.default_preset) || Object.keys(moaPresets)[0] || "";
+      var moaP = (moaPresets[moaDef] || {});
+      var moaRefs = moaP.reference_models || moa.reference_models || [];
+      var moaAggSlot = moaP.aggregator || moa.aggregator || {};
+      moaRefCount = Array.isArray(moaRefs) ? moaRefs.length : 0;
+      moaAgg = txt(moaAggSlot.model) || "";
+    }
+    return h("section", { className: "iris-card" },
+      h("div", { className: "iris-card-head" },
+        h("h3", null, TL("cpu", t("moSettings"))),
+        h("span", { className: "iris-muted" }, t("moAppliesNew"))),
+      h("div", { className: "iris-mrow" },
+        h("div", { className: "iris-mrow-txt" },
+          h("b", null, Icon("star", "tiny"), " ", t("moMain")),
+          h("small", null, (mainProv || t("moUnset")) + (mainProv && mainModel ? " · " : "") + (mainModel || t("moUnset")))),
+        Btn(t("moChange"), function () { setPicking({ kind: "main" }); }, "sm", false, "caret")),
+      h("div", { className: "iris-mrow" },
+        h("div", { className: "iris-mrow-txt" },
+          h("b", null, Icon("tool", "tiny"), " ", t("moAux")),
+          h("small", null, auxOverrideCount > 0
+            ? t("moOverrideN", auxOverrideCount) + " · " + t("moAutoN", AUX_TASKS.length - auxOverrideCount)
+            : t("moTasksAllAuto"))),
+        Btn(t("moConfigure"), function () { setAuxOpen(true); }, "sm", false, "caret")),
+      h("div", { className: "iris-mrow" },
+        h("div", { className: "iris-mrow-txt" },
+          h("b", null, Icon("cpu", "tiny"), " ", t("moMoa")),
+          h("small", null, moa ? t("moRefsN", moaRefCount) + " · " + (moaAgg || t("moUnset")) : t("moNotLoaded"))),
+        Btn(t("moConfigure"), function () { setMoaOpen(true); }, "sm", false, "caret")),
+      picking ? h(ModelPickerModal, {
+        title: t("moSetMain"), scope: "main", task: "", current: { provider: mainProv, model: mainModel },
+        onApply: applyMainPick, onClose: function () { setPicking(null); }
+      }) : null,
+      auxOpen ? h(AuxTasksModal, { aux: aux, onSaved: onSaved, onClose: function () { setAuxOpen(false); } }) : null,
+      moaOpen && moa ? h(MoaModal, { config: moa, onSaved: function (next) { setMoa(next); onSaved(); }, onClose: function () { setMoaOpen(false); } }) : null,
+      h(ReloadConfirm, { model: reloadModel, onClose: function () { setReloadModel(null); } }));
+  }
+  function ModelsPage() {
+    var locale = useLocale(); var t = makeT(locale);
+    var pd = usePersist("iris:models:days", 30); var days = pd[0], setDays = pd[1];
+    var bp = useState(0); var bump = bp[0], setBump = bp[1];
+    var ts = useState(false); var showTokens = ts[0], setShowTokens = ts[1];
+    var ax = useState(null); var auxData = ax[0], setAux = ax[1];
+    var data = useJSON("/api/analytics/models?days=" + days, 60000, bump);
+    // token/cost UI is gated on dashboard.show_token_analytics
+    useEffect(function () {
+      SDK.fetchJSON("/api/config").then(function (cfg) {
+        var dash = (cfg && cfg.dashboard) || {};
+        setShowTokens(dash.show_token_analytics === true);
+      }).catch(function () { setShowTokens(false); });
+    }, []);
+    function refreshAux() {
+      SDK.fetchJSON("/api/model/auxiliary").then(function (r) { setAux(r); }).catch(function () { /* noop */ });
+    }
+    useEffect(function () { refreshAux(); }, []);
+    // assignments change outside this page (config editor, CLI) — refetch on focus
+    useEffect(function () {
+      var last = 0;
+      function onFocus() {
+        if (document.visibilityState !== "visible") return;
+        if (Date.now() - last < 1000) return;
+        last = Date.now();
+        refreshAux();
+      }
+      window.addEventListener("focus", onFocus);
+      document.addEventListener("visibilitychange", onFocus);
+      return function () {
+        window.removeEventListener("focus", onFocus);
+        document.removeEventListener("visibilitychange", onFocus);
+      };
+    }, []);
+    function onAssigned() {
+      refreshAux();
+      setBump(bump + 1);
+    }
+    var totals = (data && data.totals) || {};
+    var models = asList(data, ["models"]);
+    var gridSection;
+    if (!data) {
+      gridSection = Empty(t("moLoading"));
+    } else if (!models.length) {
+      gridSection = h("section", { className: "iris-card" },
+        h("div", { className: "iris-mempty" },
+          Icon("cpu"),
+          h("p", null, t("moNoData")),
+          h("p", { className: "iris-muted" }, t("moStartSession"))));
+    } else {
+      gridSection = h("div", { className: "iris-mgrid" },
+        models.map(function (m, i) {
+          return h(ModelCard, {
+            key: (txt(m.model) || "m" + i) + ":" + txt(m.provider),
+            entry: m, rank: i + 1,
+            main: auxData ? auxData.main : null,
+            aux: auxData ? asList(auxData, ["tasks"]) : [],
+            onAssigned: onAssigned, showTokens: showTokens
+          });
+        }));
+    }
+    return h("div", { className: "iris-page" },
+      PageHead(t("navModels"), t("moDesc"), [
+        Chips([{ v: 7, l: "7d" }, { v: 30, l: "30d" }, { v: 90, l: "90d" }], days, setDays),
+        IconBtn("refresh", onAssigned, t("refresh"))
+      ]),
+      h("div", { className: "iris-cols" },
+        h("div", { className: "iris-col-main" },
+          h(ModelSettingsPanel, { aux: auxData, refreshKey: bump, onSaved: onAssigned })),
+        h("div", { className: "iris-col-side" },
+          h(ModelsStats, { totals: totals, showTokens: showTokens, t: t, locale: locale }))),
+      gridSection);
   }
 
   /* ================= CRON ================= */
@@ -2760,25 +3972,256 @@
   }
 
   /* ================= TOOLSETS ================= */
+  // keyword-based icon, mirroring the native SkillsPage TOOLSET_ICONS map
+  function toolsetIconOf(name) {
+    var k = String(name || "").toLowerCase();
+    var byName = { web: "globe", browser: "globe", files: "file", shell: "term", memory: "brain", scheduler: "clock", voice: "mic" };
+    if (byName[name]) return byName[name];
+    if (k.indexOf("computer") >= 0) return "server";
+    if (k.indexOf("web") >= 0 || k.indexOf("browser") >= 0) return "globe";
+    if (k.indexOf("security") >= 0) return "shield";
+    if (k.indexOf("vision") >= 0 || k.indexOf("image") >= 0) return "eye";
+    if (k.indexOf("design") >= 0) return "pencil";
+    if (k.indexOf("ai") >= 0) return "brain";
+    if (k.indexOf("integration") >= 0) return "plug";
+    if (k.indexOf("code") >= 0 || k.indexOf("shell") >= 0) return "term";
+    if (k.indexOf("automation") >= 0) return "zap";
+    return "tool";
+  }
+  // full config surface for one toolset: toggle, provider matrix, env keys,
+  // and the post-setup install hook with a live log tail (mirrors the native
+  // ToolsetConfigDrawer, rebuilt as an Iris modal)
+  function ToolsetConfigDrawer(props) {
+    var t = props.t, ts = props.toolset;
+    var profile = props.profile;
+    var name = txt(ts.name);
+    var enc = encProfile(name);
+    var pq = profileQuery(profile);
+    var label = txt(ts.label) || name;
+    var platform = txt(ts.platform_label) || txt(ts.platform) || "CLI";
+    var cfg = useState(null); var config = cfg[0], setConfig = cfg[1];
+    var ld = useState(true); var loading = ld[0], setLoading = ld[1];
+    var en = useState(ts.enabled !== false); var enabled = en[0], setEnabled = en[1];
+    var tg = useState(false); var toggling = tg[0], setToggling = tg[1];
+    var actP = useState(null); var activeProvider = actP[0], setActiveProvider = actP[1];
+    var sl = useState(null); var selecting = sl[0], setSelecting = sl[1];
+    var dr = useState({}); var drafts = dr[0], setDrafts = dr[1];
+    var sv = useState(null); var saving = sv[0], setSaving = sv[1];
+    var is = useState({}); var isSet = is[0], setIsSet = is[1];
+    var ps = useState(false); var psRunning = ps[0], setPsRunning = ps[1];
+    var pl = useState([]); var psLog = pl[0], setPsLog = pl[1];
+    var pk = useState(null); var psKey = pk[0], setPsKey = pk[1];
+    var pt = useState(0); var psTrigger = pt[0], setPsTrigger = pt[1];
+
+    function loadConfig() {
+      SDK.fetchJSON("/api/tools/toolsets/" + enc + "/config" + pq).then(function (c2) {
+        setConfig(c2);
+        setActiveProvider(c2.active_provider || null);
+        var seed = {};
+        (c2.providers || []).forEach(function (p) {
+          (p.env_vars || []).forEach(function (ev) { if (ev.is_set) seed[ev.key] = true; });
+        });
+        setIsSet(seed);
+      }).catch(function () { /* keep what we have; grid still toggles */ })
+        .then(function () { setLoading(false); });
+    }
+    useEffect(function () { loadConfig(); }, []);
+    // close on Escape, like the native drawers
+    useEffect(function () {
+      function onKey(e) { if (e.key === "Escape") { e.preventDefault(); props.onClose(); } }
+      document.addEventListener("keydown", onKey, true);
+      return function () { document.removeEventListener("keydown", onKey, true); };
+    }, []);
+    // tail the post-setup action log until it exits
+    useEffect(function () {
+      if (!psTrigger) return undefined;
+      var cancelled = false, timer = null;
+      function poll() {
+        SDK.fetchJSON("/api/actions/tools-post-setup/status?lines=300").then(function (st) {
+          if (cancelled) return;
+          setPsLog(st.lines || []);
+          if (st.running) {
+            timer = setTimeout(poll, 1200);
+          } else {
+            setPsRunning(false);
+            var ok = st.exit_code === 0;
+            toastPush(ok ? t("tsSetupComplete") : t("tsSetupErrors"), ok ? "good" : "err");
+            loadConfig();
+            props.onChanged();
+          }
+        }).catch(function () {
+          if (!cancelled) { setPsRunning(false); toastPush(t("tsSetupLost"), "err"); }
+        });
+      }
+      timer = setTimeout(poll, 800);
+      return function () { cancelled = true; if (timer) clearTimeout(timer); };
+    }, [psTrigger]);
+
+    function toggle(next) {
+      if (toggling) return;
+      setToggling(true);
+      act(t, "/api/tools/toolsets/" + enc, jinit("PUT", { enabled: next, profile: profile }), function (r) {
+        setToggling(false);
+        if (r === null) return;
+        setEnabled(next);
+        toastPush(t("updated"));
+        props.onChanged();
+      });
+    }
+    function selectProvider(p) {
+      if (selecting !== null) return;
+      setSelecting(p.name);
+      act(t, "/api/tools/toolsets/" + enc + "/provider", jinit("PUT", { provider: p.name, profile: profile }), function (r) {
+        setSelecting(null);
+        if (r === null) return;
+        setActiveProvider(p.name);
+        toastPush(t("updated"));
+        props.onChanged();
+      });
+    }
+    function saveKeys(p) {
+      if (saving !== null) return;
+      var env = {};
+      (p.env_vars || []).forEach(function (ev) {
+        var v = (drafts[ev.key] || "").trim();
+        if (v) env[ev.key] = v;
+      });
+      if (!Object.keys(env).length) { toastPush(t("tsEnterValue"), "err"); return; }
+      setSaving(p.name);
+      act(t, "/api/tools/toolsets/" + enc + "/env", jinit("PUT", { env: env, profile: profile }), function (r) {
+        setSaving(null);
+        if (r === null) return;
+        var next = Object.assign({}, isSet);
+        var saved = r.saved || [];
+        if (r.is_set) Object.keys(r.is_set).forEach(function (k) { next[k] = r.is_set[k]; });
+        setIsSet(next);
+        var nd = Object.assign({}, drafts);
+        saved.forEach(function (k) { delete nd[k]; });
+        setDrafts(nd);
+        toastPush(saved.length ? t("tsKeySavedN", saved.length) : t("tsEnterValue"), saved.length ? "good" : "err");
+        props.onChanged();
+      });
+    }
+    function runSetup(p) {
+      if (psRunning) return;
+      setPsRunning(true); setPsLog([]); setPsKey(p.post_setup);
+      act(t, "/api/tools/toolsets/" + enc + "/post-setup", jinit("POST", { key: p.post_setup, profile: profile }), function (r) {
+        if (r === null) { setPsRunning(false); return; }
+        setPsTrigger(psTrigger + 1);
+      });
+    }
+
+    var body = loading ? h("div", { className: "iris-ts-load" }, h("span", { className: "iris-spin" }))
+      : !config || !config.has_category ? h("p", { className: "iris-muted" }, t("tsNoConfigurable"))
+      : !(config.providers && config.providers.length) ? h("p", { className: "iris-muted" }, t("tsNoProviders"))
+      : h("div", { className: "iris-ts-providers" }, config.providers.map(function (p, i) {
+          var isActive = p.name === activeProvider;
+          return h("div", { key: i, className: "iris-ts-provider" + (isActive ? " on" : "") },
+            h("div", { className: "iris-ts-prov-head" },
+              h("b", null, txt(p.name)),
+              p.badge ? Badge(txt(p.badge), "neutral") : null,
+              p.requires_nous_auth ? Badge(t("tsNousPortal"), "neutral") : null,
+              h("span", { className: "iris-spacer" }),
+              isActive ? Badge(t("tsSelected"), "good")
+                : Btn(selecting === p.name ? "…" : t("tsSelect"), function () { selectProvider(p); }, "sm", selecting !== null)),
+            p.tag ? h("p", { className: "iris-ts-prov-tag" }, txt(p.tag)) : null,
+            (p.env_vars && p.env_vars.length) ? h("div", { className: "iris-ts-envs" },
+              (p.env_vars || []).map(function (ev, j) {
+                var saved = !!isSet[ev.key];
+                return h("div", { key: j, className: "iris-ts-env" },
+                  h("div", { className: "iris-ts-env-head" },
+                    h("label", { className: "iris-mono" }, ev.key),
+                    saved ? Badge(t("tsSavedKey"), "good") : null,
+                    ev.url ? h("a", { className: "iris-link", href: ev.url, target: "_blank", rel: "noreferrer" }, t("tsGetKey")) : null),
+                  h("input", {
+                    className: "iris-input", type: "password", autoComplete: "off",
+                    placeholder: saved ? t("tsKeySavedPh") : (txt(ev.prompt) || ev.key),
+                    value: drafts[ev.key] || "",
+                    onChange: function (e) {
+                      var nd = Object.assign({}, drafts); nd[ev.key] = e.target.value;
+                      setDrafts(nd);
+                    }
+                  }));
+              }),
+              h("div", { className: "iris-actions", style: { marginTop: "6px" } },
+                Btn(saving === p.name ? "…" : t("tsSaveKeys"), function () { saveKeys(p); }, "sm primary", saving !== null)))
+            : null,
+            p.post_setup ? h("div", { className: "iris-ts-psetup" },
+              h("p", null, t("tsSetupNeedInstall", p.post_setup)),
+              Btn(psRunning && psKey === p.post_setup ? t("tsInstalling") : t("tsSetupRun"), function () { runSetup(p); }, "sm", psRunning && psKey === p.post_setup))
+            : null);
+        }));
+
+    return h("div", { className: "iris-modal-scrim", onMouseDown: function (e) { if (e.target === e.currentTarget) props.onClose(); } },
+      h("div", { className: "iris-modal iris-modal-lg", role: "dialog", "aria-modal": "true", "aria-label": label },
+        h("div", { className: "iris-modal-head" },
+          h("span", { className: "iris-icbox iris-i" }, Icon(toolsetIconOf(name))),
+          h("div", { className: "iris-modal-title" },
+            h("b", null, label),
+            h("small", null, txt(ts.description) || "")),
+          IconBtn("x", props.onClose, t("cancel"))),
+        h("div", { className: "iris-modal-body" },
+          h("div", { className: "iris-ts-toggle" },
+            Switch(enabled, function () { toggle(!enabled); }, label),
+            h("span", { className: "iris-muted" }, enabled ? t("tsEnabledFor", platform) : t("tsDisabledFor", platform))),
+          body,
+          (psRunning || psLog.length) ? h("div", { className: "iris-ts-pslog" },
+            h("div", { className: "iris-ts-pslog-head" },
+              Icon("term", "sm"), h("span", { className: "iris-mono" }, t("tsSetupTitle", psKey || "")),
+              psRunning ? h("span", { className: "iris-spacer" }) : null,
+              psRunning ? h("span", { className: "iris-live-dot" }) : null),
+            h("pre", null, psLog.length ? psLog.join("\n") : t("tsStarting"))) : null),
+        h("div", { className: "iris-modal-foot" },
+          Btn(t("cancel"), props.onClose))));
+  }
   function ToolsetsPage() {
     var locale = useLocale(); var t = makeT(locale);
     var bp = useState(0); var bump = bp[0], setBump = bp[1];
-    var data = useJSON("/api/tools/toolsets", 60000, bump);
+    var flt = useState("all"); var fltProfile = flt[0], setFltProfile = flt[1];
+    var qs = useState(""); var q = qs[0], setQ = qs[1];
+    var cs = useState(null); var configTS = cs[0], setConfigTS = cs[1];
+    var data = useJSON("/api/tools/toolsets" + profileQuery(fltProfile), 60000, bump);
+    var profiles = asList(useJSON("/api/profiles", 0), ["profiles"]);
     var reload = function () { setBump(bump + 1); };
+    var selProfile = fltProfile !== "all" && fltProfile !== "default" ? fltProfile : undefined;
     var sets = asList(data, ["toolsets", "items"]);
+    var needle = q.trim().toLowerCase();
+    var shown = sets.filter(function (s2) {
+      if (!needle) return true;
+      return ((txt(s2.name) + " " + txt(s2.label) + " " + txt(s2.description)).toLowerCase().indexOf(needle) >= 0);
+    });
     return h("div", { className: "iris-page" },
-      PageHead(t("tsTitle"), t("tsDesc"), null),
-      h("div", { className: "iris-cards" }, sets.map(function (s2, i) {
+      PageHead(t("tsTitle"), t("tsDesc"), [
+        h("div", { className: "iris-field", style: { minWidth: "180px", margin: 0 } },
+          h("label", null, t("profileFilter")),
+          h("select", { className: "iris-input", value: fltProfile,
+            onChange: function (e) { setFltProfile(e.target.value); } },
+            h("option", { value: "all" }, t("allProfiles")),
+            profiles.map(function (pr, i) { return h("option", { key: i, value: txt(pr.name) }, txt(pr.name) || t("pfDefault")); })))]),
+      h("div", { className: "iris-filterbar" },
+        h("input", { className: "iris-input", type: "search", placeholder: t("tsSearch"), value: q,
+          onChange: function (e) { setQ(e.target.value); } })),
+      shown.length ? h("div", { className: "iris-cards" }, shown.map(function (s2, i) {
         var on = s2.enabled !== false;
-        var tsIcons = { web: "globe", browser: "globe", files: "file", shell: "term", memory: "brain", scheduler: "clock", voice: "mic" };
+        var tools = Array.isArray(s2.tools) ? s2.tools.filter(Boolean) : [];
+        var label = txt(s2.label) || txt(s2.name);
         return h("div", { className: "iris-mini", key: i, style: on ? null : { opacity: 0.6 } },
-          h("div", { className: "mc-head" }, Icon(tsIcons[s2.name] || "tool", "dim"), h("b", null, s2.label || s2.name),
-            Switch(on, function () { actToast(t, "/api/tools/toolsets/" + s2.name, jinit("PUT", { enabled: !on }), t("updated"), reload); }, s2.label || s2.name)),
-          h("p", null, s2.description || ""),
+          h("div", { className: "mc-head" }, Icon(toolsetIconOf(txt(s2.name)), "dim"), h("b", null, label),
+            Badge(on ? t("tsActive") : t("tsInactive"), on ? "good" : "neutral"),
+            Switch(on, function () {
+              actToast(t, "/api/tools/toolsets/" + encProfile(txt(s2.name)), jinit("PUT", { enabled: !on, profile: selProfile }), t("updated"), reload);
+            }, label)),
+          h("p", null, txt(s2.description) || ""),
+          on && s2.configured === false ? h("div", { className: "iris-ts-warn" }, Icon("alert", "sm"), t("tsSetupNeeded")) : null,
+          tools.length ? h("div", { className: "iris-badges" }, tools.map(function (tool, ti) {
+            return h("span", { className: "iris-badge neutral iris-mono", key: ti }, txt(tool));
+          })) : h("span", { className: "iris-muted" }, on ? t("tsToolsetLabel", label) : t("tsDisabledForCli")),
           h("div", { className: "mc-foot" },
-            h("span", null, t("toolsN", (s2.tools || []).length)),
-            s2.configured === false ? Badge(t("notConfigured"), "warn") : null));
-      })));
+            h("span", null, t("toolsN", tools.length)),
+            h("span", { className: "iris-spacer" }),
+            Btn(t("tsConfigure"), function () { setConfigTS(s2); }, "sm primary", false, "cog")));
+      })) : Card(null, null, Empty(t("tsNoMatch"))),
+      configTS ? h(ToolsetConfigDrawer, { t: t, toolset: configTS, profile: selProfile, onClose: function () { setConfigTS(null); }, onChanged: reload }) : null);
   }
 
   /* ================= CHANNELS ================= */
@@ -3828,6 +5271,7 @@ Btn(t("curatorRunNow"), function () { actToast(t, "/api/curator/run", jinit("POS
   window.__IRIS_PAGES__ = {
     "iris-sessions": SessionsPage,
     "iris-analytics": AnalyticsPage,
+    "iris-models": ModelsPage,
     "iris-cron": CronPage,
     "iris-webhooks": WebhooksPage,
     "iris-skills": SkillsPage,

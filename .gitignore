@@ -6,3 +6,6 @@ mockup/
 
 # graphify analysis output
 graphify-out/
+
+# agent local guidance — not part of the shipped pack
+AGENTS.md

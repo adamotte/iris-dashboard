@@ -1,0 +1,12 @@
+{
+  "name": "iris-models",
+  "label": "Models",
+  "description": "Iris redesigned page: Models",
+  "icon": "Sparkles",
+  "version": "0.1.0",
+  "entry": "dist/index.js",
+  "tab": {
+    "path": "/models",
+    "override": "/models"
+  }
+}

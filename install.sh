@@ -69,6 +69,13 @@ echo "→ Installing the iris-dark / iris-light themes…"
 mkdir -p "$HERMES_HOME/dashboard-themes"
 cp "$SRC_DIR/themes/iris-dark.yaml" "$SRC_DIR/themes/iris-light.yaml" "$HERMES_HOME/dashboard-themes/"
 
+# The /chat page embeds the real Hermes TUI, which follows the CLI skin
+# (display.skin), not the dashboard theme. Ship the matching `iris` skin so the
+# embedded terminal picks up the same palette as iris-dark.
+echo "→ Installing the iris CLI skin (embedded chat TUI)…"
+mkdir -p "$HERMES_HOME/skins"
+cp "$SRC_DIR/skins/iris.yaml" "$HERMES_HOME/skins/iris.yaml"
+
 # Since the #46435 hardening, user dashboard plugins are only served when
 # listed under plugins.enabled in config.yaml. Each iris plugin ships a
 # plugin.yaml, so `hermes plugins enable iris-*` also works — but the key is
@@ -106,6 +113,35 @@ else
   echo "    plugins.enabled: $IRIS_PLUGINS"
 fi
 
+# Default the CLI skin to `iris` so the embedded chat TUI matches iris-dark.
+# Only sets it when no display.skin is configured yet — a user's own skin wins.
+echo "→ Defaulting the CLI skin to iris…"
+if python3 - "$CFG" <<'PY' 2>/dev/null
+import os, sys, pathlib
+try:
+    import yaml
+except ImportError:
+    sys.exit(1)
+p = pathlib.Path(sys.argv[1])
+cfg = (yaml.safe_load(p.read_text()) if p.exists() else {}) or {}
+display = cfg.setdefault("display", {})
+if not display.get("skin"):
+    display["skin"] = "iris"
+    p.write_text(yaml.safe_dump(cfg, sort_keys=False, allow_unicode=True))
+sys.exit(0)
+PY
+then
+  echo "  display.skin = iris (change it with /skin or config.yaml)."
+elif [ ! -f "$CFG" ] || ! grep -qE '^display:' "$CFG"; then
+  { printf '\ndisplay:\n  skin: iris\n'; } >> "$CFG"
+  echo "  display.skin = iris (change it with /skin or config.yaml)."
+else
+  echo "  ⚠ Could not set display.skin automatically (python3+PyYAML unavailable"
+  echo "    and a display: section already exists). Set it manually:"
+  echo "      display:"
+  echo "        skin: iris"
+fi
+
 echo "→ Rescanning plugins…"
 if curl -fsS "$DASH_URL/api/dashboard/plugins/rescan" >/dev/null 2>&1; then
   echo "  plugins reloaded."
@@ -124,11 +160,14 @@ cat <<'EOF'
      the new home page replaces Status.
   2. Palette icon (header) → « Iris (sombre) » or « Iris (clair) ».
   3. On mobile, a bottom navigation bar appears automatically.
+  4. The chat tab follows the Iris palette too: the embedded terminal uses the
+     CLI skin (display.skin = iris, set above).
 
 Update:     git pull, then run this script again (or use the per-plugin
             « Update » button on the Plugins page — each install is a git
             checkout of its own branch, so hermes plugins update works).
 Uninstall:
   rm -rf <hermes-home>/plugins/iris <hermes-home>/dashboard-themes/iris-*.yaml
+  rm -f <hermes-home>/skins/iris.yaml
   (and remove "iris" from plugins.enabled in <hermes-home>/config.yaml)
 EOF

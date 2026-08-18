@@ -1,0 +1,94 @@
+# Iris — CLI skin (terminal + dashboard-embedded chat TUI).
+#
+# The dashboard's /chat page embeds the real Hermes TUI; that TUI follows the
+# CLI skin (display.skin), not the dashboard theme. This skin carries the
+# iris-dark palette into the terminal so the embedded chat matches the
+# dashboard when both are selected. Drop into ~/.hermes/skins/, then
+# `display.skin: iris` in config.yaml (or /skin iris, session-only).
+# Missing values inherit from the built-in `default` skin.
+name: iris
+description: Iris — violet profond, arc spectral, messager d'Hermès
+
+colors:
+  banner_border: "#8b80f9"
+  banner_title: "#b3aaff"
+  banner_accent: "#8b80f9"
+  banner_dim: "#8c8a9c"
+  banner_text: "#f0eff7"
+  ui_accent: "#8b80f9"
+  ui_label: "#b3aaff"
+  ui_ok: "#22b573"
+  ui_error: "#e05a6b"
+  ui_warn: "#fab219"
+  ui_tool: "#8b80f9"
+  ui_thinking: "#b3aaff"
+  diff_added: "#22b573"
+  diff_removed: "#e05a6b"
+  diff_added_word: "#2fae72"
+  diff_removed_word: "#f0717e"
+  syntax_string: "#9ee6b0"
+  syntax_number: "#c9a0ff"
+  syntax_keyword: "#8b80f9"
+  syntax_comment: "#8c8a9c"
+  prompt: "#f0eff7"
+  input_rule: "#8b80f9"
+  response_border: "#8b80f9"
+  status_bar_bg: "#16151d"
+  status_bar_text: "#aaa8bb"
+  status_bar_strong: "#f0eff7"
+  status_bar_dim: "#8c8a9c"
+  status_bar_good: "#22b573"
+  status_bar_warn: "#fab219"
+  status_bar_bad: "#e05a6b"
+  status_bar_critical: "#e05a6b"
+  session_label: "#b3aaff"
+  session_border: "#232230"
+  voice_status_bg: "#16151d"
+  selection_bg: "#2a2840"
+  completion_menu_bg: "#16151d"
+  completion_menu_current_bg: "#232136"
+  completion_menu_meta_bg: "#16151d"
+  completion_menu_meta_current_bg: "#232136"
+
+spinner:
+  waiting_faces:
+    - "(❀)"
+    - "(✿)"
+    - "(◕)"
+  thinking_faces:
+    - "(❀)"
+    - "(⌁)"
+    - "(<>)"
+  thinking_verbs:
+    - "blending the spectrum"
+    - "weaving the arc"
+    - "mixing the palette"
+    - "delivering the message"
+  wings:
+    - ["⟪❀", "❀⟫"]
+    - ["⟪", "⟫"]
+
+branding:
+  agent_name: "Iris"
+  welcome: "Welcome to Iris — your Hermes control center."
+  goodbye: "Goodbye! ⚕"
+  response_label: " ⚕ Iris "
+  prompt_symbol: "❯"
+  help_header: "(❀) Available Commands"
+
+tool_prefix: "❀"
+
+# Per-tool emoji overrides (optional)
+tool_emojis:
+  web_search: "🔮"
+  read_file: "📄"
+  terminal: "🖥️"
+
+# Custom ASCII art banner — the Iris spectral arc (Rich markup supported)
+banner_logo: |
+  [bold #8b80f9]Iris[/]
+
+banner_hero: |
+  [#e05a6b]─────[#e8a13c]─────[#2fae72]─────[#3f8fdf]─────[#7668e8]─────[#a75ce0]─────[/]
+  [bold #8b80f9]  ❀  Hermes Agent  ❀  [/]
+  [#e05a6b]─────[#e8a13c]─────[#2fae72]─────[#3f8fdf]─────[#7668e8]─────[#a75ce0]─────[/]

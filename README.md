@@ -22,15 +22,19 @@
   recent sessions, pending pairings, channel and system health at a glance
 - 🧭 **Grouped sidebar** with icons: Automation, Capabilities, Connectivity,
   Administration
-- 🖥️ **Every page redesigned**: Sessions, Analytics, Cron, Webhooks, Skills,
-  MCP, Toolsets, Plugins, Channels, Pairing, Profiles, Config, API Keys, Logs,
-  System — with their actions (create/run/pause cron, toggle skills, gateway
-  control, approve pairings, edit config and keys, live log tail…)
+- 🖥️ **Every page redesigned**: Sessions, Analytics, Models, Cron, Webhooks,
+  Skills, MCP, Toolsets, Plugins, Channels, Pairing, Profiles, Config, API Keys,
+  Logs, System — with their actions (create/run/pause cron, toggle skills,
+  gateway control, approve pairings, switch main/aux models and MoA presets,
+  edit config and keys, live log tail…)
 - 🎨 **Two themes** — `iris-dark` / `iris-light`, contrast and color-blindness
   validated, spectral-arc signature
+- 💬 **Chat skin** — the `/chat` terminal follows the CLI skin, so a matching
+  `iris` skin (`~/.hermes/skins/iris.yaml`) paints the embedded TUI with the
+  Iris palette; `display.skin: iris` is set by default at install
 - 📱 **Mobile** — bottom navigation bar, responsive pages
 - 🌍 **EN / FR** labels, following the dashboard language
-- 🛡️ **Additive** — native pages (Chat, Files, Models, Docs) keep working;
+- 🛡️ **Additive** — native pages (Chat, Files, Docs) keep working;
   disable any Iris page (Plugins page toggle, or `hermes plugins disable`)
   to get the native one back
 - 📦 **Native plugins** — each Iris page ships a standard `plugin.yaml`, so
@@ -46,12 +50,14 @@ cd iris-dashboard
 ./install.sh
 ```
 
-`install.sh` installs the 16 plugins (`iris*`) into `~/.hermes/plugins/` as git
+`install.sh` installs the 17 plugins (`iris*`) into `~/.hermes/plugins/` as git
 checkouts of their per-plugin branches (so the « Update » button and
 `hermes plugins update` work), registers them under `plugins.enabled` in
 `config.yaml` (required for user dashboard plugins since the #46435 hardening),
-copies the two themes into `~/.hermes/dashboard-themes/`, and rescans the
-dashboard.
+copies the two themes into `~/.hermes/dashboard-themes/`, copies the `iris`
+CLI skin into `~/.hermes/skins/` (defaulting `display.skin: iris` — the
+embedded chat TUI follows the CLI skin, not the dashboard theme), and rescans
+the dashboard.
 
 ### 🐳 Docker (official `nousresearch/hermes-agent` image)
 
@@ -66,16 +72,18 @@ work despite the host-owned volume.
 
 ### 📦 Plugin pack (Hermes builds with pack support)
 
-`hermes-pack.yaml` pins all 16 plugins to a single commit of this repo:
+`hermes-pack.yaml` pins all 17 plugins to a single commit of this repo:
 
 ```bash
 hermes plugins pack install ./hermes-pack.yaml   # interactive review + confirm
 for p in iris iris-analytics iris-channels iris-config iris-cron iris-keys \
-         iris-logs iris-mcp iris-pairing iris-plugins iris-profiles \
-         iris-sessions iris-skills iris-system iris-toolsets iris-webhooks; do
+         iris-logs iris-mcp iris-models iris-pairing iris-plugins \
+         iris-profiles iris-sessions iris-skills iris-system iris-toolsets \
+         iris-webhooks; do
   hermes plugins enable "$p"
 done
 cp themes/iris-*.yaml ~/.hermes/dashboard-themes/
+cp skins/iris.yaml ~/.hermes/skins/
 ```
 
 Packs install pinned snapshots: they do not enable anything, do not cover themes,
@@ -89,6 +97,9 @@ snapshot — bump it to the new release commit on each release
    and triggers a rescan.
 2. Reload the dashboard — the Iris pages replace the native ones.
 3. Pick **Iris (sombre)** or **Iris (clair)** via the palette icon in the header.
+4. The `/chat` terminal is painted by the CLI skin, not the dashboard theme:
+   `install.sh` already sets `display.skin: iris` (unless one was configured).
+   Change it with `/skin` (session-only) or `display.skin` in `config.yaml`.
 
 Each Iris plugin ships a standard `plugin.yaml`, so the usual CLI management
 applies: `hermes plugins list`, `hermes plugins enable/disable/remove iris-*`.
@@ -96,18 +107,20 @@ applies: `hermes plugins list`, `hermes plugins enable/disable/remove iris-*`.
 ## 🗑️ Uninstall
 
 ```bash
-rm -rf ~/.hermes/plugins/iris* ~/.hermes/dashboard-themes/iris-*.yaml
+rm -rf ~/.hermes/plugins/iris* ~/.hermes/dashboard-themes/iris-*.yaml \
+       ~/.hermes/skins/iris.yaml
 ```
 
 Or, since the plugins are native:
 
 ```bash
 for p in iris iris-analytics iris-channels iris-config iris-cron iris-keys \
-         iris-logs iris-mcp iris-pairing iris-plugins iris-profiles \
-         iris-sessions iris-skills iris-system iris-toolsets iris-webhooks; do
+         iris-logs iris-mcp iris-models iris-pairing iris-plugins \
+         iris-profiles iris-sessions iris-skills iris-system iris-toolsets \
+         iris-webhooks; do
   hermes plugins remove "$p"
 done
-rm -f ~/.hermes/dashboard-themes/iris-*.yaml
+rm -f ~/.hermes/dashboard-themes/iris-*.yaml ~/.hermes/skins/iris.yaml
 ```
 
 The native dashboard comes back immediately.

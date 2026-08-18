@@ -116,3 +116,22 @@ customCSS: |
     #app-sidebar > div:first-child { visibility: hidden; }
     #app-sidebar [aria-label="Collapse"] { display: none; }
   }
+  /* ---- Iris chat page chrome (native /chat page) ----
+     The chat page embeds the real Hermes TUI; the TUI content is painted by
+     the CLI skin (skins/iris.yaml, display.skin), so here we only frame the
+     pane and rail. `[data-chat-active="true"]` is the persistent chat host;
+     the mobile side panel is portaled to <body>, so it stays out of scope. */
+  [data-chat-active="true"] div:has(> .hermes-chat-xterm-host) {
+    background: var(--color-card, #ffffff) !important;
+    box-shadow: var(--iris-shadow-pop, 0 12px 40px rgba(26,24,44,.14)) !important;
+  }
+  [data-chat-active="true"] .hermes-chat-xterm-host {
+    border: 1px solid var(--color-border, rgba(26,24,44,.09));
+    border-radius: calc(var(--radius, .8rem) - 2px);
+  }
+  [data-chat-active="true"] #chat-side-panel {
+    background: var(--color-card, #ffffff);
+    border: 1px solid var(--color-border, rgba(26,24,44,.09));
+    border-radius: var(--radius, .8rem);
+    padding: 10px;
+  }
