@@ -4209,7 +4209,7 @@
       PageHead(t("tsTitle"), t("tsDesc"), [
         Btn(showInactive ? t("tsActiveBtn", activeCount) : t("tsInactiveBtn", sets.length - activeCount),
           function () { setShowInactive(!showInactive); }, "", false, showInactive ? "eye" : "eyeOff"),
-        h("div", { className: "iris-field", style: { minWidth: "180px", margin: 0 } },
+        h("div", { className: "iris-field-inline" },
           h("label", null, t("profileFilter")),
           h("select", { className: "iris-input", value: fltProfile,
             onChange: function (e) { setFltProfile(e.target.value); } },
