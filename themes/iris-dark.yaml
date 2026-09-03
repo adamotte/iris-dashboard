@@ -15,7 +15,9 @@ palette:
     alpha: 1
   noiseOpacity: 0
 
-colors:
+# colorOverrides: the v0.21 first-class mechanism. Each key maps 1:1 to the
+# --color-<kebab> CSS var and wins over the palette cascade for this theme.
+colorOverrides:
   card: "#16151d"
   cardForeground: "#f0eff7"
   popover: "#1d1c26"
@@ -32,7 +34,7 @@ colors:
   destructiveForeground: "#f0eff7"
   success: "#22b573"
   warning: "#fab219"
-  border: "#232230"
+  border: "rgba(255,255,255,.07)"
   input: "#1d1c26"
   ring: "#8b80f9"
 
@@ -62,31 +64,11 @@ componentStyles:
     background: "#16151d"
 
 customCSS: |
-  /* The v0.20 shell derives every --color-* token from the palette alone and
-     ignores the colors/layout blocks above: force the Iris tokens here. */
+  /* Colors now come from colorOverrides: (v0.21 first-class mechanism).
+     customCSS keeps only Iris-specific chrome the YAML cannot express:
+     fonts, the spectral arc, the grouped-nav sidebar and the chat page. */
   :root:root {
-    --color-primary: #8b80f9 !important;
-    --color-primary-foreground: #0f0e15 !important;
-    --color-accent: #8b80f9 !important;
-    --color-accent-foreground: #0f0e15 !important;
-    --color-ring: #8b80f9 !important;
-    --color-destructive: #e05a6b !important;
-    --color-success: #22b573 !important;
-    --color-warning: #fab219 !important;
-    --color-card: #16151d !important;
-    --color-card-foreground: #f0eff7 !important;
-    --color-popover: #1d1c26 !important;
-    --color-popover-foreground: #f0eff7 !important;
-    --color-secondary: #1d1c26 !important;
-    --color-secondary-foreground: #aaa8bb !important;
-    --color-muted: #1d1c26 !important;
-    --color-muted-foreground: #8c8a9c !important;
-    --color-border: rgba(255,255,255,.07) !important;
-    --color-input: #1d1c26 !important;
     --theme-font-mono: 'JetBrains Mono', ui-monospace, monospace !important;
-    --theme-line-height: 1.5 !important;
-    --theme-radius: .8rem !important;
-    --radius: .8rem !important;
     /* Iris chart/series + surface tokens (mockup) */
     --iris-series-1: #7668e8;
     --iris-series-2: #199e70;
