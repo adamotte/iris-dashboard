@@ -6,7 +6,7 @@
    - Grouped sidebar (desktop) + bottom bar (mobile) via the overlay
      slot; client-side navigation through pushState + popstate.
    - Read endpoints degrade to "—"; actions call the real API routes
-     verified against hermes-agent v0.20.
+      verified against hermes-agent v0.21.
    - i18n: built-in EN/FR catalog following the dashboard locale.
    ============================================================= */
 (function () {
@@ -137,7 +137,12 @@
       modeAgent: "agent", modeScript: "script+agent", modeNoAgent: "no_agent",
       modelTag: "model", badgeSkills: "skills", badgeToolsets: "toolsets",
       repeat: "repeat", forever: "forever",
-      lastError: "last error", deliveryError: "delivery error",
+      continuity: "continuity", reasoningEffort: "reasoning effort", modeMonitor: "monitor",
+      continuityLbl: "continuity: carry the previous run's output into the next run",
+      reasoningEffortLbl: "Reasoning effort",
+      reasoningEffortHint: "Pin a per-job thinking level (overrides global config). Leave empty to follow config.",
+      lastError: "last error", deliveryError: "delivery error", missedFire: "missed scheduled fire",
+      failureStreak: "N failed runs in a row", notepadBadge: "notepad",
       tabJobs: "Jobs", tabBlueprints: "Blueprints",
       bpLoading: "Loading blueprints…", bpNone: "No automation blueprints available.",
       bpLoadError: "Couldn't load blueprints", bpSetup: "Set up", bpScheduled: "scheduled",
@@ -429,7 +434,12 @@
       modeAgent: "agent", modeScript: "script+agent", modeNoAgent: "no_agent",
       modelTag: "modèle", badgeSkills: "skills", badgeToolsets: "toolsets",
       repeat: "répétition", forever: "permanent",
-      lastError: "dernière erreur", deliveryError: "erreur de livraison",
+      continuity: "continuité", reasoningEffort: "effort de raisonnement", modeMonitor: "moniteur",
+      continuityLbl: "continuité : reporter la sortie de l'exécution précédente dans la suivante",
+      reasoningEffortLbl: "Effort de raisonnement",
+      reasoningEffortHint: "Pincer un niveau de réflexion par job (outrepasse la config globale). Laisser vide pour suivre la config.",
+      lastError: "dernière erreur", deliveryError: "erreur de livraison", missedFire: "exécution planifiée manquée",
+      failureStreak: "{0} exécutions ratées d'affilée", notepadBadge: "notepad",
       tabJobs: "Jobs", tabBlueprints: "Plans",
       bpLoading: "Chargement des plans…", bpNone: "Aucun plan d'automatisation disponible.",
       bpLoadError: "Impossible de charger les plans", bpSetup: "Configurer", bpScheduled: "programmé",
@@ -728,6 +738,7 @@
   function profileQuery(p) { return p && p !== "all" && p !== "default" ? "?profile=" + encProfile(p) : ""; }
   function jobMode(j) {
     if (j.no_agent) return "no_agent";
+    if (j.monitor || j.monitor_mode) return "monitor";
     if (txt(j.script)) return "script+agent";
     return "agent";
   }
@@ -735,10 +746,13 @@
     var out = [];
     out.push(Badge(jobProfile(j), "neutral"));
     var md = jobMode(j);
-    var mdl = md === "no_agent" ? t("modeNoAgent") : md === "script+agent" ? t("modeScript") : t("modeAgent");
+    var mdl = md === "no_agent" ? t("modeNoAgent") : md === "script+agent" ? t("modeScript") : md === "monitor" ? t("modeMonitor") : t("modeAgent");
     out.push(Badge(mdl, "neutral"));
     var m = txt(j.model);
     if (m) out.push(Badge(t("modelTag") + " " + m, "neutral"));
+    if (j.continuity) out.push(Badge(t("continuity"), "neutral"));
+    var re = txt(j.reasoning_effort);
+    if (re) out.push(Badge(t("reasoningEffort") + " " + re, "neutral"));
     if (Array.isArray(j.skills) && j.skills.length) {
       out.push(Badge(t("badgeSkills") + " " + j.skills.filter(Boolean).slice(0, 3).join(", ") + (j.skills.length > 3 ? " +" + (j.skills.length - 3) : ""), "neutral"));
     }
@@ -1117,6 +1131,8 @@
       out.context_from = String(f.context_from).split(/[\n,]/).map(function (x) { return x.trim(); }).filter(Boolean);
     }
     if (f.enabled_toolsets && f.enabled_toolsets.length) out.enabled_toolsets = f.enabled_toolsets;
+    if (f.continuity) out.continuity = true;
+    if (f.reasoning_effort) out.reasoning_effort = f.reasoning_effort;
     return out;
   }
   function CheckList(props) {
@@ -1220,6 +1236,8 @@
     var wd = useState(isEdit ? txt(job.workdir) : "");
     var cf = useState(isEdit ? (Array.isArray(job.context_from) ? job.context_from.join("\n") : txt(job.context_from)) : "");
     var ts = useState(isEdit ? (Array.isArray(job.enabled_toolsets) ? job.enabled_toolsets.filter(Boolean) : []) : []);
+    var co = useState(!!(isEdit && job.continuity));
+    var re = useState(isEdit ? txt(job.reasoning_effort) : "");
     var err = useState(null);
     var pq = "?profile=" + encProfile(profile);
     var targets = res.targets || [];
@@ -1236,7 +1254,8 @@
         name: n[0], prompt: p[0], schedule: schedule, deliver: d[0],
         skills: sk[0], provider: pr[0], model: mo[0], base_url: bu[0],
         no_agent: na[0], script: sc[0], workdir: wd[0],
-        context_from: cf[0], enabled_toolsets: ts[0]
+        context_from: cf[0], enabled_toolsets: ts[0],
+        continuity: co[0], reasoning_effort: re[0]
       });
       if (!payload.no_agent && !String(payload.prompt || "").trim() && !payload.script && !(payload.skills && payload.skills.length)) {
         err[1](t("errContentReq")); return;
@@ -1261,7 +1280,7 @@
         h("select", { className: "iris-input", value: d[0], onChange: function (e) { d[1](e.target.value); } },
           targets.map(function (tg, i) {
             var lbl = tg.id === "local" ? t("deliveryLocal") : (txt(tg.name) || tg.id);
-            if (tg.id !== "local" && !tg.home_target_set) lbl += " — " + t("homeChannelFirst");
+            if (tg.id !== "local" && tg.home_target_set === false && tg.id.indexOf("bot-chat") !== 0) lbl += " — " + t("homeChannelFirst");
             return h("option", { key: i, value: tg.id }, lbl);
           }),
           d[0] && !targets.some(function (x) { return x.id === d[0]; }) ? h("option", { value: d[0] }, d[0]) : null),
@@ -1294,6 +1313,18 @@
               h("input", { className: "iris-input", placeholder: t("scriptPh"), value: sc[0], onChange: function (e) { sc[1](e.target.value); } }))),
           h("div", { className: "iris-field" }, h("label", null, t("workdirLbl")),
             h("input", { className: "iris-input", placeholder: t("workdirPh"), value: wd[0], onChange: function (e) { wd[1](e.target.value); } })),
+          h("div", { className: "iris-field-row" },
+            h("div", { className: "iris-field" }, h("label", { className: "iris-check" },
+              h("input", { type: "checkbox", checked: co[0], onChange: function (e) { co[1](e.target.checked); } }),
+              h("span", null, t("continuityLbl")))),
+            h("div", { className: "iris-field" }, h("label", null, t("reasoningEffortLbl")),
+              h("select", { className: "iris-input", value: re[0], onChange: function (e) { re[1](e.target.value); } },
+                h("option", { value: "" }, t("defaultOpt")),
+                ["none", "minimal", "low", "medium", "high", "xhigh", "max", "ultra"].map(function (lv, i) {
+                  return h("option", { key: i, value: lv }, lv);
+                }),
+                re[0] && ["none", "minimal", "low", "medium", "high", "xhigh", "max", "ultra"].indexOf(re[0]) < 0 ? h("option", { value: re[0] }, re[0]) : null),
+              h("small", { className: "iris-muted" }, t("reasoningEffortHint")))),
           h("div", { className: "iris-field" }, h("label", null, t("contextFromLbl")),
             h("textarea", { className: "iris-input iris-textarea", placeholder: t("contextFromPh"), value: cf[0], onChange: function (e) { cf[1](e.target.value); } })),
           h("div", { className: "iris-field" }, h("label", null, t("toolsetsLbl")),
@@ -3480,12 +3511,19 @@
             else lastBadge = Badge(txt(lastStatus), "warn");
           }
           var jUntil = nr ? timeUntil(nr, locale) : "";
-          var jobErr = txt(j.last_error) || txt(j.last_delivery_error);
+          // last_run / delivery / missed-fire errors — mishandled runs show a
+          // dot; v0.21 can also surface delivery_failed, delivery_unverified,
+          // blocked_config and last_fire_error (missed scheduled fire).
+          var lastFireErr = txt(j.last_fire_error);
+          var jobErr = txt(j.last_error) || txt(j.last_delivery_error) || lastFireErr;
           var jobErrTitle = txt(j.last_error) ? t("lastError") + ": " + txt(j.last_error)
-            : t("deliveryError") + ": " + txt(j.last_delivery_error);
+            : txt(j.last_delivery_error) ? t("deliveryError") + ": " + txt(j.last_delivery_error)
+            : lastFireErr ? t("missedFire") + ": " + lastFireErr : "";
+          var failStreak = j.failure_streak != null && isFinite(Number(j.failure_streak)) && Number(j.failure_streak) > 0 ? Number(j.failure_streak) : 0;
           return h("tr", { key: i, style: isPaused ? { opacity: .55 } : undefined },
             h("td", null, h("b", null, txt(j.name) || id), h("br"),
               h("small", { className: "iris-muted iris-cron-prompt", title: promptTxt || "" }, promptTxt || ""),
+              txt(j.notepad) ? h("div", { className: "iris-badges" }, h("span", { className: "iris-badge neutral", title: txt(j.notepad), "aria-label": txt(j.notepad) }, t("notepadBadge"))) : null,
               h("div", { className: "iris-badges" }, jobBadges(j, t))),
             h("td", { className: "hide-m" },
               h("span", { className: "iris-mono" }, exprStr || dispStr),
@@ -3494,7 +3532,8 @@
             h("td", null, Badge(isPaused ? t("paused") : t("active"), isPaused ? "neutral" : "good")),
             h("td", { className: "r num hide-m", style: { whiteSpace: "nowrap" } }, lr
               ? h(React.Fragment, null, fmtRel(lr, t, locale) || String(lr).slice(5, 16), lastBadge ? " " : null, lastBadge,
-                  jobErr ? " " : null, jobErr ? h("span", { title: jobErrTitle, className: "iris-err-dot", "aria-label": jobErrTitle }) : null)
+                  jobErr ? " " : null, jobErr ? h("span", { title: jobErrTitle, className: "iris-err-dot", "aria-label": jobErrTitle }) : null,
+                  failStreak ? " " : null, failStreak ? Badge(t("failureStreak", failStreak), "warn") : null)
               : "—"),
             h("td", { className: "r num" }, (!isPaused && nr)
               ? h(React.Fragment, null, h("b", null, fmtNextRun(nr) || "—"),
